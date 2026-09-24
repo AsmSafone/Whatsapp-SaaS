@@ -10268,7 +10268,7 @@
           "apiKey": {
             "type": "string",
             "description": "Full API key (only shown once at creation)",
-            "example": "owa_k1_abc123..."
+            "example": "zap_k1_abc123..."
           }
         },
         "required": [
@@ -10616,7 +10616,7 @@
           "apiKey": {
             "type": "string",
             "description": "Session-scoped operator API key, returned once at create for a Zaptura account.",
-            "example": "owa_k1_..."
+            "example": "zap_k1_..."
           }
         },
         "required": [

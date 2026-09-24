@@ -27,7 +27,7 @@ class TestClientCore:
         backend = MockBackend().on("GET", "/api/sessions", body=[])
         client = make_client(backend)
         client.sessions.list()
-        assert backend.last_call.headers["x-api-key"] == "owa_k1_test"
+        assert backend.last_call.headers["x-api-key"] == "zap_k1_test"
         assert backend.last_call.headers["content-type"] == "application/json"
 
     def test_default_headers_cannot_override_api_key(self):

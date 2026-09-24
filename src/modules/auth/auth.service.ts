@@ -27,7 +27,7 @@ import { looksLikeJwt } from './user-token';
 /**
  * Resolves the API key to seed on first boot (when no keys exist yet).
  * Precedence: an explicit `API_MASTER_KEY` always wins; otherwise a
- * cryptographically random `owa_k1_` key is generated — the secure default,
+ * cryptographically random `zap_k1_` key is generated — the secure default,
  * including in non-production. The legacy fixed `dev-admin-key` is used only when
  * a developer explicitly opts in with `ALLOW_DEV_API_KEY=true`, never by default.
  */
@@ -38,7 +38,7 @@ export function resolveSeedApiKey(): string {
   if (process.env.ALLOW_DEV_API_KEY === 'true') {
     return 'dev-admin-key';
   }
-  return `owa_k1_${randomBytes(32).toString('hex')}`;
+  return `zap_k1_${randomBytes(32).toString('hex')}`;
 }
 
 /**
@@ -182,8 +182,8 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     dto: CreateApiKeyDto,
     extras?: { userId?: string | null },
   ): Promise<{ apiKey: ApiKey; rawKey: string }> {
-    // Generate secure random key: owa_k1_<32 bytes hex>
-    const rawKey = `owa_k1_${randomBytes(32).toString('hex')}`;
+    // Generate secure random key: zap_k1_<32 bytes hex>
+    const rawKey = `zap_k1_${randomBytes(32).toString('hex')}`;
     const keyHash = this.hashKey(rawKey);
     const keyPrefix = rawKey.substring(0, 12);
 

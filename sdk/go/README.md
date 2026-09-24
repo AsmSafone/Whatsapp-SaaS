@@ -23,7 +23,7 @@ import (
 )
 
 func main() {
-	client, err := openwa.New("http://localhost:2785", "owa_k1_…")
+	client, err := openwa.New("http://localhost:2785", "zap_k1_…")
 	if err != nil {
 		log.Fatal(err)
 	}

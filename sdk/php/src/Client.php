@@ -36,7 +36,7 @@ use OpenWA\Resources\WebhooksResource;
  *
  * $client = new Client([
  *     'baseUrl' => 'http://localhost:2785',
- *     'apiKey'  => 'owa_k1_…',
+ *     'apiKey'  => 'zap_k1_…',
  * ]);
  *
  * $client->sessions->start('my-session');

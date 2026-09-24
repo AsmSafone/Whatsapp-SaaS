@@ -72,7 +72,7 @@ import { OpenWAClient } from '@rmyndharis/openwa';
 
 const client = new OpenWAClient({
   baseUrl: 'http://localhost:2785',
-  apiKey: 'owa_k1_…',
+  apiKey: 'zap_k1_…',
 });
 
 await client.sessions.start('my-session');
@@ -110,7 +110,7 @@ from openwa import OpenWAClient, OpenWANotFoundError
 
 client = OpenWAClient(
     base_url="http://localhost:2785",
-    api_key="owa_k1_…",
+    api_key="zap_k1_…",
 )
 
 client.sessions.start("my-session")
@@ -136,7 +136,7 @@ use OpenWA\Client;
 
 $client = new Client([
     'baseUrl' => 'http://localhost:2785',
-    'apiKey'  => 'owa_k1_…',
+    'apiKey'  => 'zap_k1_…',
 ]);
 
 $client->sessions->start('my-session');
@@ -165,7 +165,7 @@ import com.rmyndharis.openwa.OpenWAClient;
 import com.rmyndharis.openwa.model.MessageResponse;
 import com.rmyndharis.openwa.model.SendTextRequest;
 
-OpenWAClient client = new OpenWAClient("http://localhost:2785", "owa_k1_…");
+OpenWAClient client = new OpenWAClient("http://localhost:2785", "zap_k1_…");
 
 client.sessions.start("my-session");
 MessageResponse result = client.messages.sendText("my-session",
@@ -196,7 +196,7 @@ import (
     openwa "github.com/rmyndharis/OpenWA/sdk/go"
 )
 
-client, err := openwa.New("http://localhost:2785", "owa_k1_…")
+client, err := openwa.New("http://localhost:2785", "zap_k1_…")
 if err != nil {
     log.Fatal(err)
 }

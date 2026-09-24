@@ -19,7 +19,7 @@ import { OpenWAClient } from '@rmyndharis/openwa';
 
 const client = new OpenWAClient({
   baseUrl: 'https://your-gateway.example.com',
-  apiKey: 'owa_k1_…',
+  apiKey: 'zap_k1_…',
 });
 
 await client.sessions.start('my-session');

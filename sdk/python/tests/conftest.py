@@ -84,7 +84,7 @@ class MockBackend:
 
 
 def make_client(
-    backend: MockBackend, base_url: str = "http://localhost:2785", api_key: str = "owa_k1_test"
+    backend: MockBackend, base_url: str = "http://localhost:2785", api_key: str = "zap_k1_test"
 ) -> "OpenWAClient":
     from openwa import OpenWAClient
 

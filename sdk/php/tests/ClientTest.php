@@ -30,7 +30,7 @@ class ClientTest extends TestCase
         $client = $backend->makeClient();
         $client->sessions->list();
         $call = $backend->lastCall();
-        $this->assertSame('owa_k1_test', $call['headers']['x-api-key'] ?? '');
+        $this->assertSame('zap_k1_test', $call['headers']['x-api-key'] ?? '');
         $this->assertSame('application/json', $call['headers']['content-type'] ?? '');
     }
 

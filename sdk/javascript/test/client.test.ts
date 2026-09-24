@@ -17,7 +17,7 @@ import { MockTransport } from './helpers';
 function client(transport: MockTransport): OpenWAClient {
   return new OpenWAClient({
     baseUrl: 'http://localhost:2785',
-    apiKey: 'owa_k1_test',
+    apiKey: 'zap_k1_test',
     fetch: transport.asFetch(),
   });
 }
@@ -31,7 +31,7 @@ describe('OpenWAClient', () => {
   it('sends the API key as X-API-Key and JSON content type', async () => {
     const t = new MockTransport().on('GET', '/api/sessions', { body: [] });
     await client(t).sessions.list();
-    expect(t.lastCall!.headers['x-api-key']).toBe('owa_k1_test');
+    expect(t.lastCall!.headers['x-api-key']).toBe('zap_k1_test');
     expect(t.lastCall!.headers['content-type']).toBe('application/json');
   });
 

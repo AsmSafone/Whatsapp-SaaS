@@ -44,7 +44,7 @@ import java.util.Map;
  * domain resources as fields:
  *
  * <pre>{@code
- * OpenWAClient client = new OpenWAClient("http://localhost:2785", "owa_k1_…");
+ * OpenWAClient client = new OpenWAClient("http://localhost:2785", "zap_k1_…");
  * client.sessions.start("my-session");
  * client.messages.sendText("my-session",
  *     SendTextRequest.builder().chatId("628123456789@c.us").text("Hello!").build());

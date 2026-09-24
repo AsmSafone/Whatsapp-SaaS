@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 class ClientTest {
     final MockTransport tx = new MockTransport();
     final OpenWAClient client = new OpenWAClient(
-        ClientConfig.builder().baseUrl("http://h:2785").apiKey("owa_k1_x").transport(tx).build());
+        ClientConfig.builder().baseUrl("http://h:2785").apiKey("zap_k1_x").transport(tx).build());
 
     @Test
     void constructorRejectsMissingConfig() {
@@ -36,7 +36,7 @@ class ClientTest {
         SuccessResult r = client.request(HttpMethod.POST, "/api/x", null, null, SuccessResult.class);
         assertTrue(r.success());
         assertEquals("http://h:2785/api/x", tx.lastRequest().url());
-        assertEquals("owa_k1_x", tx.lastRequest().headers().get("X-API-Key"));
+        assertEquals("zap_k1_x", tx.lastRequest().headers().get("X-API-Key"));
         assertEquals("application/json", tx.lastRequest().headers().get("Content-Type"));
     }
 

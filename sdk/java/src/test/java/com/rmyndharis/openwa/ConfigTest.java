@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class ConfigTest {
     private static ClientConfig.Builder base() {
-        return ClientConfig.builder().baseUrl("http://h").apiKey("owa_k1_x");
+        return ClientConfig.builder().baseUrl("http://h").apiKey("zap_k1_x");
     }
 
     @Test
@@ -26,13 +26,13 @@ class ConfigTest {
     @Test
     void rejectsMalformedBaseUrl() {
         assertThrows(IllegalArgumentException.class,
-            () -> ClientConfig.builder().baseUrl("http://my host:2785").apiKey("owa_k1_x").build());
+            () -> ClientConfig.builder().baseUrl("http://my host:2785").apiKey("zap_k1_x").build());
     }
 
     @Test
     void rejectsApiKeyWithInteriorControlChar() {
         assertThrows(IllegalArgumentException.class,
-            () -> ClientConfig.builder().baseUrl("http://h").apiKey("owa\nk1").build());
+            () -> ClientConfig.builder().baseUrl("http://h").apiKey("zap\nk1").build());
     }
 
     @Test
@@ -40,9 +40,9 @@ class ConfigTest {
         // A trailing newline (e.g. key read from a file/env) must be tolerated, not fatal.
         MockTransport tx = new MockTransport().respond(200, "{\"valid\":true}");
         OpenWAClient c = new OpenWAClient(
-            ClientConfig.builder().baseUrl("http://h ").apiKey(" owa_k1_x\n").transport(tx).build());
+            ClientConfig.builder().baseUrl("http://h ").apiKey(" zap_k1_x\n").transport(tx).build());
         c.auth();
-        assertEquals("owa_k1_x", tx.lastRequest().headers().get("X-API-Key"));
+        assertEquals("zap_k1_x", tx.lastRequest().headers().get("X-API-Key"));
         assertTrue(tx.lastRequest().url().startsWith("http://h/"));
     }
 

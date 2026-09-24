@@ -17,7 +17,7 @@ For local development that is `http://localhost:2785/api`; behind a reverse prox
 A global API-key guard protects every route unless it is explicitly marked **public** (`@Public()`). Send the key in the `X-API-Key` header:
 
 ```http
-X-API-Key: owa_k1_your-api-key-here
+X-API-Key: zap_k1_your-api-key-here
 ```
 
 > **Auth is header-only (never in a URL).** A query-parameter API key is **not** accepted anywhere. REST routes take the key via the `X-API-Key` header; the WebSocket (Socket.IO) handshake — see §6.5 Real-time API — accepts it via the handshake `auth.apiKey` field or the `X-API-Key` header. The former `?apiKey=` query fallback was **removed** (it leaked the credential into proxy/access logs). Never put the key in a URL.
@@ -27,7 +27,7 @@ The metrics endpoint is the lone exception to the API-key scheme: it authenticat
 ### Common Headers
 
 ```http
-X-API-Key: owa_k1_your-api-key      # required on every non-public REST route
+X-API-Key: zap_k1_your-api-key      # required on every non-public REST route
 Content-Type: application/json       # required on requests with a JSON body
 ```
 
@@ -4760,7 +4760,7 @@ Bare JSON array (no envelope), ordered by `createdAt` DESC. Null array/date fiel
   {
     "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
     "name": "Production Bot",
-    "keyPrefix": "owa_k1_a1b2",
+    "keyPrefix": "zap_k1_a1b2",
     "role": "operator",
     "allowedIps": ["192.168.1.1", "10.0.0.0/8"],
     "allowedSessions": ["session-uuid-1"],
@@ -4793,7 +4793,7 @@ Get a single API key's details by id. No plaintext key.
 {
   "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
   "name": "Production Bot",
-  "keyPrefix": "owa_k1_a1b2",
+  "keyPrefix": "zap_k1_a1b2",
   "role": "operator",
   "allowedIps": ["192.168.1.1", "10.0.0.0/8"],
   "allowedSessions": ["session-uuid-1"],
@@ -4836,13 +4836,13 @@ Create a new API key; returns the full plaintext key exactly once.
 
 **Response** `201` — `ApiKeyCreatedResponseDto`
 
-Same shape as the read DTO **plus** an `apiKey` field carrying the full plaintext key `owa_k1_<64 hex>`. This is the **only** time the plaintext key is returned. `keyPrefix` is the first 12 chars; `usageCount` starts at `0`, `isActive` is `true`. Null `allowedIps`/`allowedSessions`/`expiresAt`/`lastUsedAt` are omitted.
+Same shape as the read DTO **plus** an `apiKey` field carrying the full plaintext key `zap_k1_<64 hex>`. This is the **only** time the plaintext key is returned. `keyPrefix` is the first 12 chars; `usageCount` starts at `0`, `isActive` is `true`. Null `allowedIps`/`allowedSessions`/`expiresAt`/`lastUsedAt` are omitted.
 
 ```json
 {
   "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
   "name": "Production Bot",
-  "keyPrefix": "owa_k1_a1b2",
+  "keyPrefix": "zap_k1_a1b2",
   "role": "operator",
   "allowedIps": ["192.168.1.1", "10.0.0.0/8"],
   "allowedSessions": ["session-uuid-1"],
@@ -4850,7 +4850,7 @@ Same shape as the read DTO **plus** an `apiKey` field carrying the full plaintex
   "expiresAt": "2027-12-31T23:59:59.000Z",
   "usageCount": 0,
   "createdAt": "2026-06-25T09:30:00.000Z",
-  "apiKey": "owa_k1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  "apiKey": "zap_k1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 }
 ```
 
@@ -4896,7 +4896,7 @@ Returns the updated key (no plaintext).
 {
   "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
   "name": "Renamed Bot",
-  "keyPrefix": "owa_k1_a1b2",
+  "keyPrefix": "zap_k1_a1b2",
   "role": "viewer",
   "allowedIps": ["203.0.113.5"],
   "isActive": true,
@@ -4928,7 +4928,7 @@ Sets `isActive` to `false` and returns the key with explicit HTTP `200`. After r
 {
   "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
   "name": "Production Bot",
-  "keyPrefix": "owa_k1_a1b2",
+  "keyPrefix": "zap_k1_a1b2",
   "role": "operator",
   "isActive": false,
   "usageCount": 42,

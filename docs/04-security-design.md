@@ -59,8 +59,8 @@ sequenceDiagram
 ### API Key Format
 
 ```
-Format: owa_k1_<64 hex chars>   (32 random bytes, hex-encoded — 71 characters in total)
-Example: owa_k1_3f9c1d0a7b2e4c5680a1f2d3e4b5c6a7980b1c2d3e4f50617283940a1b2c3d4e
+Format: zap_k1_<64 hex chars>   (32 random bytes, hex-encoded — 71 characters in total)
+Example: zap_k1_3f9c1d0a7b2e4c5680a1f2d3e4b5c6a7980b1c2d3e4f50617283940a1b2c3d4e
 
 Storage: SHA-256 hash only (never store plain key); `keyPrefix` keeps the first 12 characters
 ```

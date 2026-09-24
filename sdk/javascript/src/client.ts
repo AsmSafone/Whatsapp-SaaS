@@ -10,7 +10,7 @@
  *
  * const client = new OpenWAClient({
  *   baseUrl: 'http://localhost:2785',
- *   apiKey: 'owa_k1_…',
+ *   apiKey: 'zap_k1_…',
  * });
  *
  * await client.sessions.start('my-session');

@@ -8,7 +8,7 @@ transport) and exposes domain resources as properties::
 
     client = OpenWAClient(
         base_url="http://localhost:2785",
-        api_key="owa_k1_…",
+        api_key="zap_k1_…",
     )
 
     client.sessions.start("my-session")

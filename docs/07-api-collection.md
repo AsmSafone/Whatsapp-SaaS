@@ -6,7 +6,7 @@ This collection gives a runnable cURL for the primary OpenWA REST endpoints; the
 
 ```bash
 export BASE=http://localhost:2785
-export API_KEY=owa_k1_your-api-key-here
+export API_KEY=zap_k1_your-api-key-here
 ```
 
 (For the metrics endpoint also `export METRICS_TOKEN=...`.)

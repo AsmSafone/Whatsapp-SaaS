@@ -63,7 +63,7 @@ describe('production SQLite schema path: full migration chain from scratch (e2e)
     // migrations created api_keys and the boot path could persist.
     expect(existsSync(keyFile)).toBe(true);
     const key = readFileSync(keyFile, 'utf8').trim();
-    expect(key).toMatch(/^owa_k1_/);
+    expect(key).toMatch(/^zap_k1_/);
     const auth = await request(app.getHttpServer()).get('/api/sessions').set('X-API-Key', key).expect(200);
     expect(Array.isArray(auth.body)).toBe(true);
   });

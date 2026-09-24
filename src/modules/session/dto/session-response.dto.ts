@@ -100,7 +100,7 @@ export class SessionResponseDto {
 
   @ApiPropertyOptional({
     description: 'Session-scoped operator API key, returned once at create for a Zaptura account.',
-    example: 'owa_k1_...',
+    example: 'zap_k1_...',
   })
   apiKey?: string;
 

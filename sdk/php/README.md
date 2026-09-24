@@ -22,7 +22,7 @@ use OpenWA\Client;
 
 $client = new Client([
     'baseUrl' => 'https://your-gateway.example.com',
-    'apiKey'  => 'owa_k1_…',
+    'apiKey'  => 'zap_k1_…',
 ]);
 
 $client->sessions->start('my-session');

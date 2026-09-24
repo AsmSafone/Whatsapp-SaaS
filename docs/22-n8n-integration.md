@@ -50,7 +50,7 @@ Execute operations on your OpenWA server.
 | Field      | Description                      | Example                  |
 | ---------- | -------------------------------- | ------------------------ |
 | Server URL | OpenWA server URL (without /api) | `https://wa.example.com` |
-| API Key    | API key from OpenWA dashboard    | `owa_xxxxxxxx...`        |
+| API Key    | API key from OpenWA dashboard    | `zap_xxxxxxxx...`        |
 
 #### Resources & Operations
 

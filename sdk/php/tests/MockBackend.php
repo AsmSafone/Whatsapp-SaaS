@@ -72,7 +72,7 @@ class MockBackend
         return new GuzzleClient(['handler' => HandlerStack::create($recorder)]);
     }
 
-    public function makeClient(string $baseUrl = 'http://localhost:2785', string $apiKey = 'owa_k1_test'): OpenWAClient
+    public function makeClient(string $baseUrl = 'http://localhost:2785', string $apiKey = 'zap_k1_test'): OpenWAClient
     {
         return new OpenWAClient([
             'baseUrl' => $baseUrl,

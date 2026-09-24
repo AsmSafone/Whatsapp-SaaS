@@ -22,7 +22,7 @@ function installFetchStub(): void {
           {
             id: 'key-1',
             name: 'billing-bot',
-            keyPrefix: 'owa_k1ab',
+            keyPrefix: 'zap_k1ab',
             role: 'operator',
             isActive: true,
             usageCount: 0,
@@ -66,7 +66,7 @@ test('a key row shows its prefix masked and offers no show/hide toggle', async (
       createElement(ToastProvider, null, createElement(ApiKeys)),
     ),
   );
-  await rtl.screen.findByText('owa_k1ab****');
+  await rtl.screen.findByText('zap_k1ab****');
   assert.ok(
     !rtl.screen.queryByRole('button', { name: 'Show API key' }),
     'the row offers to show a key it does not have',

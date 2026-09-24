@@ -33,7 +33,7 @@ import com.rmyndharis.openwa.OpenWAClient;
 import com.rmyndharis.openwa.model.MessageResponse;
 import com.rmyndharis.openwa.model.SendTextRequest;
 
-OpenWAClient client = new OpenWAClient("http://localhost:2785", "owa_k1_…");
+OpenWAClient client = new OpenWAClient("http://localhost:2785", "zap_k1_…");
 
 client.sessions.start("my-session");
 
@@ -55,7 +55,7 @@ import java.time.Duration;
 
 OpenWAClient client = new OpenWAClient(ClientConfig.builder()
     .baseUrl("https://wa.example.com")
-    .apiKey("owa_k1_…")
+    .apiKey("zap_k1_…")
     .timeout(Duration.ofSeconds(15))
     .build());
 ```

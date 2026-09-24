@@ -47,7 +47,7 @@ func (t *recordTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 func newTestClient(t *testing.T, rt http.RoundTripper, opts ...Option) *Client {
 	t.Helper()
 	all := append([]Option{WithTransport(rt)}, opts...)
-	c, err := New("https://api.example.com", "owa_k1_test", all...)
+	c, err := New("https://api.example.com", "zap_k1_test", all...)
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
@@ -86,7 +86,7 @@ func TestSendTextHitsCorrectPath(t *testing.T) {
 	if rt.lastReq.Method != "POST" {
 		t.Fatalf("method = %q, want POST", rt.lastReq.Method)
 	}
-	if got := rt.lastReq.Header.Get("X-API-Key"); got != "owa_k1_test" {
+	if got := rt.lastReq.Header.Get("X-API-Key"); got != "zap_k1_test" {
 		t.Fatalf("X-API-Key = %q", got)
 	}
 

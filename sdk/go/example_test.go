@@ -11,7 +11,7 @@ import (
 )
 
 func ExampleNew() {
-	client, err := openwa.New("http://localhost:2785", "owa_k1_…")
+	client, err := openwa.New("http://localhost:2785", "zap_k1_…")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func ExampleNew() {
 }
 
 func ExampleClient_typedErrors() {
-	client, _ := openwa.New("http://localhost:2785", "owa_k1_…")
+	client, _ := openwa.New("http://localhost:2785", "zap_k1_…")
 
 	_, err := client.Messages.SendText(context.Background(), "my-session", openwa.SendTextRequest{
 		ChatID: "628123456789@c.us",
@@ -54,7 +54,7 @@ func ExampleClient_typedErrors() {
 func ExampleWithRetry() {
 	// Opt into automatic retries with exponential backoff, and inject a custom
 	// per-request timeout — dependencies flow through functional options.
-	client, _ := openwa.New("http://localhost:2785", "owa_k1_…",
+	client, _ := openwa.New("http://localhost:2785", "zap_k1_…",
 		openwa.WithRetry(openwa.DefaultRetryPolicy()),
 		openwa.WithTimeout(15*time.Second),
 	)
@@ -62,7 +62,7 @@ func ExampleWithRetry() {
 }
 
 func ExampleClient_webhookEvents() {
-	client, _ := openwa.New("http://localhost:2785", "owa_k1_…")
+	client, _ := openwa.New("http://localhost:2785", "zap_k1_…")
 
 	// Subscribe to the group and call events with the Event* constants — they
 	// are the exact wire values, so a typo is a compile error, not a silent

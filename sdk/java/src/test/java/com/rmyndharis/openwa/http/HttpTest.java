@@ -42,9 +42,9 @@ class HttpTest {
         defaults.put("Content-Type", "text/plain");
         defaults.put("X-App", "1");
         Map<String, String> per = Map.of("X-Trace", "abc");
-        Map<String, String> out = Http.mergeHeaders(defaults, per, "owa_k1_secret");
+        Map<String, String> out = Http.mergeHeaders(defaults, per, "zap_k1_secret");
         assertEquals("application/json", out.get("Content-Type"));
-        assertEquals("owa_k1_secret", out.get("X-API-Key"));
+        assertEquals("zap_k1_secret", out.get("X-API-Key"));
         assertEquals("1", out.get("X-App"));
         assertEquals("abc", out.get("X-Trace"));
     }

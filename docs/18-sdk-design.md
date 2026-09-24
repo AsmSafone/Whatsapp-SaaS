@@ -72,7 +72,7 @@ import { OpenWAClient } from '@rmyndharis/openwa';
 
 const client = new OpenWAClient({
   baseUrl: 'http://localhost:2785',
-  apiKey: 'owa_k1_…',
+  apiKey: 'zap_k1_…',
 });
 
 async function main() {
@@ -437,7 +437,7 @@ from openwa import OpenWAClient
 
 client = OpenWAClient(
     base_url="http://localhost:2785",
-    api_key="owa_k1_…",
+    api_key="zap_k1_…",
 )
 
 # Create then start a session
@@ -457,7 +457,7 @@ client.close()
 `OpenWAClient` is also a context manager, so the connection pool is closed for you:
 
 ```python
-with OpenWAClient(base_url="http://localhost:2785", api_key="owa_k1_…") as client:
+with OpenWAClient(base_url="http://localhost:2785", api_key="zap_k1_…") as client:
     print(client.health.check())
 ```
 
@@ -745,7 +745,7 @@ from openwa import (
     OpenWAApiError,
 )
 
-client = OpenWAClient(base_url="http://localhost:2785", api_key="owa_k1_…")
+client = OpenWAClient(base_url="http://localhost:2785", api_key="zap_k1_…")
 
 try:
     client.messages.send_text("my-session", {
@@ -801,7 +801,7 @@ use OpenWA\Client;
 
 $client = new Client([
     'baseUrl' => 'http://localhost:2785',
-    'apiKey'  => 'owa_k1_…',
+    'apiKey'  => 'zap_k1_…',
 ]);
 
 $client->sessions->start('my-session');
