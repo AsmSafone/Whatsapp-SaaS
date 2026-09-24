@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Check,
   ChevronDown,
+  ChevronLeft,
   Code2,
   Copy,
   CheckCheck,
@@ -15,6 +16,7 @@ import {
   Lock,
   MessageSquare,
   Mic,
+  Plus,
   QrCode,
   Send,
   Sparkles,
@@ -288,13 +290,26 @@ export function Landing() {
             </div>
           </div>
 
-          {/* Right: Realistic Dark Mode WhatsApp Phone Mockup */}
+          {/* Right: Realistic Dark Mode WhatsApp iPhone Mockup */}
           <div className="zp-sim-phone-col">
             <div className="zp-phone-wrapper">
-              <div className="zp-phone-notch" />
+              {/* iPhone Dynamic Island & Status Bar */}
+              <div className="zp-iphone-status-bar">
+                <span className="zp-iphone-time">9:41</span>
+                <div className="zp-iphone-island">
+                  <div className="zp-iphone-island-cam" />
+                </div>
+                <div className="zp-iphone-status-icons">
+                  <span className="zp-iphone-net">5G</span>
+                  <div className="zp-iphone-battery">
+                    <div className="zp-iphone-battery-fill" />
+                  </div>
+                </div>
+              </div>
 
               {/* WhatsApp App Header */}
               <div className="zp-wa-header">
+                <ChevronLeft size={20} className="zp-wa-back" />
                 <div className="zp-wa-avatar">
                   <span>ZP</span>
                 </div>
@@ -365,10 +380,16 @@ export function Landing() {
 
               {/* Phone Footer */}
               <div className="zp-wa-footer">
+                <Plus size={18} className="zp-wa-attach-btn" />
                 <span className="zp-wa-mock-input">Type a message...</span>
                 <div className="zp-wa-send-btn">
-                  <Send size={15} />
+                  <Send size={14} />
                 </div>
+              </div>
+
+              {/* iPhone Home Indicator */}
+              <div className="zp-iphone-home-indicator">
+                <div className="zp-iphone-home-pill" />
               </div>
             </div>
           </div>

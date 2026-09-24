@@ -114,47 +114,54 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
   });
 
   // Enhanced Security Headers
-  app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          // The bundled dashboard pulls webfonts from Google Fonts (CSS from fonts.googleapis.com,
-          // font files from fonts.gstatic.com). Now that NestJS serves the dashboard under this CSP,
-          // allow those origins or the @import'd fonts are blocked and the UI falls back to system fonts.
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-          scriptSrc: ["'self'", (_req, res) => `'nonce-${(res as Response).locals.cspNonce as string}'`],
-          // `blob:` is needed for the outgoing image-attachment preview, which the dashboard renders
-          // from a URL.createObjectURL(file) blob before the message is sent (Chats.tsx).
-          imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
-          // Chat media (voice notes, video) is served to the dashboard as data: URIs. Without an
-          // explicit media-src, <audio>/<video> fall back to default-src 'self' and are blocked.
-          // Mirror imgSrc so audio/video render the same way images already do.
-          mediaSrc: ["'self'", 'data:', 'blob:', 'https:'],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-          objectSrc: ["'none'"],
-          // Auto-upgrade HTTP→HTTPS in production, unless CSP_UPGRADE_INSECURE_REQUESTS opts out for an
-          // HTTP-only private-network deployment (otherwise the browser forces the dashboard to https). (#611)
-          upgradeInsecureRequests: isUpgradeInsecureRequestsEnabled(
-            process.env.CSP_UPGRADE_INSECURE_REQUESTS,
-            process.env.NODE_ENV,
-          )
-            ? []
-            : null,
-        },
+  const helmetMiddleware = helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        // The bundled dashboard pulls webfonts from Google Fonts (CSS from fonts.googleapis.com,
+        // font files from fonts.gstatic.com). Now that NestJS serves the dashboard under this CSP,
+        // allow those origins or the @import'd fonts are blocked and the UI falls back to system fonts.
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        scriptSrc: ["'self'", (_req, res) => `'nonce-${(res as Response).locals.cspNonce as string}'`],
+        // `blob:` is needed for the outgoing image-attachment preview, which the dashboard renders
+        // from a URL.createObjectURL(file) blob before the message is sent (Chats.tsx).
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        // Chat media (voice notes, video) is served to the dashboard as data: URIs. Without an
+        // explicit media-src, <audio>/<video> fall back to default-src 'self' and are blocked.
+        // Mirror imgSrc so audio/video render the same way images already do.
+        mediaSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        objectSrc: ["'none'"],
+        // Auto-upgrade HTTP→HTTPS in production, unless CSP_UPGRADE_INSECURE_REQUESTS opts out for an
+        // HTTP-only private-network deployment (otherwise the browser forces the dashboard to https). (#611)
+        upgradeInsecureRequests: isUpgradeInsecureRequestsEnabled(
+          process.env.CSP_UPGRADE_INSECURE_REQUESTS,
+          process.env.NODE_ENV,
+        )
+          ? []
+          : null,
       },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
-      },
-      noSniff: true,
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      // Disable for API usage
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-    }),
-  );
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    noSniff: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    // Disable for API usage
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  });
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    // Exclude Swagger documentation routes from strict nonce CSP so Swagger UI assets & inline configs render properly
+    if (req.path.startsWith('/api/docs') || req.path === '/api/docs') {
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      return next();
+    }
+    helmetMiddleware(req, res, next);
+  });
 
   // Serve SPA documents dynamically so the nonce embedded in this exact document matches its CSP
   // response header. A shared cookie is deliberately avoided: a second dashboard tab could overwrite

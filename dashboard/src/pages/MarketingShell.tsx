@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X, ArrowRight, ShieldCheck, Terminal, Sparkles } from 'lucide-react';
+import { Menu, X, ArrowRight, ShieldCheck, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ZapturaLogo } from '../components/ZapturaLogo';
 import './Marketing.css';
@@ -17,19 +17,6 @@ export function MarketingShell({ children }: MarketingShellProps) {
     <div className="zp-shell">
       {/* Glow gradient backdrop */}
       <div className="zp-shell-ambient" aria-hidden="true" />
-
-      {/* Top Banner Notice */}
-      <div className="zp-top-banner">
-        <div className="zp-top-banner-inner">
-          <span className="zp-banner-pill">
-            <Sparkles size={13} className="zp-pill-icon" /> New v2.4 Release
-          </span>
-          <span className="zp-banner-text">Autonomous Multi-Session Scaling & Webhook Queues are now live!</span>
-          <Link to="/register" className="zp-banner-link">
-            Claim 3-Day Free Trial <ArrowRight size={13} />
-          </Link>
-        </div>
-      </div>
 
       {/* Navigation Header */}
       <header className="zp-nav-wrap">
@@ -87,7 +74,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
                 Sign In
               </Link>
               <Link to="/register" className="zp-btn zp-btn-glow" onClick={close}>
-                Get Started Free
+                Get Started
               </Link>
             </div>
           </div>

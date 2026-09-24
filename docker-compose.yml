@@ -277,7 +277,7 @@ services:
       # .spec.ts derives the required set from .env.example so a new knob cannot ship unreachable.
       - API_KEY_PEPPER=${API_KEY_PEPPER:-}
       - BOOTSTRAP_KEY_FILE=${BOOTSTRAP_KEY_FILE:-}
-      - ENABLE_SWAGGER=${ENABLE_SWAGGER:-}
+      - ENABLE_SWAGGER=${ENABLE_SWAGGER:-true}
       - VALIDATION_ERROR_DETAIL=${VALIDATION_ERROR_DETAIL:-}
       - MCP_READONLY=${MCP_READONLY:-}
       - MCP_RATE_LIMIT_MAX=${MCP_RATE_LIMIT_MAX:-}

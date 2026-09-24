@@ -178,7 +178,6 @@ export class SessionController {
     return sessions.map(s => this.transformSession(s));
   }
 
-
   @ChatScoped('agnostic')
   @Get(':sessionId')
   @ApiOperation({ summary: 'Get session by ID' })
