@@ -80,6 +80,7 @@ export interface SessionResponse {
    * with no engine. Absent from a gateway that predates the field.
    */
   engineLoaded: boolean;
+  apiKey?: string;
 }
 
 /**

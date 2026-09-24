@@ -165,7 +165,8 @@ type SessionResponse struct {
 	// precondition stop/logout/force-kill require and start refuses. Not derivable from Status:
 	// "disconnected" covers both a session mid automatic-reconnect (engine present) and one stopped
 	// with no engine. Nil from a gateway that predates the field.
-	EngineLoaded bool `json:"engineLoaded"`
+	EngineLoaded bool    `json:"engineLoaded"`
+	APIKey       *string `json:"apiKey,omitempty"`
 }
 
 // ProxyType is the scheme of a session proxy.

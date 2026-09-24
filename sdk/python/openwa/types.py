@@ -251,6 +251,7 @@ class SessionResponse(TypedDict):
     # session mid automatic-reconnect (engine present) and one stopped with no engine. Absent from a
     # gateway that predates the field (the TypedDict is total=False).
     engineLoaded: bool
+    apiKey: NotRequired[str]
 
 
 class SessionProxy(TypedDict):

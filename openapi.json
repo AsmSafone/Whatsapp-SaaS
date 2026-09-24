@@ -340,6 +340,114 @@
         ]
       }
     },
+    "/api/account/register": {
+      "post": {
+        "operationId": "AccountController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Register a Zaptura account",
+        "tags": [
+          "account"
+        ],
+        "security": []
+      }
+    },
+    "/api/account/login": {
+      "post": {
+        "operationId": "AccountController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Log in to a Zaptura account",
+        "tags": [
+          "account"
+        ],
+        "security": []
+      }
+    },
+    "/api/account/plans": {
+      "get": {
+        "operationId": "AccountController_plans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List mocked subscription plans",
+        "tags": [
+          "account"
+        ],
+        "security": []
+      }
+    },
+    "/api/account/me": {
+      "get": {
+        "operationId": "AccountController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Current account profile",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/api/account/plan": {
+      "patch": {
+        "operationId": "AccountController_changePlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Change plan (mocked, no payment)",
+        "tags": [
+          "account"
+        ]
+      }
+    },
     "/api/sessions": {
       "post": {
         "operationId": "SessionController_create",
@@ -9785,16 +9893,20 @@
     }
   },
   "info": {
-    "title": "OpenWA API",
-    "description": "Open Source WhatsApp API Gateway - Free, Self-Hosted HTTP API\n\n**Gateway-wide responses.** Two statuses are returned by middleware before routing, so any operation can emit them:\n\n- `415 Unsupported Media Type` — the request body carries a `Content-Encoding` other than `identity`. The aggregate in-flight body cap counts wire bytes, so a compressed body would be admitted on its compressed size and then inflated past the memory it is meant to bound. Send the body uncompressed.\n- `503 Service Unavailable` with `Retry-After` — the gateway already has too much request body data in flight. The body is not read; retry after the given delay.",
+    "title": "Zaptura API",
+    "description": "Zaptura Autonomous WhatsApp API Gateway & SaaS Platform\n\n**Gateway-wide responses.** Two statuses are returned by middleware before routing, so any operation can emit them:\n\n- `415 Unsupported Media Type` — the request body carries a `Content-Encoding` other than `identity`. The aggregate in-flight body cap counts wire bytes, so a compressed body would be admitted on its compressed size and then inflated past the memory it is meant to bound. Send the body uncompressed.\n- `503 Service Unavailable` with `Retry-After` — the gateway already has too much request body data in flight. The body is not read; retry after the given delay.",
     "version": "0.23.6",
     "contact": {
-      "name": "OpenWA",
-      "url": "https://github.com/rmyndharis/OpenWA",
-      "email": "yudhi@rmyndharis.com"
+      "name": "Zaptura",
+      "url": "https://zaptura.io",
+      "email": "support@zaptura.io"
     }
   },
   "tags": [
+    {
+      "name": "account",
+      "description": "Zaptura account registration and login"
+    },
     {
       "name": "sessions",
       "description": "WhatsApp session management"
@@ -10297,6 +10409,62 @@
           "valid"
         ]
       },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ada Lovelace"
+          },
+          "email": {
+            "type": "string",
+            "example": "dev@zaptura.io"
+          },
+          "password": {
+            "type": "string",
+            "example": "at-least-8-chars"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "dev@zaptura.io"
+          },
+          "password": {
+            "type": "string",
+            "example": "at-least-8-chars"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ChangePlanDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "starter",
+              "pro",
+              "plus",
+              "business"
+            ]
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
       "CreateSessionDto": {
         "type": "object",
         "properties": {
@@ -10444,6 +10612,11 @@
             "type": "boolean",
             "description": "Whether the gateway currently holds a live engine for this session. This is the precondition the lifecycle routes actually enforce, and `status` alone does not imply it: a `disconnected` session keeps its engine for the duration of an automatic reconnect backoff, while a session stopped through `POST /sessions/:sessionId/stop` carries the same status with no engine. When `true`, `stop`, `logout` and `force-kill` can act and `start` answers 400; when `false`, the reverse. Derived per request from live process state, so it is never persisted and never historical.",
             "example": true
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "Session-scoped operator API key, returned once at create for a Zaptura account.",
+            "example": "owa_k1_..."
           }
         },
         "required": [
