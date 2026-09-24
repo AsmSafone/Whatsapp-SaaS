@@ -49,36 +49,34 @@ describe('resolveCorsPolicy', () => {
 });
 
 describe('isUpgradeInsecureRequestsEnabled', () => {
-  it('keeps the legacy default: on in production, off elsewhere (unset)', () => {
-    expect(isUpgradeInsecureRequestsEnabled(undefined, 'production')).toBe(true);
+  it('is false by default when unset (in production and development)', () => {
+    expect(isUpgradeInsecureRequestsEnabled(undefined, 'production')).toBe(false);
     expect(isUpgradeInsecureRequestsEnabled(undefined, 'development')).toBe(false);
     expect(isUpgradeInsecureRequestsEnabled(undefined)).toBe(false);
   });
-  it('lets an explicit value override NODE_ENV', () => {
-    // HTTP-only private-network prod opts OUT so the dashboard stays reachable (#611)
-    expect(isUpgradeInsecureRequestsEnabled('false', 'production')).toBe(false);
-    // and it can be forced on outside production
+  it('enables only when explicitly set to "true"', () => {
+    expect(isUpgradeInsecureRequestsEnabled('true', 'production')).toBe(true);
     expect(isUpgradeInsecureRequestsEnabled('true', 'development')).toBe(true);
-  });
-  it('treats any non-"true"/"false" value as unset (falls back to NODE_ENV)', () => {
-    expect(isUpgradeInsecureRequestsEnabled('', 'production')).toBe(true);
+    expect(isUpgradeInsecureRequestsEnabled('false', 'production')).toBe(false);
+    expect(isUpgradeInsecureRequestsEnabled('', 'production')).toBe(false);
     expect(isUpgradeInsecureRequestsEnabled('1', 'development')).toBe(false);
   });
 });
 
 describe('isDashboardCspUpgradeTrapLikely', () => {
-  it('flags a production instance serving the dashboard with the opt-out unset (#731)', () => {
-    expect(isDashboardCspUpgradeTrapLikely({ nodeEnv: 'production', dashboardServed: true })).toBe(true);
+  it('flags an instance serving the dashboard when CSP upgrade is explicitly true (#731)', () => {
+    expect(isDashboardCspUpgradeTrapLikely({ cspEnv: 'true', dashboardServed: true })).toBe(true);
   });
-  it('stays quiet once the operator opts out', () => {
+  it('stays quiet when CSP upgrade is false or unset (default)', () => {
     expect(isDashboardCspUpgradeTrapLikely({ nodeEnv: 'production', cspEnv: 'false', dashboardServed: true })).toBe(
       false,
     );
+    expect(isDashboardCspUpgradeTrapLikely({ nodeEnv: 'production', dashboardServed: true })).toBe(false);
   });
   it('stays quiet when no dashboard is served (API-only: no UI to break)', () => {
-    expect(isDashboardCspUpgradeTrapLikely({ nodeEnv: 'production', dashboardServed: false })).toBe(false);
+    expect(isDashboardCspUpgradeTrapLikely({ cspEnv: 'true', dashboardServed: false })).toBe(false);
   });
-  it('stays quiet outside production, where the directive is already off', () => {
+  it('stays quiet outside production when unset', () => {
     expect(isDashboardCspUpgradeTrapLikely({ nodeEnv: 'development', dashboardServed: true })).toBe(false);
   });
 });

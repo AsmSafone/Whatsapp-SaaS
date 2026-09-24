@@ -706,6 +706,7 @@ export function comparePair(handName, handMembers, schemaName, schema, schemas, 
  * TypedDict inheritance (the parent's own total flag governs its members).
  */
 export function parsePythonTypes(source) {
+  source = source.replace(/\r\n/g, '\n');
   // Join continuation lines inside unclosed brackets so multi-line Literal[...] aliases and
   // annotations parse as one token (a truncated `Literal[` is worse than no token).
   const joined = [];
@@ -1009,7 +1010,10 @@ export function parseJavaTypes(sources) {
           members.push(serialized[1]);
           continue;
         }
-        const bare = part.replace(/@\w+\([^)]*\)/g, '').trim().match(/^([A-Z][A-Z0-9_]*)$/);
+        const bare = part
+          .replace(/@\w+\([^)]*\)/g, '')
+          .trim()
+          .match(/^([A-Z][A-Z0-9_]*)$/);
         if (bare) members.push(bare[1]);
       }
       if (members.length) enums[m[1]] = `enum(${sortEnumMembers([...new Set(members)]).join(',')})`;

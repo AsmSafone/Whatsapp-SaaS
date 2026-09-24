@@ -238,7 +238,7 @@ async function bootstrap() {
     })
   ) {
     console.warn(
-      '⚠️  Dashboard: CSP upgrade-insecure-requests is ON (production default). If this instance is ' +
+      '⚠️  Dashboard: CSP upgrade-insecure-requests is ON (CSP_UPGRADE_INSECURE_REQUESTS=true). If this instance is ' +
         "reached over plain HTTP, the browser will upgrade the UI's scripts to https:// and the " +
         'dashboard will render blank. Behind a TLS proxy? Ignore this. Serving direct HTTP? Set ' +
         'CSP_UPGRADE_INSECURE_REQUESTS=false.',

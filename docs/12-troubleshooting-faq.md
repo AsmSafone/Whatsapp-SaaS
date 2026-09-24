@@ -172,26 +172,28 @@ docker compose up -d --build   # `docker compose pull` never updates it
 - You reach the instance directly over plain HTTP (a host:port allocation, a private network, a
   panel like Pterodactyl) rather than through a TLS-terminating reverse proxy
 
-**Cause:** In production OpenWA sends the CSP `upgrade-insecure-requests` directive, which tells the
+**Cause:** If `CSP_UPGRADE_INSECURE_REQUESTS=true` is set, Zaptura WA sends the CSP `upgrade-insecure-requests` directive, which tells the
 browser to upgrade every sub-resource fetch to HTTPS. That is correct behind a TLS proxy. Over plain
 HTTP the browser upgrades the dashboard's own script requests to `https://`, the non-TLS server
 cannot answer them, no JavaScript runs, and React never mounts — a blank page. The failure happens
 in the browser, so the server log stays clean.
 
+Note that `CSP_UPGRADE_INSECURE_REQUESTS` is `false` by default.
+
 **Solution:**
 
 ```bash
-# Opt out, then fully restart the container (not just reload)
+# Keep false or set to false for plain HTTP, then fully restart the container
 CSP_UPGRADE_INSECURE_REQUESTS=false
 
 # Confirm it actually reached the process
 docker compose exec openwa-api printenv NODE_ENV CSP_UPGRADE_INSECURE_REQUESTS
 ```
 
-A production boot that serves the dashboard with the opt-out unset prints a warning naming this
+When `CSP_UPGRADE_INSECURE_REQUESTS=true` is explicitly set, boot prints a warning naming this
 setting. If you are behind a TLS proxy, ignore that warning — the directive is doing its job.
 
-> The alternative is to front OpenWA with a TLS-terminating reverse proxy (the shipped
+> The alternative is to front Zaptura WA with a TLS-terminating reverse proxy (the shipped
 > `docker-compose.yml` topology), which serves the dashboard over HTTPS and makes the upgrade a
 > no-op.
 

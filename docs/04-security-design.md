@@ -415,8 +415,8 @@ app.use(helmet({
       connectSrc: ["'self'"],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       objectSrc: ["'none'"],
-      // On in production, unless CSP_UPGRADE_INSECURE_REQUESTS opts an HTTP-only
-      // private-network deployment out (#611).
+      // Off by default (so HTTP-only deployments work), unless CSP_UPGRADE_INSECURE_REQUESTS=true
+      // is explicitly enabled for HTTPS-only deployments (#611, #731).
       upgradeInsecureRequests: isUpgradeInsecureRequestsEnabled(...) ? [] : null,
     },
   },
