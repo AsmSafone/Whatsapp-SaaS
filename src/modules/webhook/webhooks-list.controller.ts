@@ -56,11 +56,13 @@ export class WebhooksListController {
     @Query('offset') offset?: string,
   ): Promise<WebhookResponseDto[]> {
     // Scope to the key's allowedSessions so a session-restricted key cannot enumerate every
-    // session's webhook URLs. A null/empty allowlist (e.g. ADMIN) still sees all.
+    // session's webhook URLs. Tenant users are further restricted to their own sessions.
+    const tenantUserId = apiKey?.id?.startsWith('user:') ? apiKey.userId : null;
     return WebhookResponseDto.fromEntities(
       await this.webhookService.findAll(apiKey?.allowedSessions, {
         limit: limit ? parseInt(limit, 10) : undefined,
         offset: offset ? parseInt(offset, 10) : undefined,
+        ownerUserId: tenantUserId ?? undefined,
       }),
     );
   }

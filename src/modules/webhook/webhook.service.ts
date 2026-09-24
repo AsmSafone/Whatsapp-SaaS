@@ -167,11 +167,31 @@ export class WebhookService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async findAll(allowedSessions?: string[] | null, opts: ListOptions = {}): Promise<Webhook[]> {
+  async findAll(
+    allowedSessions?: string[] | null,
+    opts: ListOptions & { ownerUserId?: string } = {},
+  ): Promise<Webhook[]> {
     // A session-restricted key only sees its own sessions' webhooks; an unrestricted key
     // (null/empty allowlist, e.g. ADMIN) sees all — mirroring the ApiKeyGuard allowedSessions model.
+    // A tenant ownerUserId further restricts to webhooks whose session belongs to that user.
     const { limit, offset } = resolveListWindow(opts.limit, opts.offset);
     // `id` tiebreaks the second-resolution `createdAt` so a paged walk has a total order.
+
+    if (opts.ownerUserId) {
+      // Use QueryBuilder to join session and filter by ownerUserId.
+      const qb = this.webhookRepository
+        .createQueryBuilder('w')
+        .innerJoin('w.session', 's', 's.ownerUserId = :uid', { uid: opts.ownerUserId })
+        .orderBy('w.createdAt', 'DESC')
+        .addOrderBy('w.id', 'DESC')
+        .take(limit)
+        .skip(offset);
+      if (allowedSessions && allowedSessions.length > 0) {
+        qb.andWhere('w.sessionId IN (:...ids)', { ids: allowedSessions });
+      }
+      return qb.getMany();
+    }
+
     const options: FindManyOptions<Webhook> = {
       order: { createdAt: 'DESC', id: 'DESC' },
       take: limit,

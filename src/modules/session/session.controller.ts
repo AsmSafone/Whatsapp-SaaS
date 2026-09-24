@@ -86,6 +86,14 @@ export class SessionController {
     return SessionResponseDto.fromEntity(session, this.sessionService.isActive(session.id));
   }
 
+  /**
+   * Returns the userId of the calling tenant, or null for platform-level admin API keys.
+   * Used to scope per-session reads so a tenant cannot access another tenant's sessions by id.
+   */
+  private resolveTenantUserId(apiKey?: ApiKey): string | null {
+    return apiKey?.id?.startsWith('user:') ? (apiKey.userId ?? null) : null;
+  }
+
   @Post()
   @RequireRole(ApiKeyRole.OPERATOR)
   // Creating a session has no existing session id for the class-level @SessionScoped fence to check,
@@ -158,15 +166,18 @@ export class SessionController {
     if (Array.isArray(name) || name === '') {
       throw new BadRequestException('name must be a single non-empty value');
     }
-    // Scope to the key's allowedSessions so a session-restricted key cannot enumerate every
-    // session. A null/empty allowlist (e.g. ADMIN) still lists all.
+    // Tenant users only see their own sessions; admins (no userId) see all.
+    // A session-restricted key is further clamped to its allowedSessions allowlist.
+    const tenantUserId = apiKey?.id?.startsWith('user:') ? apiKey.userId : null;
     const sessions = await this.sessionService.findAll(apiKey?.allowedSessions, {
       limit: limit ? parseInt(limit, 10) : undefined,
       offset: offset ? parseInt(offset, 10) : undefined,
       name,
+      ownerUserId: tenantUserId ?? undefined,
     });
     return sessions.map(s => this.transformSession(s));
   }
+
 
   @ChatScoped('agnostic')
   @Get(':sessionId')
@@ -178,8 +189,11 @@ export class SessionController {
     type: SessionResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async findOne(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionResponseDto> {
-    const session = await this.sessionService.findOne(id);
+  async findOne(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionResponseDto> {
+    const session = await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey));
     return this.transformSession(session);
   }
 
@@ -192,7 +206,11 @@ export class SessionController {
     type: SessionConfigResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async getConfig(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionConfigResponseDto> {
+  async getConfig(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionConfigResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     return this.sessionService.getConfig(id);
   }
 
@@ -237,7 +255,11 @@ export class SessionController {
     type: SessionProxyResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async getProxy(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionProxyResponseDto> {
+  async getProxy(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionProxyResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     return this.sessionService.getProxy(id);
   }
 

@@ -362,9 +362,21 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
     return sessions.map(session => this.attachRuntimeState(session));
   }
 
-  async findOne(id: string): Promise<Session> {
+  /**
+   * Load a session by id, throwing 404 if it does not exist.
+   *
+   * When `assertOwnedBy` is supplied (a non-null tenant userId), the call also throws 404 if
+   * the session's ownerUserId does not match — intentionally indistinguishable from "not found"
+   * to prevent cross-tenant enumeration.
+   */
+  async findOne(id: string, assertOwnedBy?: string | null): Promise<Session> {
     const session = await this.sessionRepository.findOne({ where: { id } });
     if (!session) {
+      throw new NotFoundException(`Session with id '${id}' not found`);
+    }
+    // Tenant ownership check: return 404 (not 403) so a malicious user cannot probe
+    // whether another tenant's session id exists.
+    if (assertOwnedBy && session.ownerUserId !== assertOwnedBy) {
       throw new NotFoundException(`Session with id '${id}' not found`);
     }
     return this.attachRuntimeState(session);
