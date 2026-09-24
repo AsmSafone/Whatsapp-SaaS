@@ -1448,4 +1448,9 @@ export const accountApi = {
       method: 'PATCH',
       body: JSON.stringify({ plan }),
     }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<{ ok: boolean; message: string }>('/account/password', {
+      method: 'PATCH',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }),
 };

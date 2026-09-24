@@ -1143,7 +1143,12 @@ describe('AuthService', () => {
       (repository.create as jest.Mock).mockReturnValue(mockKey);
       (repository.save as jest.Mock).mockResolvedValue(mockKey);
 
-      const result = await service.seedApiKey('zap_k1_seed_test_key', 'Default Admin Key', ApiKeyRole.ADMIN, 'admin-user-uuid');
+      const result = await service.seedApiKey(
+        'zap_k1_seed_test_key',
+        'Default Admin Key',
+        ApiKeyRole.ADMIN,
+        'admin-user-uuid',
+      );
 
       expect(repository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1166,13 +1171,9 @@ describe('AuthService', () => {
 
       await service.linkUnlinkedAdminKeys('admin-user-123');
 
-      expect(repository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            role: ApiKeyRole.ADMIN,
-          }),
-        }),
-      );
+      expect(repository.find).toHaveBeenCalled();
+      const findCalls = (repository.find as jest.Mock).mock.calls as Array<[{ where: Record<string, unknown> }]>;
+      expect(findCalls[0][0].where).toMatchObject({ role: ApiKeyRole.ADMIN });
       expect(mockKey1.userId).toBe('admin-user-123');
       expect(mockKey2.userId).toBe('admin-user-123');
       expect(repository.save).toHaveBeenCalledWith(mockKey1);
@@ -1186,4 +1187,3 @@ describe('AuthService', () => {
     });
   });
 });
-

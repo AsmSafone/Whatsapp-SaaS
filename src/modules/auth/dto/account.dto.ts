@@ -37,6 +37,20 @@ export class ChangePlanDto {
   plan!: 'starter' | 'pro' | 'plus' | 'business';
 }
 
+export class ChangePasswordDto {
+  @ApiProperty({ example: 'current-secret-password' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(128)
+  currentPassword!: string;
+
+  @ApiProperty({ example: 'new-secret-password-8-chars' })
+  @IsString()
+  @MinLength(8)
+  @MaxLength(128)
+  newPassword!: string;
+}
+
 export class AccountResponseDto {
   @ApiProperty()
   id!: string;

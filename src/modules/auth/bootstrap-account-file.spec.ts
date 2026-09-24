@@ -66,7 +66,10 @@ describe('bootstrap account file', () => {
       writeFileSync(join(dir, '.admin-account'), 'not-json');
 
       expect(readBootstrapAccount(logger)).toBeNull();
-      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('Failed to read admin account file'), expect.anything());
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to read admin account file'),
+        expect.anything(),
+      );
     });
   });
 
@@ -75,7 +78,7 @@ describe('bootstrap account file', () => {
       writeBootstrapAccount('admin@zaptura.io', 'written-secret');
 
       const content = readFileSync(join(dir, '.admin-account'), 'utf-8');
-      const parsed = JSON.parse(content);
+      const parsed: unknown = JSON.parse(content);
       expect(parsed).toEqual({ email: 'admin@zaptura.io', password: 'written-secret' });
     });
   });

@@ -1,10 +1,6 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import {
-  AccountService,
-  resolveDefaultAdminEmail,
-  resolveDefaultAdminPassword,
-} from './account.service';
+import { AccountService, resolveDefaultAdminEmail, resolveDefaultAdminPassword } from './account.service';
 import { User } from './entities/user.entity';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { Session } from '../session/entities/session.entity';
@@ -24,7 +20,10 @@ describe('AccountService', () => {
       findOne: jest.fn(),
       find: jest.fn(),
       save: jest.fn(),
-      create: jest.fn(dto => ({ id: 'user-uuid-1', createdAt: new Date(), updatedAt: new Date(), ...dto })),
+      create: jest.fn(
+        (dto: Partial<User>): User =>
+          ({ id: 'user-uuid-1', createdAt: new Date(), updatedAt: new Date(), ...dto }) as User,
+      ),
       count: jest.fn(),
     };
     sessionsRepo = {
@@ -143,14 +142,20 @@ describe('AccountService', () => {
     it('throws ConflictException on duplicate email', async () => {
       usersRepo.findOne!.mockResolvedValue({ id: 'existing' });
 
-      await expect(
-        service.register({ name: 'Bob', email: 'bob@example.com', password: 'pass' }),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.register({ name: 'Bob', email: 'bob@example.com', password: 'pass' })).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it('logs in successfully with correct password', async () => {
       const hash = hashPassword('correctpass');
-      usersRepo.findOne!.mockResolvedValue({ id: 'u2', email: 'user@example.com', name: 'User', plan: 'starter', passwordHash: hash });
+      usersRepo.findOne!.mockResolvedValue({
+        id: 'u2',
+        email: 'user@example.com',
+        name: 'User',
+        plan: 'starter',
+        passwordHash: hash,
+      });
 
       const res = await service.login('user@example.com', 'correctpass');
       expect(res.id).toBe('u2');
@@ -240,4 +245,46 @@ describe('AccountService', () => {
       expect(actor.allowedSessions).toBeNull();
     });
   });
+
+  describe('changePassword', () => {
+    it('throws UnauthorizedException if account is not found', async () => {
+      usersRepo.findOne!.mockResolvedValue(null);
+      await expect(service.changePassword('missing-id', 'old', 'new-pass-123')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('throws UnauthorizedException if current password does not match', async () => {
+      const user = {
+        id: 'u1',
+        email: 'user@example.com',
+        passwordHash: hashPassword('correct-old-password'),
+      };
+      usersRepo.findOne!.mockResolvedValue(user);
+
+      await expect(service.changePassword('u1', 'wrong-old-password', 'new-pass-123')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('updates password hash and saves user when current password matches', async () => {
+      const user = {
+        id: 'u1',
+        email: 'user@example.com',
+        passwordHash: hashPassword('correct-old-password'),
+      };
+      usersRepo.findOne!.mockResolvedValue(user);
+      usersRepo.save!.mockImplementation(u => Promise.resolve(u));
+
+      const updated = await service.changePassword('u1', 'correct-old-password', 'brand-new-secret-123');
+
+      expect(usersRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'u1',
+        }),
+      );
+      expect(updated.passwordHash).not.toBe(user.passwordHash);
+    });
+  });
 });
+

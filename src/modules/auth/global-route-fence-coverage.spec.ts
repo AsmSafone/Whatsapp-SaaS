@@ -36,6 +36,10 @@ const ALLOWLIST = new Map<string, string>([
   // Self-validation only: the route returns {valid, role} for the calling key and reads/writes no
   // resource, so a session-restricted key validating itself is harmless (it cannot broaden scope).
   ['auth-validate.controller.ts :: validate', 'self-validation of the calling key; no resource access'],
+  // Account self-service operates on user identity rather than WhatsApp sessions.
+  ['account.controller.ts :: me', 'self-inspection of calling account/user'],
+  ['account.controller.ts :: changePlan', 'self-service plan modification for calling account'],
+  ['account.controller.ts :: changePassword', 'self-service password update for calling account'],
 ]);
 
 /**

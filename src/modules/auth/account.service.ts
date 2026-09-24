@@ -8,6 +8,7 @@ import { Session } from '../session/entities/session.entity';
 import { hashPassword, signUserToken, verifyPassword, verifyUserToken } from './user-token';
 import { PLAN_LIMITS } from './saas-plans';
 import { RegisterDto } from './dto/account.dto';
+import { writeBootstrapAccount } from './bootstrap-account-file';
 
 export function resolveDefaultAdminEmail(): string {
   return (
@@ -78,6 +79,27 @@ export class AccountService {
     if (!user) throw new UnauthorizedException('Account not found');
     user.plan = plan;
     return this.users.save(user);
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<User> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('Account not found');
+    if (!verifyPassword(currentPassword, user.passwordHash)) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+    user.passwordHash = hashPassword(newPassword);
+    const saved = await this.users.save(user);
+
+    // Keep data/.admin-account updated if changing default admin's password
+    if (user.email === resolveDefaultAdminEmail()) {
+      try {
+        writeBootstrapAccount(user.email, newPassword);
+      } catch {
+        // file write non-fatal
+      }
+    }
+
+    return saved;
   }
 
   async fromToken(token: string): Promise<User | null> {
@@ -161,4 +183,3 @@ export class AccountService {
     return apiKey;
   }
 }
-

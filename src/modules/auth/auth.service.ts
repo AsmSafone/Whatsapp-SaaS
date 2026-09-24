@@ -200,12 +200,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     removeBootstrapKey('its key was revoked or deleted', this.logger);
   }
 
-  async seedApiKey(
-    rawKey: string,
-    name: string,
-    role: ApiKeyRole,
-    userId?: string | null,
-  ): Promise<ApiKey> {
+  async seedApiKey(rawKey: string, name: string, role: ApiKeyRole, userId?: string | null): Promise<ApiKey> {
     const keyHash = this.hashKey(rawKey);
     const keyPrefix = rawKey.substring(0, 12);
 

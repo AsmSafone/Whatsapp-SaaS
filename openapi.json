@@ -448,6 +448,31 @@
         ]
       }
     },
+    "/api/account/password": {
+      "patch": {
+        "operationId": "AccountController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Change account password",
+        "tags": [
+          "account"
+        ]
+      }
+    },
     "/api/sessions": {
       "post": {
         "operationId": "SessionController_create",
@@ -10463,6 +10488,23 @@
         },
         "required": [
           "plan"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "current-secret-password"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "new-secret-password-8-chars"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
         ]
       },
       "CreateSessionDto": {
