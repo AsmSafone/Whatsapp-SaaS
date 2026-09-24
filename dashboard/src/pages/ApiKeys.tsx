@@ -428,17 +428,7 @@ export function ApiKeys() {
           )}
         </div>
 
-        <div className="permissions-reference">
-          <h3>{t('apiKeys.rolesTitle')}</h3>
-          <div className="permissions-list">
-            {roleNames.map(r => (
-              <div key={r} className="perm-item">
-                <code>{r}</code>
-                <span>{t(`apiKeys.roleDescriptions.${r}`)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
 
       {confirmAction && (

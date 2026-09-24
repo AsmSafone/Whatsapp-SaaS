@@ -1,9 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Languages, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { CustomSelect } from '../components/CustomSelect';
-import { languageOptions, resolveSupportedLanguage, type SupportedLanguage } from '../i18n';
+import { Eye, EyeOff, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ZapturaLogo } from '../components/ZapturaLogo';
@@ -14,19 +12,13 @@ interface LoginProps {
 }
 
 export function Login({ onLogin }: LoginProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   useDocumentTitle('Sign In — Zaptura WA');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const currentLang = resolveSupportedLanguage(i18n.resolvedLanguage || i18n.language);
-
-  const changeLanguage = (language: SupportedLanguage) => {
-    void i18n.changeLanguage(language);
-  };
-
   const finishWithToken = async (token: string) => {
     const response = await fetch(`${API_BASE_URL}/auth/validate`, {
       method: 'POST',

@@ -4,7 +4,7 @@ import { AccountService, resolveDefaultAdminEmail } from './account.service';
 import { ChangePasswordDto, ChangePlanDto, LoginDto, RegisterDto, UpdateProfileDto } from './dto/account.dto';
 import { Public, CurrentApiKey } from './decorators/auth.decorators';
 import { PLAN_CATALOG, PLAN_LIMITS } from './saas-plans';
-import type { ApiKey } from './entities/api-key.entity';
+import { type ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Session } from '../session/entities/session.entity';
@@ -54,7 +54,7 @@ export class AccountController {
         plan: 'platform',
         sessionLimit: null,
         sessionCount: null,
-        role: actor?.role === 'admin' ? 'admin' : 'user',
+        role: actor?.role === ApiKeyRole.ADMIN ? 'admin' : 'user',
       };
     }
     const user = await this.accounts.findById(actor.userId);
