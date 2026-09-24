@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface ZapturaLogoProps {
   size?: number;
   showText?: boolean;
