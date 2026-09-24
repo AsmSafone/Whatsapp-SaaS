@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Star, ArrowRight, ShieldCheck, Zap, HelpCircle } from 'lucide-react';
+import { Check, Star, ArrowRight } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { MarketingShell } from './MarketingShell';
 import { NX_PLAN_FEATURES, NX_PLANS } from './marketing-data';

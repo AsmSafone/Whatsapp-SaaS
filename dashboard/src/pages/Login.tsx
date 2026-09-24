@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Languages, ArrowLeft, KeyRound, User, Sparkles, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Languages, ArrowLeft, KeyRound, User, ShieldCheck } from 'lucide-react';
 import { CustomSelect } from '../components/CustomSelect';
 import { languageOptions, resolveSupportedLanguage, type SupportedLanguage } from '../i18n';
 import { API_BASE_URL } from '../services/api';

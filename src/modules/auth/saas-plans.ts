@@ -14,8 +14,32 @@ export const PLAN_CATALOG: Array<{
   sessions: number;
   blurb: string;
 }> = [
-  { id: 'starter', name: 'Starter', price: 6, sessions: 1, blurb: 'One WhatsApp number for individuals and small tools.' },
-  { id: 'pro', name: 'Pro', price: 15, sessions: 3, blurb: 'Growing products that need a few linked numbers.' },
-  { id: 'plus', name: 'Plus', price: 30, sessions: 6, blurb: 'Teams covering more inboxes and brands.' },
-  { id: 'business', name: 'Business', price: 45, sessions: 10, blurb: 'Higher density for agencies and production workloads.' },
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 6,
+    sessions: 1,
+    blurb: 'One WhatsApp number for individuals and small tools.',
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 15,
+    sessions: 3,
+    blurb: 'Growing products that need a few linked numbers.',
+  },
+  {
+    id: 'plus',
+    name: 'Plus',
+    price: 30,
+    sessions: 6,
+    blurb: 'Teams covering more inboxes and brands.',
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 45,
+    sessions: 10,
+    blurb: 'Higher density for agencies and production workloads.',
+  },
 ];

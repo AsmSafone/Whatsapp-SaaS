@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ShieldCheck, Sparkles, User, Mail, Lock } from 'lucide-react';
+import { ArrowLeft, Check, ShieldCheck, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ZapturaLogo } from '../components/ZapturaLogo';

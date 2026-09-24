@@ -79,7 +79,7 @@ export class AccountService {
   async actorFromToken(token: string): Promise<ApiKey> {
     const user = await this.fromToken(token);
     if (!user) throw new UnauthorizedException('Invalid session');
-    const owned = await this.sessions.find({ where: { ownerUserId: user.id }, select: ['id'] });
+    const owned = await this.sessions.find({ where: { ownerUserId: user.id }, select: { id: true } });
     const apiKey = new ApiKey();
     apiKey.id = `user:${user.id}`;
     apiKey.name = user.name;
@@ -89,8 +89,7 @@ export class AccountService {
     apiKey.allowedIps = null;
     // An empty allowlist means "unrestricted" on every existing fence. A tenant with zero sessions
     // must still be locked to nothing they own — never the platform-admin inventory.
-    apiKey.allowedSessions =
-      owned.length > 0 ? owned.map(row => row.id) : ['00000000-0000-4000-a000-000000000000'];
+    apiKey.allowedSessions = owned.length > 0 ? owned.map(row => row.id) : ['00000000-0000-4000-a000-000000000000'];
     apiKey.allowedChats = null;
     apiKey.isActive = true;
     apiKey.expiresAt = null;
