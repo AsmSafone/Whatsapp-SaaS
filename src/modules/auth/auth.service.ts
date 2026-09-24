@@ -264,7 +264,13 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     return { apiKey: saved, rawKey };
   }
 
-  async findAll(): Promise<ApiKey[]> {
+  async findAll(userId?: string): Promise<ApiKey[]> {
+    if (userId) {
+      return this.apiKeyRepository.find({
+        where: { userId },
+        order: { createdAt: 'DESC' },
+      });
+    }
     return this.apiKeyRepository.find({
       order: { createdAt: 'DESC' },
     });

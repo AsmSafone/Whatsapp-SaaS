@@ -200,7 +200,7 @@
     "registering": "Creating account...",
     "registerInvalid": "Name, a valid email, and a password of at least 8 characters are required.",
     "registerFailed": "Could not create the account",
-    "hasAccount": "Already have an account?",
+    "hasAccount": "Existing user?",
     "apiKey": "Clé API",
     "apiKeyPlaceholder": "Entrez votre clé API",
     "apiKeyRequired": "La clé API est requise",

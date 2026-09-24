@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ZapturaLogo } from '../components/ZapturaLogo';
@@ -151,23 +151,10 @@ export function Register({ onLogin }: RegisterProps) {
           </button>
         </form>
 
-        <div className="register-perks">
-          <div className="register-perk">
-            <Check size={14} className="login-text-emerald" />
-            <span>Instant multi-device QR pairing</span>
-          </div>
-          <div className="register-perk">
-            <Check size={14} className="login-text-emerald" />
-            <span>Zero per-message fees</span>
-          </div>
-          <div className="register-perk">
-            <ShieldCheck size={14} className="login-text-emerald" />
-            <span>No credit card required upfront</span>
-          </div>
-        </div>
+
 
         <p className="login-help">
-          {t('login.hasAccount')} <Link to="/login">Sign in here</Link>
+          {t('login.hasAccount')} <Link to="/login">Sign in</Link>
         </p>
       </div>
 

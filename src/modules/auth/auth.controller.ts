@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Req, HttpCode, HttpStatus, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -46,7 +46,7 @@ export class AuthController {
     @Req() req: Request,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyCreatedResponseDto> {
-    const { apiKey, rawKey } = await this.authService.createApiKey(dto);
+    const { apiKey, rawKey } = await this.authService.createApiKey(dto, { userId: actor?.userId ?? null });
     await this.auditService.logInfo(AuditAction.API_KEY_CREATED, {
       ...this.auditContext(req, actor),
       metadata: { targetKeyId: apiKey.id, targetKeyName: apiKey.name, role: apiKey.role },
@@ -76,8 +76,8 @@ export class AuthController {
     description: 'All API keys (the plaintext key is never returned; only the keyPrefix).',
     type: [ApiKeyResponseDto],
   })
-  async findAll(): Promise<ApiKeyResponseDto[]> {
-    const keys = await this.authService.findAll();
+  async findAll(@CurrentApiKey() actor?: ApiKey): Promise<ApiKeyResponseDto[]> {
+    const keys = await this.authService.findAll(actor?.userId ?? undefined);
     return keys.map(k => ({
       id: k.id,
       name: k.name,
@@ -173,6 +173,9 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'The key is the last usable admin key.' })
   async delete(@Param('id') id: string, @Req() req: Request, @CurrentApiKey() actor?: ApiKey): Promise<void> {
     const target = await this.authService.findOne(id);
+    if (actor?.userId && target.userId && target.userId !== actor.userId) {
+      throw new ForbiddenException('Cannot delete another account API key');
+    }
     await this.authService.delete(id);
     await this.auditService.logInfo(AuditAction.API_KEY_DELETED, {
       ...this.auditContext(req, actor),
@@ -191,6 +194,10 @@ export class AuthController {
     @Req() req: Request,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyResponseDto> {
+    const target = await this.authService.findOne(id);
+    if (actor?.userId && target.userId && target.userId !== actor.userId) {
+      throw new ForbiddenException('Cannot revoke another account API key');
+    }
     const k = await this.authService.revoke(id);
     await this.auditService.logInfo(AuditAction.API_KEY_REVOKED, {
       ...this.auditContext(req, actor),

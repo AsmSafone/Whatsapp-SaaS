@@ -56,7 +56,7 @@ export const CODE_SAMPLES: Record<string, { label: string; code: string }> = {
   JS: {
     label: 'Node / JS',
     code: `// Send WhatsApp text or rich media in 3 lines
-const response = await fetch('https://api.zaptura.io/api/sessions/' + sessionId + '/messages/send-text', {
+const response = await fetch('https://zaptura.io/api/sessions/' + sessionId + '/messages/send-text', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ console.log('Dispatched message ID:', data.id);`,
 
 # Dispatch instant message with Python requests
 res = requests.post(
-    f"https://api.zaptura.io/api/sessions/{session_id}/messages/send-text",
+    f"https://zaptura.io/api/sessions/{session_id}/messages/send-text",
     headers={"X-API-Key": os.environ["ZAPTURA_API_KEY"]},
     json={
         "chatId": "15551234567@c.us",
@@ -87,7 +87,7 @@ print("Delivered status:", res.json())`,
   },
   cURL: {
     label: 'cURL',
-    code: `curl -X POST "https://api.zaptura.io/api/sessions/$SESSION_ID/messages/send-text" \\
+    code: `curl -X POST "https://zaptura.io/api/sessions/$SESSION_ID/messages/send-text" \\
   -H "X-API-Key: $ZAPTURA_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -106,7 +106,7 @@ import (
 )
 
 func main() {
-    url := "https://api.zaptura.io/api/sessions/" + os.Getenv("SESSION_ID") + "/messages/send-text"
+    url := "https://zaptura.io/api/sessions/" + os.Getenv("SESSION_ID") + "/messages/send-text"
     payload := []byte(\`{"chatId":"15551234567@c.us","text":"⚡ Zaptura Go worker active"}\`)
     
     req, _ := http.NewRequest("POST", url, bytes.NewBuffer(payload))
@@ -120,7 +120,7 @@ func main() {
     label: 'PHP',
     code: `<?php
 $client = new \\GuzzleHttp\\Client();
-$response = $client->post('https://api.zaptura.io/api/sessions/' . $sessionId . '/messages/send-text', [
+$response = $client->post('https://zaptura.io/api/sessions/' . $sessionId . '/messages/send-text', [
   'headers' => [
     'X-API-Key' => getenv('ZAPTURA_API_KEY'),
     'Content-Type' => 'application/json'

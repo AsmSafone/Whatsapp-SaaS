@@ -81,7 +81,7 @@ export function Docs() {
           <div className="zp-code-topbar">
             <div className="zp-sim-card-title">
               <Terminal size={16} className="zp-text-emerald" />
-              <span>cURL Disptach Example</span>
+              <span>cURL Dispatch Example</span>
             </div>
             <button type="button" onClick={handleCopy} className="zp-copy-btn">
               {copied ? <Check size={14} className="zp-text-emerald" /> : <Copy size={14} />}

@@ -36,12 +36,10 @@ import { Modal } from '../components/Modal';
 import { SessionScopePicker } from '../components/SessionScopePicker';
 import { useToast } from '../hooks/useToast';
 import { copyToClipboard } from '../utils/clipboard';
-import { canScopeSessions, sameSessionScope, sessionScopeNames } from '../utils/sessionScope';
+import { sameSessionScope, sessionScopeNames } from '../utils/sessionScope';
 import './ApiKeys.css';
 
-const roleNames = ['admin', 'operator', 'viewer'] as const;
-
-const emptyKeyForm = { name: '', role: 'operator', allowedSessions: [] as string[] };
+const emptyKeyForm = { name: '', allowedSessions: [] as string[] };
 
 function useWindowSize() {
   const [width, setWidth] = useState(window.innerWidth);
@@ -100,8 +98,7 @@ export function ApiKeys() {
     try {
       const created = await createMutation.mutateAsync({
         name: newKey.name,
-        role: newKey.role,
-        ...(canScopeSessions(newKey.role) ? { allowedSessions: newKey.allowedSessions } : {}),
+        ...(newKey.allowedSessions.length > 0 ? { allowedSessions: newKey.allowedSessions } : {}),
       });
       setCreatedKey(created.apiKey || null);
       setNewKey(emptyKeyForm);
@@ -187,10 +184,6 @@ export function ApiKeys() {
             </span>
           ),
         }),
-        columnHelper.accessor('role', {
-          header: () => t('apiKeys.columns.role'),
-          cell: info => <span className="permission-badge">{info.getValue()}</span>,
-        }),
         columnHelper.accessor('allowedSessions', {
           id: 'sessions',
           header: () => t('apiKeys.columns.sessions'),
@@ -231,7 +224,7 @@ export function ApiKeys() {
               <span className="actions-cell">
                 {/* No per-row copy: the full key only exists once (post-creation modal); the row
                     only has the prefix, so a copy button here could only copy a useless fragment. */}
-                {canScopeSessions(apiKey.role) && apiKey.isActive && (
+                {apiKey.isActive && (
                   <button
                     className="icon-btn"
                     onClick={() => openEditSessions(apiKey)}
@@ -355,33 +348,14 @@ export function ApiKeys() {
                 placeholder={t('apiKeys.namePlaceholder')}
                 value={newKey.name}
                 onChange={e => setNewKey({ ...newKey, name: e.target.value })}
+                aria-label={t('common.name')}
               />
-              <label htmlFor="ak-2">{t('common.role')}</label>
-              <select
-                id="ak-2"
-                value={newKey.role}
-                onChange={e =>
-                  setNewKey({
-                    ...newKey,
-                    role: e.target.value,
-                    allowedSessions: canScopeSessions(e.target.value) ? newKey.allowedSessions : [],
-                  })
-                }
-              >
-                {roleNames.map(r => (
-                  <option key={r} value={r}>
-                    {t(`apiKeys.roles.${r}`)}
-                  </option>
-                ))}
-              </select>
-              {canScopeSessions(newKey.role) && (
-                <SessionScopePicker
-                  sessions={sessions}
-                  selectedIds={newKey.allowedSessions}
-                  onChange={ids => setNewKey({ ...newKey, allowedSessions: ids })}
-                  disabled={createMutation.isPending}
-                />
-              )}
+              <SessionScopePicker
+                sessions={sessions}
+                selectedIds={newKey.allowedSessions}
+                onChange={ids => setNewKey({ ...newKey, allowedSessions: ids })}
+                disabled={createMutation.isPending}
+              />
             </>
           )}
         </Modal>

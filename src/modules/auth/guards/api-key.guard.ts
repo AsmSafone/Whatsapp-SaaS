@@ -20,7 +20,6 @@ import {
   UNSCOPED_KEY,
   CHAT_SCOPED_KEY,
   CHAT_QUOTED_ALLOWED_KEY,
-  ALLOW_TENANT_SCOPED_CREATE_KEY,
   ChatScopeKind,
 } from '../decorators/auth.decorators';
 import { resolveClientIp } from '../../../common/utils/ip';
@@ -136,11 +135,10 @@ export class ApiKeyGuard implements CanActivate {
       context.getClass(),
     ]);
     if (requireUnscoped && (apiKey.allowedSessions?.length ?? 0) > 0) {
-      const allowTenantCreate = this.reflector.getAllAndOverride<boolean>(ALLOW_TENANT_SCOPED_CREATE_KEY, [
-        context.getHandler(),
-        context.getClass(),
-      ]);
-      if (!(allowTenantCreate && apiKey.id.startsWith('user:'))) {
+      const isRestricted = context.getClass().name.startsWith('Infra') || context.getClass().name.startsWith('Audit');
+      if (apiKey.id.startsWith('user:') && !isRestricted) {
+        // User accounts are admin of their own tenant resources (api-keys, plugins, etc.)
+      } else {
         throw new ForbiddenException('Session-scoped API keys are not permitted on this route');
       }
     }

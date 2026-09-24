@@ -200,7 +200,7 @@
     "registering": "Creating account...",
     "registerInvalid": "Name, a valid email, and a password of at least 8 characters are required.",
     "registerFailed": "Could not create the account",
-    "hasAccount": "Already have an account?",
+    "hasAccount": "Existing user?",
     "apiKey": "API 키",
     "apiKeyPlaceholder": "API 키를 입력하세요",
     "apiKeyRequired": "API 키가 필요합니다",

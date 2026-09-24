@@ -147,6 +147,7 @@ export class AccountService {
   }
 
   issue(user: User) {
+    const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
     const token = signUserToken(
       { sub: user.id, email: user.email, name: user.name, plan: user.plan },
       this.jwtSecret(),
@@ -158,6 +159,7 @@ export class AccountService {
       plan: user.plan,
       sessionLimit: PLAN_LIMITS[user.plan] ?? 1,
       token,
+      role: isOwner ? 'admin' : 'user',
     };
   }
 
@@ -192,19 +194,11 @@ export class AccountService {
     apiKey.keyHash = '';
     apiKey.keyPrefix = 'nxw_jwt';
 
-    let isAdmin = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
-    if (!isAdmin && this.apiKeys) {
-      const adminKey = await this.apiKeys.findOne({
-        where: { userId: user.id, role: ApiKeyRole.ADMIN, isActive: true },
-      });
-      if (adminKey) {
-        isAdmin = true;
-      }
-    }
+    const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
 
-    apiKey.role = isAdmin ? ApiKeyRole.ADMIN : ApiKeyRole.OPERATOR;
+    apiKey.role = ApiKeyRole.ADMIN;
     apiKey.allowedIps = null;
-    if (isAdmin) {
+    if (isOwner) {
       apiKey.allowedSessions = null;
     } else {
       apiKey.allowedSessions = owned.length > 0 ? owned.map(row => row.id) : ['00000000-0000-4000-a000-000000000000'];

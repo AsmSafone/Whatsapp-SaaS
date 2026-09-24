@@ -982,7 +982,7 @@ export const apiKeyApi = {
   list: () => request<ApiKey[]>('/auth/api-keys'),
   create: (data: {
     name: string;
-    role: string;
+    role?: string;
     allowedIps?: string[];
     allowedSessions?: string[];
     expiresAt?: string;

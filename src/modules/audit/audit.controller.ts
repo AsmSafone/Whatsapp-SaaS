@@ -3,11 +3,12 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AuditListResponseDto } from './dto/audit-response.dto';
 import { AuditService, AuditQueryOptions } from './audit.service';
 import { AuditLog, AuditAction, AuditSeverity } from './entities/audit-log.entity';
-import { RequireRole, CurrentApiKey } from '../auth/decorators/auth.decorators';
+import { RequireRole, RequireUnscopedKey, CurrentApiKey } from '../auth/decorators/auth.decorators';
 import { ApiKey, ApiKeyRole } from '../auth/entities/api-key.entity';
 
 @ApiTags('audit')
 @Controller('audit')
+@RequireUnscopedKey()
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 

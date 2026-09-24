@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AccountService } from './account.service';
+import { AccountService, resolveDefaultAdminEmail } from './account.service';
 import { ChangePasswordDto, ChangePlanDto, LoginDto, RegisterDto, UpdateProfileDto } from './dto/account.dto';
 import { Public, CurrentApiKey } from './decorators/auth.decorators';
 import { PLAN_CATALOG, PLAN_LIMITS } from './saas-plans';
@@ -54,11 +54,12 @@ export class AccountController {
         plan: 'platform',
         sessionLimit: null,
         sessionCount: null,
-        role: actor?.role,
+        role: actor?.role === 'admin' ? 'admin' : 'user',
       };
     }
     const user = await this.accounts.findById(actor.userId);
     const sessionCount = await this.sessions.count({ where: { ownerUserId: actor.userId } });
+    const isOwner = user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
     return {
       id: user?.id,
       name: user?.name,
@@ -66,7 +67,7 @@ export class AccountController {
       plan: user?.plan,
       sessionLimit: user ? PLAN_LIMITS[user.plan] : 1,
       sessionCount,
-      role: actor.role,
+      role: isOwner ? 'admin' : 'user',
     };
   }
 

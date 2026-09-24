@@ -51,7 +51,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
               Sign In
             </Link>
             <Link to="/register" className="zp-btn zp-btn-glow zp-btn-sm">
-              Deploy Free
+              Get Started
               <ArrowRight size={14} className="zp-btn-arrow" />
             </Link>
             <button

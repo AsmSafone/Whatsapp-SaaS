@@ -24,6 +24,7 @@ export class AuthValidateController {
     if (!apiKey) {
       return { valid: false };
     }
-    return { valid: true, role: apiKey.role };
+    const role = apiKey.userId && apiKey.allowedSessions !== null ? 'user' : apiKey.role;
+    return { valid: true, role };
   }
 }

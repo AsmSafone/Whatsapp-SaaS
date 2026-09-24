@@ -190,7 +190,7 @@ export function useCreateApiKeyMutation() {
   return useMutation({
     mutationFn: (data: {
       name: string;
-      role: string;
+      role?: string;
       allowedIps?: string[];
       allowedSessions?: string[];
       expiresAt?: string;

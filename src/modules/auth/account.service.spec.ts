@@ -196,7 +196,7 @@ describe('AccountService', () => {
       expect(actor.userId).toBe('admin-id');
     });
 
-    it('returns ApiKeyRole.OPERATOR and scoped allowedSessions for regular tenants', async () => {
+    it('returns ApiKeyRole.ADMIN and scoped allowedSessions for regular tenants', async () => {
       const tenantToken = signUserToken(
         { sub: 'tenant-id', email: 'tenant@example.com', name: 'Tenant', plan: 'starter' },
         service.jwtSecret(),
@@ -214,35 +214,9 @@ describe('AccountService', () => {
       const actor = await service.actorFromToken(tenantToken);
 
       expect(actor.id).toBe('user:tenant-id');
-      expect(actor.role).toBe(ApiKeyRole.OPERATOR);
+      expect(actor.role).toBe(ApiKeyRole.ADMIN);
       expect(actor.allowedSessions).toEqual(['sess-1']);
       expect(actor.userId).toBe('tenant-id');
-    });
-
-    it('returns ApiKeyRole.ADMIN if user has an active ADMIN key linked', async () => {
-      const customAdminToken = signUserToken(
-        { sub: 'custom-admin-id', email: 'custom@other.com', name: 'Custom Admin', plan: 'business' },
-        service.jwtSecret(),
-      );
-      usersRepo.findOne!.mockResolvedValue({
-        id: 'custom-admin-id',
-        email: 'custom@other.com',
-        name: 'Custom Admin',
-        plan: 'business',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      apiKeysRepo.findOne!.mockResolvedValue({
-        id: 'k1',
-        userId: 'custom-admin-id',
-        role: ApiKeyRole.ADMIN,
-        isActive: true,
-      });
-
-      const actor = await service.actorFromToken(customAdminToken);
-
-      expect(actor.role).toBe(ApiKeyRole.ADMIN);
-      expect(actor.allowedSessions).toBeNull();
     });
   });
 
