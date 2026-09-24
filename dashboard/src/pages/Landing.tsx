@@ -507,11 +507,13 @@ export function Landing() {
           <div className="zp-roi-card">
             <div className="zp-roi-slider-block">
               <div className="zp-roi-slider-header">
-                <span>Estimated Monthly Outbound Messages:</span>
+                <label htmlFor="monthly-volume">Estimated Monthly Outbound Messages:</label>
                 <strong className="zp-roi-count">{monthlyVolume.toLocaleString()} msgs / month</strong>
               </div>
               <input
+                id="monthly-volume"
                 type="range"
+                aria-label="Estimated Monthly Outbound Messages"
                 min={5000}
                 max={150000}
                 step={5000}

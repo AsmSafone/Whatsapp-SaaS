@@ -9,14 +9,16 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, UpdateQueryBuilder, DeleteQueryBuilder, type QueryDeepPartialEntity } from 'typeorm';
+import { In, IsNull, Repository, UpdateQueryBuilder, DeleteQueryBuilder, type QueryDeepPartialEntity } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { ipMatches } from '../../common/utils/ip';
 import { hashApiKey } from './api-key-hash';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
+import { User } from './entities/user.entity';
 import { CreateApiKeyDto, UpdateApiKeyDto } from './dto';
 import { createLogger } from '../../common/services/logger.service';
 import { readBootstrapKey, removeBootstrapKey, writeBootstrapKey } from './bootstrap-key-file';
+import { writeBootstrapAccount } from './bootstrap-account-file';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { apiKeyAuthorizationFingerprint, normalizeScopeList } from './api-key-authorization';
 import { normalizeChatAllowList } from '../../common/security/chat-scope';
@@ -68,6 +70,23 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit(): Promise<void> {
+    // Ensure default admin user account on first run
+    let adminResult: { user: User; rawPassword?: string; isNew: boolean } | null = null;
+    if (this.accountService) {
+      try {
+        adminResult = await this.accountService.ensureDefaultAdminUser();
+        if (adminResult.isNew && adminResult.rawPassword) {
+          try {
+            writeBootstrapAccount(adminResult.user.email, adminResult.rawPassword);
+          } catch (err) {
+            this.logger.warn('Could not save admin account file', { error: String(err) });
+          }
+        }
+      } catch (err) {
+        this.logger.warn('Could not ensure default admin account', { error: String(err) });
+      }
+    }
+
     // Seed a default API key if none exist
     const count = await this.apiKeyRepository.count();
     let displayKey: string;
@@ -76,7 +95,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     if (count === 0) {
       displayKey = resolveSeedApiKey();
 
-      await this.seedApiKey(displayKey, 'Default Admin Key', ApiKeyRole.ADMIN);
+      await this.seedApiKey(displayKey, 'Default Admin Key', ApiKeyRole.ADMIN, adminResult?.user?.id);
       isNewKey = true;
 
       // Save raw key to file for startup script to read (owner-only — it's the raw admin key).
@@ -89,6 +108,11 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       // Read the saved bootstrap key from the file — but only while it still resolves to a LIVE
       // key; a revoked/rotated/deleted key must not be advertised in the banner.
       displayKey = (await this.readLiveBootstrapKey()) ?? '(check dashboard for keys)';
+
+      // If an existing admin key has no linked user, link it to the default admin user
+      if (adminResult?.user) {
+        await this.linkUnlinkedAdminKeys(adminResult.user.id);
+      }
     }
 
     // Always show the welcome banner on startup
@@ -104,6 +128,18 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`  📊 Dashboard: ${dashboardUrl}`);
     this.logger.log(`  📚 API Docs:  ${apiBaseUrl}/api/docs`);
     this.logger.log('');
+    if (adminResult?.user) {
+      if (adminResult.isNew && adminResult.rawPassword) {
+        this.logger.log('  👤 Admin Account (newly created):');
+        this.logger.log(`     Email:    ${adminResult.user.email}`);
+        this.logger.log(`     Password: ${adminResult.rawPassword}`);
+      } else {
+        this.logger.log('  👤 Admin Account:');
+        this.logger.log(`     Email:    ${adminResult.user.email}`);
+        this.logger.log('     Password: (check data/.admin-account or dashboard)');
+      }
+      this.logger.log('');
+    }
     if (isNewKey) {
       this.logger.log('  🔑 API Key (newly created):');
     } else {
@@ -164,7 +200,12 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     removeBootstrapKey('its key was revoked or deleted', this.logger);
   }
 
-  private async seedApiKey(rawKey: string, name: string, role: ApiKeyRole): Promise<ApiKey> {
+  async seedApiKey(
+    rawKey: string,
+    name: string,
+    role: ApiKeyRole,
+    userId?: string | null,
+  ): Promise<ApiKey> {
     const keyHash = this.hashKey(rawKey);
     const keyPrefix = rawKey.substring(0, 12);
 
@@ -173,9 +214,28 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       keyHash,
       keyPrefix,
       role,
+      userId: userId ?? null,
     });
 
     return this.apiKeyRepository.save(apiKey);
+  }
+
+  async linkUnlinkedAdminKeys(adminUserId: string): Promise<void> {
+    try {
+      const unlinked = await this.apiKeyRepository.find({
+        where: { role: ApiKeyRole.ADMIN, userId: IsNull() },
+      });
+      if (Array.isArray(unlinked)) {
+        for (const key of unlinked) {
+          key.userId = adminUserId;
+          await this.apiKeyRepository.save(key);
+        }
+      }
+    } catch (err) {
+      this.logger.warn('Failed to link unlinked admin keys to default admin user', {
+        error: String(err),
+      });
+    }
   }
 
   async createApiKey(

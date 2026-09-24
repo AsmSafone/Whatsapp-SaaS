@@ -1,12 +1,34 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, Optional, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomBytes } from 'crypto';
 import { User, UserPlan } from './entities/user.entity';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { Session } from '../session/entities/session.entity';
 import { hashPassword, signUserToken, verifyPassword, verifyUserToken } from './user-token';
 import { PLAN_LIMITS } from './saas-plans';
 import { RegisterDto } from './dto/account.dto';
+
+export function resolveDefaultAdminEmail(): string {
+  return (
+    process.env.ADMIN_EMAIL?.trim().toLowerCase() ||
+    process.env.DEFAULT_ADMIN_EMAIL?.trim().toLowerCase() ||
+    'admin@zaptura.io'
+  );
+}
+
+export function resolveDefaultAdminPassword(): { password: string; isGenerated: boolean } {
+  if (process.env.ADMIN_PASSWORD) {
+    return { password: process.env.ADMIN_PASSWORD, isGenerated: false };
+  }
+  if (process.env.DEFAULT_ADMIN_PASSWORD) {
+    return { password: process.env.DEFAULT_ADMIN_PASSWORD, isGenerated: false };
+  }
+  if (process.env.ALLOW_DEV_API_KEY === 'true') {
+    return { password: 'dev-admin-password', isGenerated: false };
+  }
+  return { password: randomBytes(16).toString('hex'), isGenerated: true };
+}
 
 @Injectable()
 export class AccountService {
@@ -15,6 +37,9 @@ export class AccountService {
     private readonly users: Repository<User>,
     @InjectRepository(Session, 'data')
     private readonly sessions: Repository<Session>,
+    @Optional()
+    @InjectRepository(ApiKey, 'main')
+    private readonly apiKeys?: Repository<ApiKey>,
   ) {}
 
   jwtSecret(): string {
@@ -76,6 +101,27 @@ export class AccountService {
     };
   }
 
+  async ensureDefaultAdminUser(): Promise<{ user: User; rawPassword?: string; isNew: boolean }> {
+    const email = resolveDefaultAdminEmail();
+    const existing = await this.users.findOne({ where: { email } });
+    if (existing) {
+      return { user: existing, isNew: false };
+    }
+
+    const { password } = resolveDefaultAdminPassword();
+    const adminName = process.env.ADMIN_NAME?.trim() || process.env.DEFAULT_ADMIN_NAME?.trim() || 'Admin';
+    const user = await this.users.save(
+      this.users.create({
+        name: adminName,
+        email,
+        passwordHash: hashPassword(password),
+        plan: 'business',
+      }),
+    );
+
+    return { user, rawPassword: password, isNew: true };
+  }
+
   async actorFromToken(token: string): Promise<ApiKey> {
     const user = await this.fromToken(token);
     if (!user) throw new UnauthorizedException('Invalid session');
@@ -85,11 +131,24 @@ export class AccountService {
     apiKey.name = user.name;
     apiKey.keyHash = '';
     apiKey.keyPrefix = 'nxw_jwt';
-    apiKey.role = ApiKeyRole.OPERATOR;
+
+    let isAdmin = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    if (!isAdmin && this.apiKeys) {
+      const adminKey = await this.apiKeys.findOne({
+        where: { userId: user.id, role: ApiKeyRole.ADMIN, isActive: true },
+      });
+      if (adminKey) {
+        isAdmin = true;
+      }
+    }
+
+    apiKey.role = isAdmin ? ApiKeyRole.ADMIN : ApiKeyRole.OPERATOR;
     apiKey.allowedIps = null;
-    // An empty allowlist means "unrestricted" on every existing fence. A tenant with zero sessions
-    // must still be locked to nothing they own — never the platform-admin inventory.
-    apiKey.allowedSessions = owned.length > 0 ? owned.map(row => row.id) : ['00000000-0000-4000-a000-000000000000'];
+    if (isAdmin) {
+      apiKey.allowedSessions = null;
+    } else {
+      apiKey.allowedSessions = owned.length > 0 ? owned.map(row => row.id) : ['00000000-0000-4000-a000-000000000000'];
+    }
     apiKey.allowedChats = null;
     apiKey.isActive = true;
     apiKey.expiresAt = null;
@@ -102,3 +161,4 @@ export class AccountService {
     return apiKey;
   }
 }
+

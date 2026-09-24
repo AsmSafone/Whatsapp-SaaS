@@ -1136,4 +1136,54 @@ describe('AuthService', () => {
       expect(queried).toBe(createHash('sha256').update('zap_raw_key').digest('hex'));
     });
   });
+
+  describe('seedApiKey', () => {
+    it('creates and saves an API key linked with userId', async () => {
+      const mockKey = createMockApiKey({ role: ApiKeyRole.ADMIN, userId: 'admin-user-uuid' });
+      (repository.create as jest.Mock).mockReturnValue(mockKey);
+      (repository.save as jest.Mock).mockResolvedValue(mockKey);
+
+      const result = await service.seedApiKey('zap_k1_seed_test_key', 'Default Admin Key', ApiKeyRole.ADMIN, 'admin-user-uuid');
+
+      expect(repository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Default Admin Key',
+          role: ApiKeyRole.ADMIN,
+          userId: 'admin-user-uuid',
+        }),
+      );
+      expect(repository.save).toHaveBeenCalledWith(mockKey);
+      expect(result).toBe(mockKey);
+    });
+  });
+
+  describe('linkUnlinkedAdminKeys', () => {
+    it('finds unlinked admin keys and saves them with the admin user id', async () => {
+      const mockKey1 = createMockApiKey({ id: 'k-1', role: ApiKeyRole.ADMIN, userId: null });
+      const mockKey2 = createMockApiKey({ id: 'k-2', role: ApiKeyRole.ADMIN, userId: null });
+      (repository.find as jest.Mock).mockResolvedValue([mockKey1, mockKey2]);
+      (repository.save as jest.Mock).mockImplementation((k: ApiKey) => Promise.resolve(k));
+
+      await service.linkUnlinkedAdminKeys('admin-user-123');
+
+      expect(repository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            role: ApiKeyRole.ADMIN,
+          }),
+        }),
+      );
+      expect(mockKey1.userId).toBe('admin-user-123');
+      expect(mockKey2.userId).toBe('admin-user-123');
+      expect(repository.save).toHaveBeenCalledWith(mockKey1);
+      expect(repository.save).toHaveBeenCalledWith(mockKey2);
+    });
+
+    it('handles database errors gracefully without throwing', async () => {
+      (repository.find as jest.Mock).mockRejectedValue(new Error('DB connection failed'));
+
+      await expect(service.linkUnlinkedAdminKeys('admin-user-123')).resolves.toBeUndefined();
+    });
+  });
 });
+

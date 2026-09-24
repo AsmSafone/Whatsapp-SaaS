@@ -102,7 +102,7 @@ export class SessionController {
   @ApiResponse({ status: 409, description: 'Session name already exists' })
   async create(@Body() dto: CreateSessionDto, @CurrentApiKey() actor?: ApiKey): Promise<SessionResponseDto> {
     const tenantUserId = actor?.id?.startsWith('user:') ? actor.userId : null;
-    if (tenantUserId) {
+    if (tenantUserId && actor?.role !== ApiKeyRole.ADMIN) {
       const plan = (actor?.plan as UserPlan | undefined) ?? 'starter';
       const limit = PLAN_LIMITS[plan] ?? 1;
       const owned = await this.sessionService.findAll(undefined, { ownerUserId: tenantUserId, limit: 1000 });
