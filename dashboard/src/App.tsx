@@ -43,7 +43,9 @@ function AppContent() {
   // handleLogin stores a fresh key would re-fire the startup re-validation effect below and
   // double the /auth/validate request on every sign-in — the effect is for genuine page
   // refreshes with a saved key only.
-  const [savedKey] = useState(() => sessionStorage.getItem('zaptura_api_key') || sessionStorage.getItem('openwa_api_key'));
+  const [savedKey] = useState(
+    () => sessionStorage.getItem('zaptura_api_key') || sessionStorage.getItem('openwa_api_key'),
+  );
   const [isAuthenticated, setIsAuthenticated] = useState(!!savedKey);
   const [, setApiKey] = useState(savedKey || '');
   const { setRole, role } = useRole();

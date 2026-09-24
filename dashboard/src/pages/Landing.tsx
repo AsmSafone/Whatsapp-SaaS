@@ -46,7 +46,9 @@ export function Landing() {
   const [simText, setSimText] = useState('Order #9482 confirmed! Your tracking link is ready.');
   const [simRecipient, setSimRecipient] = useState('+1 (555) 382-9012');
   const [simTyping, setSimTyping] = useState(false);
-  const [messagesList, setMessagesList] = useState<Array<{ id: number; from: 'out' | 'in'; text: string; type: MsgType; time: string }>>([
+  const [messagesList, setMessagesList] = useState<
+    Array<{ id: number; from: 'out' | 'in'; text: string; type: MsgType; time: string }>
+  >([
     { id: 1, from: 'in', text: 'Hi! Can you send me the status of my order?', type: 'text', time: '10:41 AM' },
     { id: 2, from: 'out', text: 'Order #9482 confirmed! Your tracking link is ready.', type: 'text', time: '10:42 AM' },
   ]);
@@ -80,10 +82,7 @@ export function Landing() {
     const newId = Date.now();
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    setMessagesList(prev => [
-      ...prev,
-      { id: newId, from: 'out', text: simText, type: simType, time: timeStr },
-    ]);
+    setMessagesList(prev => [...prev, { id: newId, from: 'out', text: simText, type: simType, time: timeStr }]);
 
     // Simulate webhook bot auto-reply
     setSimTyping(true);
@@ -132,8 +131,8 @@ export function Landing() {
           </h1>
 
           <p className="zp-hero-lead">
-            Connect multiple WhatsApp numbers in seconds, stream bi-directional webhooks, hook into AI agents,
-            and dispatch unlimited automated notifications with zero message markups.
+            Connect multiple WhatsApp numbers in seconds, stream bi-directional webhooks, hook into AI agents, and
+            dispatch unlimited automated notifications with zero message markups.
           </p>
 
           <div className="zp-hero-cta-group">
@@ -178,8 +177,8 @@ export function Landing() {
             Test The Zaptura Gateway <span>In Real-Time</span>
           </h2>
           <p className="zp-section-desc">
-            Compose dynamic messages, toggle rich payload types, inspect live delivery states, and watch the
-            developer JSON output update synchronously.
+            Compose dynamic messages, toggle rich payload types, inspect live delivery states, and watch the developer
+            JSON output update synchronously.
           </p>
         </div>
 
@@ -257,24 +256,33 @@ export function Landing() {
               {/* Real-time JSON Payload Inspector */}
               <div className="zp-sim-payload-box">
                 <div className="zp-payload-header">
-                  <span>POST /api/sessions/default/messages/send-{simType === 'doc' ? 'file' : simType === 'image' ? 'image' : simType === 'voice' ? 'voice' : 'text'}</span>
+                  <span>
+                    POST /api/sessions/default/messages/send-
+                    {simType === 'doc'
+                      ? 'file'
+                      : simType === 'image'
+                        ? 'image'
+                        : simType === 'voice'
+                          ? 'voice'
+                          : 'text'}
+                  </span>
                   <span className="zp-payload-status">Status: 201 Created</span>
                 </div>
                 <pre className="zp-payload-code">
-{JSON.stringify(
-  {
-    chatId: simRecipient.replace(/\D/g, '') + '@c.us',
-    type: simType,
-    text: simText,
-    metadata: {
-      client: 'Zaptura Cloud Engine v2.4',
-      sentAt: new Date().toISOString(),
-      ackStatus: 'DELIVERED',
-    },
-  },
-  null,
-  2
-)}
+                  {JSON.stringify(
+                    {
+                      chatId: simRecipient.replace(/\D/g, '') + '@c.us',
+                      type: simType,
+                      text: simText,
+                      metadata: {
+                        client: 'Zaptura Cloud Engine v2.4',
+                        sentAt: new Date().toISOString(),
+                        ackStatus: 'DELIVERED',
+                      },
+                    },
+                    null,
+                    2,
+                  )}
                 </pre>
               </div>
             </div>
@@ -284,7 +292,7 @@ export function Landing() {
           <div className="zp-sim-phone-col">
             <div className="zp-phone-wrapper">
               <div className="zp-phone-notch" />
-              
+
               {/* WhatsApp App Header */}
               <div className="zp-wa-header">
                 <div className="zp-wa-avatar">
@@ -338,12 +346,10 @@ export function Landing() {
                     )}
 
                     <p className="zp-wa-text">{msg.text}</p>
-                    
+
                     <div className="zp-wa-meta">
                       <span className="zp-wa-time">{msg.time}</span>
-                      {msg.from === 'out' && (
-                        <CheckCheck size={14} className="zp-wa-checks zp-checks-blue" />
-                      )}
+                      {msg.from === 'out' && <CheckCheck size={14} className="zp-wa-checks zp-checks-blue" />}
                     </div>
                   </div>
                 ))}
@@ -405,12 +411,7 @@ export function Landing() {
                 ))}
               </div>
 
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="zp-copy-btn"
-                aria-label="Copy code snippet"
-              >
+              <button type="button" onClick={handleCopyCode} className="zp-copy-btn" aria-label="Copy code snippet">
                 {copied ? <CheckCheck size={14} className="zp-text-emerald" /> : <Copy size={14} />}
                 <span>{copied ? 'Copied!' : 'Copy'}</span>
               </button>
@@ -530,7 +531,10 @@ export function Landing() {
             <div className="zp-roi-comparison-grid">
               <div className="zp-roi-box zp-roi-meta">
                 <span className="zp-roi-box-label">Meta Cloud API / Twilio</span>
-                <div className="zp-roi-price">${metaCost}<span>/mo</span></div>
+                <div className="zp-roi-price">
+                  ${metaCost}
+                  <span>/mo</span>
+                </div>
                 <p className="zp-roi-box-sub">Pay-per-conversation markup + conversation window expirations.</p>
               </div>
 
@@ -538,7 +542,10 @@ export function Landing() {
 
               <div className="zp-roi-box zp-roi-zaptura">
                 <span className="zp-roi-box-label zp-text-emerald">Zaptura Flat SaaS</span>
-                <div className="zp-roi-price zp-text-emerald">${zapturaCost}<span>/mo</span></div>
+                <div className="zp-roi-price zp-text-emerald">
+                  ${zapturaCost}
+                  <span>/mo</span>
+                </div>
                 <p className="zp-roi-box-sub">Zero per-message fees. Unlimited messaging capacity.</p>
               </div>
             </div>
@@ -546,7 +553,8 @@ export function Landing() {
             <div className="zp-roi-savings-banner">
               <Sparkles size={20} className="zp-text-emerald" />
               <span>
-                You save approximately <strong>${annualSavings.toLocaleString()} per year</strong> by switching to Zaptura!
+                You save approximately <strong>${annualSavings.toLocaleString()} per year</strong> by switching to
+                Zaptura!
               </span>
             </div>
           </div>
@@ -606,18 +614,10 @@ export function Landing() {
 
         <div className="zp-billing-toggle-wrap">
           <div className="zp-billing-toggle">
-            <button
-              type="button"
-              className={!yearly ? 'active' : ''}
-              onClick={() => setYearly(false)}
-            >
+            <button type="button" className={!yearly ? 'active' : ''} onClick={() => setYearly(false)}>
               Monthly Billing
             </button>
-            <button
-              type="button"
-              className={yearly ? 'active' : ''}
-              onClick={() => setYearly(true)}
-            >
+            <button type="button" className={yearly ? 'active' : ''} onClick={() => setYearly(true)}>
               Annual Billing <span className="zp-save-pill">Save 15%</span>
             </button>
           </div>
@@ -627,10 +627,7 @@ export function Landing() {
           {NX_PLANS.map(plan => {
             const price = yearly ? Math.round(plan.monthly * 12 * 0.85) : plan.monthly;
             return (
-              <div
-                key={plan.id}
-                className={`zp-pricing-card ${plan.popular ? 'popular' : ''}`}
-              >
+              <div key={plan.id} className={`zp-pricing-card ${plan.popular ? 'popular' : ''}`}>
                 {plan.popular && (
                   <div className="zp-popular-badge">
                     <Star size={12} fill="currentColor" />
@@ -654,7 +651,9 @@ export function Landing() {
                 <ul className="zp-plan-features">
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
-                    <strong>{plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Numbers' : 'Number'}</strong>
+                    <strong>
+                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Numbers' : 'Number'}
+                    </strong>
                   </li>
                   {NX_PLAN_FEATURES.map((feat, idx) => (
                     <li key={idx}>
@@ -688,10 +687,7 @@ export function Landing() {
 
         <div className="zp-faq-list">
           {FAQ_ITEMS.map((item, idx) => (
-            <div
-              key={idx}
-              className={`zp-faq-item ${openFaq === idx ? 'open' : ''}`}
-            >
+            <div key={idx} className={`zp-faq-item ${openFaq === idx ? 'open' : ''}`}>
               <button
                 type="button"
                 className="zp-faq-question"
@@ -715,12 +711,10 @@ export function Landing() {
       <section className="zp-cta-section">
         <div className="zp-cta-box">
           <div className="zp-cta-glow" aria-hidden="true" />
-          <h2 className="zp-cta-title">
-            Ready to Supercharge Your WhatsApp Communications?
-          </h2>
+          <h2 className="zp-cta-title">Ready to Supercharge Your WhatsApp Communications?</h2>
           <p className="zp-cta-desc">
-            Deploy your first WhatsApp session in seconds. No per-message fees, no complex Meta verification,
-            and complete REST API automation.
+            Deploy your first WhatsApp session in seconds. No per-message fees, no complex Meta verification, and
+            complete REST API automation.
           </p>
 
           <div className="zp-cta-actions">

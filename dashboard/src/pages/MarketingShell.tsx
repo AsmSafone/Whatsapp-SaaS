@@ -24,9 +24,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
           <span className="zp-banner-pill">
             <Sparkles size={13} className="zp-pill-icon" /> New v2.4 Release
           </span>
-          <span className="zp-banner-text">
-            Autonomous Multi-Session Scaling & Webhook Queues are now live!
-          </span>
+          <span className="zp-banner-text">Autonomous Multi-Session Scaling & Webhook Queues are now live!</span>
           <Link to="/register" className="zp-banner-link">
             Claim 3-Day Free Trial <ArrowRight size={13} />
           </Link>
@@ -107,8 +105,8 @@ export function MarketingShell({ children }: MarketingShellProps) {
               <ZapturaLogo size={34} showText={true} subtitle="The Autonomous WhatsApp Cloud Engine" />
             </Link>
             <p className="zp-footer-desc">
-              High-throughput, unofficial WhatsApp API platform built for modern development teams, agencies, and SaaS founders.
-              Zero per-message fees. Real-time webhooks. Isolated multi-tenant security.
+              High-throughput, unofficial WhatsApp API platform built for modern development teams, agencies, and SaaS
+              founders. Zero per-message fees. Real-time webhooks. Isolated multi-tenant security.
             </p>
             <div className="zp-status-badge">
               <span className="zp-status-pulse" />
@@ -147,18 +145,15 @@ export function MarketingShell({ children }: MarketingShellProps) {
               <Terminal size={16} className="zp-text-cyan" />
               <span>SSRF-Protected Sandboxing</span>
             </div>
-            <p className="zp-mock-note">
-              Instant activation with 3-day full access. No card required.
-            </p>
+            <p className="zp-mock-note">Instant activation with 3-day full access. No card required.</p>
           </div>
         </div>
 
         <div className="zp-footer-bar">
-          <div className="zp-footer-copy">
-            © {new Date().getFullYear()} Zaptura Cloud Systems. All rights reserved.
-          </div>
+          <div className="zp-footer-copy">© {new Date().getFullYear()} Zaptura Cloud Systems. All rights reserved.</div>
           <div className="zp-footer-disclaimer">
-            Zaptura is an independent developer gateway. WhatsApp is a registered trademark of Meta Platforms, Inc. Zaptura is not affiliated with, sponsored by, or endorsed by Meta.
+            Zaptura is an independent developer gateway. WhatsApp is a registered trademark of Meta Platforms, Inc.
+            Zaptura is not affiliated with, sponsored by, or endorsed by Meta.
           </div>
         </div>
       </footer>

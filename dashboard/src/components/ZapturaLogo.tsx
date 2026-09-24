@@ -7,14 +7,12 @@ interface ZapturaLogoProps {
   className?: string;
 }
 
-export function ZapturaLogo({
-  size = 36,
-  showText = true,
-  subtitle,
-  className = '',
-}: ZapturaLogoProps) {
+export function ZapturaLogo({ size = 36, showText = true, subtitle, className = '' }: ZapturaLogoProps) {
   return (
-    <div className={`zaptura-logo-container ${className}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+    <div
+      className={`zaptura-logo-container ${className}`}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}
+    >
       <div
         className="zaptura-logo-mark"
         style={{
@@ -51,11 +49,7 @@ export function ZapturaLogo({
             </filter>
           </defs>
           <circle cx="50" cy="50" r="42" stroke="url(#zapGrad)" strokeWidth="3" strokeDasharray="6 4" opacity="0.4" />
-          <path
-            d="M32 26 L68 26 L42 50 L64 50 L28 78 L38 56 L24 56 Z"
-            fill="url(#zapGrad)"
-            filter="url(#logoGlow)"
-          />
+          <path d="M32 26 L68 26 L42 50 L64 50 L28 78 L38 56 L24 56 Z" fill="url(#zapGrad)" filter="url(#logoGlow)" />
         </svg>
       </div>
 
@@ -92,9 +86,7 @@ export function ZapturaLogo({
             </span>
           </div>
           {subtitle && (
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 500, marginTop: '2px' }}>
-              {subtitle}
-            </span>
+            <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 500, marginTop: '2px' }}>{subtitle}</span>
           )}
         </div>
       )}

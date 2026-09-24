@@ -119,7 +119,10 @@ export function Login({ onLogin }: LoginProps) {
           <button
             type="button"
             className={mode === 'account' ? 'active' : ''}
-            onClick={() => { setMode('account'); setError(''); }}
+            onClick={() => {
+              setMode('account');
+              setError('');
+            }}
           >
             <User size={14} />
             <span>{t('login.accountTab')}</span>
@@ -127,7 +130,10 @@ export function Login({ onLogin }: LoginProps) {
           <button
             type="button"
             className={mode === 'key' ? 'active' : ''}
-            onClick={() => { setMode('key'); setError(''); }}
+            onClick={() => {
+              setMode('key');
+              setError('');
+            }}
           >
             <KeyRound size={14} />
             <span>{t('login.apiKeyTab')}</span>

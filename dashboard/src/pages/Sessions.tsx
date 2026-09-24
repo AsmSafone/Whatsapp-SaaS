@@ -717,53 +717,53 @@ export function Sessions() {
             </div>
           ) : (
             <>
-          <label htmlFor="sess-1">{t('sessions.create.label')}</label>
-          <input
-            id="sess-1"
-            type="text"
-            placeholder={t('sessions.create.placeholder')}
-            value={newSessionName}
-            onChange={e => {
-              const value = e.target.value.toLowerCase().replace(/\s+/g, '-');
-              setNewSessionName(value);
-            }}
-            onKeyDown={e => e.key === 'Enter' && handleCreate()}
-          />
-          <p className="input-hint">
-            <Trans i18nKey="sessions.create.hint" components={{ code: <code /> }} />
-          </p>
-          {nameIssues.includes('format') && <p className="input-error">{t('sessions.create.invalidChars')}</p>}
-          {nameIssues.includes('too-long') && (
-            <p className="input-error">{t('sessions.create.tooLong', { length: newSessionName.length })}</p>
-          )}
-          {nameIssues.includes('duplicate') && <p className="input-error">{t('sessions.create.duplicate')}</p>}
-          <div className="proxy-form-section">
-            <label className="detail-toggle-row" htmlFor="create-use-proxy">
-              <span>{t('sessions.proxy.enabled')}</span>
+              <label htmlFor="sess-1">{t('sessions.create.label')}</label>
               <input
-                id="create-use-proxy"
-                type="checkbox"
-                checked={useProxy}
-                onChange={e => setUseProxy(e.target.checked)}
+                id="sess-1"
+                type="text"
+                placeholder={t('sessions.create.placeholder')}
+                value={newSessionName}
+                onChange={e => {
+                  const value = e.target.value.toLowerCase().replace(/\s+/g, '-');
+                  setNewSessionName(value);
+                }}
+                onKeyDown={e => e.key === 'Enter' && handleCreate()}
               />
-            </label>
-            {useProxy && (
-              <>
-                <label htmlFor="create-proxy-url">{t('sessions.proxy.url')}</label>
-                <input
-                  id="create-proxy-url"
-                  type="text"
-                  placeholder={t('sessions.proxy.urlPlaceholder')}
-                  value={createProxyUrl}
-                  onChange={e => setCreateProxyUrl(e.target.value)}
-                />
-                {createProxyInvalid && createProxyUrl.trim() && (
-                  <p className="input-error">{t('sessions.proxy.invalidUrl')}</p>
+              <p className="input-hint">
+                <Trans i18nKey="sessions.create.hint" components={{ code: <code /> }} />
+              </p>
+              {nameIssues.includes('format') && <p className="input-error">{t('sessions.create.invalidChars')}</p>}
+              {nameIssues.includes('too-long') && (
+                <p className="input-error">{t('sessions.create.tooLong', { length: newSessionName.length })}</p>
+              )}
+              {nameIssues.includes('duplicate') && <p className="input-error">{t('sessions.create.duplicate')}</p>}
+              <div className="proxy-form-section">
+                <label className="detail-toggle-row" htmlFor="create-use-proxy">
+                  <span>{t('sessions.proxy.enabled')}</span>
+                  <input
+                    id="create-use-proxy"
+                    type="checkbox"
+                    checked={useProxy}
+                    onChange={e => setUseProxy(e.target.checked)}
+                  />
+                </label>
+                {useProxy && (
+                  <>
+                    <label htmlFor="create-proxy-url">{t('sessions.proxy.url')}</label>
+                    <input
+                      id="create-proxy-url"
+                      type="text"
+                      placeholder={t('sessions.proxy.urlPlaceholder')}
+                      value={createProxyUrl}
+                      onChange={e => setCreateProxyUrl(e.target.value)}
+                    />
+                    {createProxyInvalid && createProxyUrl.trim() && (
+                      <p className="input-error">{t('sessions.proxy.invalidUrl')}</p>
+                    )}
+                    <p className="input-hint">{t('sessions.proxy.createHint')}</p>
+                  </>
                 )}
-                <p className="input-hint">{t('sessions.proxy.createHint')}</p>
-              </>
-            )}
-          </div>
+              </div>
             </>
           )}
         </Modal>

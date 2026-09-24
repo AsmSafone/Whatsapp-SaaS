@@ -25,7 +25,8 @@ export function Docs() {
             Build with the <span>Zaptura REST Gateway</span>
           </h1>
           <p className="zp-section-desc">
-            Connect via standard HTTPS REST endpoints, receive bi-directional webhooks, and automate your WhatsApp workflow in 4 steps.
+            Connect via standard HTTPS REST endpoints, receive bi-directional webhooks, and automate your WhatsApp
+            workflow in 4 steps.
           </p>
         </div>
 
@@ -35,7 +36,8 @@ export function Docs() {
             <div>
               <h3>Register Your Zaptura Account</h3>
               <p>
-                Sign up at <Link to="/register">/register</Link> to receive your root account JWT and enter the management dashboard.
+                Sign up at <Link to="/register">/register</Link> to receive your root account JWT and enter the
+                management dashboard.
               </p>
             </div>
           </div>
@@ -45,7 +47,8 @@ export function Docs() {
             <div>
               <h3>Create a WhatsApp Session & Copy the Scoped API Key</h3>
               <p>
-                Navigate to <strong>Sessions</strong> in the dashboard and click <strong>Create Session</strong>. A one-time high-entropy session key is issued.
+                Navigate to <strong>Sessions</strong> in the dashboard and click <strong>Create Session</strong>. A
+                one-time high-entropy session key is issued.
               </p>
             </div>
           </div>
@@ -55,7 +58,9 @@ export function Docs() {
             <div>
               <h3>Scan the Multi-Device QR Code</h3>
               <p>
-                From the WhatsApp app on your phone, navigate to <strong>Linked Devices &gt; Link a Device</strong> and scan the on-screen QR code. Status will transition from <code>SCAN_QR_CODE</code> to <code>WORKING</code> in ~5 seconds.
+                From the WhatsApp app on your phone, navigate to <strong>Linked Devices &gt; Link a Device</strong> and
+                scan the on-screen QR code. Status will transition from <code>SCAN_QR_CODE</code> to{' '}
+                <code>WORKING</code> in ~5 seconds.
               </p>
             </div>
           </div>
@@ -65,7 +70,8 @@ export function Docs() {
             <div>
               <h3>Dispatch Your First WhatsApp Message</h3>
               <p>
-                Execute a POST request to <code>/api/sessions/:sessionId/messages/send-text</code> passing your API Key in the <code>X-API-Key</code> HTTP header.
+                Execute a POST request to <code>/api/sessions/:sessionId/messages/send-text</code> passing your API Key
+                in the <code>X-API-Key</code> HTTP header.
               </p>
             </div>
           </div>
@@ -97,7 +103,11 @@ export function Docs() {
             </div>
             <h3>Interactive Swagger UI</h3>
             <p>
-              Explore live endpoints, inspect DTO schemas, and test interactive requests at <a href="/api/docs" target="_blank" rel="noreferrer" className="zp-inline-link">/api/docs <ExternalLink size={12} /></a>.
+              Explore live endpoints, inspect DTO schemas, and test interactive requests at{' '}
+              <a href="/api/docs" target="_blank" rel="noreferrer" className="zp-inline-link">
+                /api/docs <ExternalLink size={12} />
+              </a>
+              .
             </p>
           </div>
 
@@ -108,7 +118,8 @@ export function Docs() {
             </div>
             <h3>Bi-Directional Webhooks</h3>
             <p>
-              Configure webhook URLs per session for message arrival, message delivery acknowledgments (ack 1, 2, 3), and connection state shifts.
+              Configure webhook URLs per session for message arrival, message delivery acknowledgments (ack 1, 2, 3),
+              and connection state shifts.
             </p>
           </div>
 
@@ -119,7 +130,8 @@ export function Docs() {
             </div>
             <h3>Safe Automation Rate Limits</h3>
             <p>
-              Keep dispatch pace human-like (e.g. 1-3 seconds between bulk messages). Always provide customer opt-out mechanisms to protect account health.
+              Keep dispatch pace human-like (e.g. 1-3 seconds between bulk messages). Always provide customer opt-out
+              mechanisms to protect account health.
             </p>
           </div>
         </div>

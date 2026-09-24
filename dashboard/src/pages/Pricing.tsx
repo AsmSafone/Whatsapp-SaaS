@@ -19,25 +19,17 @@ export function Pricing() {
             Simple, Predictable Plans for <span>Every Scale</span>
           </h2>
           <p className="zp-section-desc">
-            No per-message markup. No conversation expiration windows. Pay one low monthly or annual subscription
-            and automate WhatsApp with total peace of mind.
+            No per-message markup. No conversation expiration windows. Pay one low monthly or annual subscription and
+            automate WhatsApp with total peace of mind.
           </p>
         </div>
 
         <div className="zp-billing-toggle-wrap">
           <div className="zp-billing-toggle">
-            <button
-              type="button"
-              className={!yearly ? 'active' : ''}
-              onClick={() => setYearly(false)}
-            >
+            <button type="button" className={!yearly ? 'active' : ''} onClick={() => setYearly(false)}>
               Monthly Billing
             </button>
-            <button
-              type="button"
-              className={yearly ? 'active' : ''}
-              onClick={() => setYearly(true)}
-            >
+            <button type="button" className={yearly ? 'active' : ''} onClick={() => setYearly(true)}>
               Annual Billing <span className="zp-save-pill">Save 15%</span>
             </button>
           </div>
@@ -47,10 +39,7 @@ export function Pricing() {
           {NX_PLANS.map(plan => {
             const price = yearly ? Math.round(plan.monthly * 12 * 0.85) : plan.monthly;
             return (
-              <div
-                key={plan.id}
-                className={`zp-pricing-card ${plan.popular ? 'popular' : ''}`}
-              >
+              <div key={plan.id} className={`zp-pricing-card ${plan.popular ? 'popular' : ''}`}>
                 {plan.popular && (
                   <div className="zp-popular-badge">
                     <Star size={12} fill="currentColor" />
@@ -74,7 +63,9 @@ export function Pricing() {
                 <ul className="zp-plan-features">
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
-                    <strong>{plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Numbers' : 'Number'}</strong>
+                    <strong>
+                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Numbers' : 'Number'}
+                    </strong>
                   </li>
                   {NX_PLAN_FEATURES.map((feat, idx) => (
                     <li key={idx}>
@@ -120,10 +111,18 @@ export function Pricing() {
                 </tr>
                 <tr>
                   <td>Monthly Outbound Messages</td>
-                  <td><span className="zp-text-emerald">Unlimited</span></td>
-                  <td><span className="zp-text-emerald">Unlimited</span></td>
-                  <td><span className="zp-text-emerald">Unlimited</span></td>
-                  <td><span className="zp-text-emerald">Unlimited</span></td>
+                  <td>
+                    <span className="zp-text-emerald">Unlimited</span>
+                  </td>
+                  <td>
+                    <span className="zp-text-emerald">Unlimited</span>
+                  </td>
+                  <td>
+                    <span className="zp-text-emerald">Unlimited</span>
+                  </td>
+                  <td>
+                    <span className="zp-text-emerald">Unlimited</span>
+                  </td>
                 </tr>
                 <tr>
                   <td>Inbound Webhooks & Events</td>
