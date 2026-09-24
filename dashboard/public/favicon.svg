@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="zapGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+    <linearGradient id="zapBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background Shield -->
+  <rect width="120" height="120" rx="28" fill="url(#zapBg)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+  
+  <!-- Outer ambient ring -->
+  <circle cx="60" cy="60" r="44" stroke="url(#zapGlow)" stroke-width="1.5" stroke-opacity="0.3" stroke-dasharray="4 4" />
+
+  <!-- WhatsApp Speech Tail Glow -->
+  <path d="M42 82 L32 94 L50 86" stroke="url(#zapGlow)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
+
+  <!-- Glowing Zaptura 'Z' Lightning Symbol -->
+  <path d="M42 36 L78 36 L48 64 L74 64 L38 92 L50 68 L32 68 Z"
+        fill="url(#zapGlow)"
+        filter="url(#glowFilter)" />
+  <path d="M42 36 L78 36 L48 64 L74 64 L38 92 L50 68 L32 68 Z"
+        fill="url(#zapGlow)" />
+</svg>
