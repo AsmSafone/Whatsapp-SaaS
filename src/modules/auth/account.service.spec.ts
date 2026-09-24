@@ -4,7 +4,7 @@ import { AccountService, resolveDefaultAdminEmail, resolveDefaultAdminPassword }
 import { User } from './entities/user.entity';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { Session } from '../session/entities/session.entity';
-import { hashPassword, signUserToken } from './user-token';
+import { hashPassword, signUserToken, verifyPassword } from './user-token';
 
 describe('AccountService', () => {
   let service: AccountService;
@@ -249,9 +249,7 @@ describe('AccountService', () => {
   describe('changePassword', () => {
     it('throws UnauthorizedException if account is not found', async () => {
       usersRepo.findOne!.mockResolvedValue(null);
-      await expect(service.changePassword('missing-id', 'old', 'new-pass-123')).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.changePassword('missing-id', 'old', 'new-pass-123')).rejects.toThrow(UnauthorizedException);
     });
 
     it('throws UnauthorizedException if current password does not match', async () => {
@@ -262,16 +260,15 @@ describe('AccountService', () => {
       };
       usersRepo.findOne!.mockResolvedValue(user);
 
-      await expect(service.changePassword('u1', 'wrong-old-password', 'new-pass-123')).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.changePassword('u1', 'wrong-old-password', 'new-pass-123')).rejects.toThrow(UnauthorizedException);
     });
 
     it('updates password hash and saves user when current password matches', async () => {
+      const oldHash = hashPassword('correct-old-password');
       const user = {
         id: 'u1',
         email: 'user@example.com',
-        passwordHash: hashPassword('correct-old-password'),
+        passwordHash: oldHash,
       };
       usersRepo.findOne!.mockResolvedValue(user);
       usersRepo.save!.mockImplementation(u => Promise.resolve(u));
@@ -283,8 +280,8 @@ describe('AccountService', () => {
           id: 'u1',
         }),
       );
-      expect(updated.passwordHash).not.toBe(user.passwordHash);
+      expect(updated.passwordHash).not.toBe(oldHash);
+      expect(verifyPassword('brand-new-secret-123', updated.passwordHash)).toBe(true);
     });
   });
 });
-
