@@ -62,7 +62,9 @@ export function isValidationErrorDetailEnabled(validationDetailEnv?: string, nod
  * Set CSP_UPGRADE_INSECURE_REQUESTS=true for HTTPS deployments. Defaults to false so plain-HTTP and
  * private-network deployments work without blanking the dashboard UI. (#611, #731)
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isUpgradeInsecureRequestsEnabled(cspEnv?: string, _nodeEnv?: string): boolean {
+  void _nodeEnv;
   return cspEnv === 'true';
 }
 
