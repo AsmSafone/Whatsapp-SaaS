@@ -1443,6 +1443,11 @@ export interface AccountMe {
 
 export const accountApi = {
   me: () => request<AccountMe>('/account/me'),
+  updateProfile: (data: { name?: string; email?: string }) =>
+    request<AccountMe & { token?: string }>('/account/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
   changePlan: (plan: string) =>
     request<AccountMe & { token?: string }>('/account/plan', {
       method: 'PATCH',

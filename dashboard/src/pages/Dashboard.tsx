@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { lazyWithRetry as lazy } from '../utils/lazyWithRetry';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, Send, Webhook, Activity, Loader2, CreditCard } from 'lucide-react';
+import { MessageSquare, Send, Webhook, Activity, Loader2 } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useRole } from '../hooks/useRole';
 import { useToast } from '../hooks/useToast';
@@ -12,7 +12,6 @@ import {
   useWebhooksQuery,
   useStopSessionMutation,
   useStatsOverviewQuery,
-  useAccountMeQuery,
 } from '../hooks/queries';
 import { PageHeader } from '../components/PageHeader';
 import './Dashboard.css';
@@ -33,7 +32,6 @@ export function Dashboard() {
   // /stats/overview is ADMIN-only; for a non-admin key it 403s → overview stays undefined and the
   // message cards fall back to '—' without breaking the (un-gated) session cards.
   const { data: overview } = useStatsOverviewQuery();
-  const { data: account } = useAccountMeQuery();
   const stopMutation = useStopSessionMutation();
   const unavailable = '—';
   const messagesToday = overview ? overview.messages.today.sent + overview.messages.today.received : unavailable;
@@ -66,19 +64,6 @@ export function Dashboard() {
     { label: t('dashboard.stats.messagesToday'), value: messagesToday, icon: Send },
     { label: t('dashboard.stats.webhooksConfigured'), value: webhookCount, icon: Webhook },
     { label: t('dashboard.stats.totalMessages'), value: totalMessages, icon: Activity },
-    ...(account && account.sessionLimit != null
-      ? [
-          {
-            label: t('dashboard.stats.plan'),
-            value: account.plan,
-            icon: CreditCard,
-            detail: t('dashboard.stats.planUsage', {
-              used: account.sessionCount ?? 0,
-              limit: account.sessionLimit,
-            }),
-          },
-        ]
-      : []),
   ];
 
   const formatLastActive = (date?: string | null) => {

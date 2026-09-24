@@ -65,7 +65,8 @@
     "messageTester": "메시지 테스터",
     "infrastructure": "인프라",
     "plugins": "플러그인",
-    "logs": "로그"
+    "logs": "로그",
+    "profile": "프로필"
   },
   "chats": {
     "media": {
@@ -1086,4 +1087,3 @@
     "loading": "검색하는 중…"
   }
 }
-

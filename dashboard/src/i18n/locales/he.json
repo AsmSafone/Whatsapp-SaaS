@@ -65,7 +65,8 @@
     "messageTester": "בדיקת הודעות",
     "infrastructure": "תשתית",
     "plugins": "תוספים",
-    "logs": "לוגים"
+    "logs": "לוגים",
+    "profile": "פרופיל"
   },
   "chats": {
     "media": {
@@ -1095,4 +1096,3 @@
     "loading": "מחפש…"
   }
 }
-

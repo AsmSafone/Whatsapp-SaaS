@@ -40,6 +40,7 @@ const ALLOWLIST = new Map<string, string>([
   ['account.controller.ts :: me', 'self-inspection of calling account/user'],
   ['account.controller.ts :: changePlan', 'self-service plan modification for calling account'],
   ['account.controller.ts :: changePassword', 'self-service password update for calling account'],
+  ['account.controller.ts :: updateProfile', 'self-service profile modification for calling account'],
 ]);
 
 /**

@@ -381,3 +381,39 @@ export function useAccountMeQuery() {
     retry: false,
   });
 }
+
+export function useUpdateProfileMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name?: string; email?: string }) => accountApi.updateProfile(data),
+    onSuccess: (res) => {
+      if (res?.token) {
+        sessionStorage.setItem('zaptura_api_key', res.token);
+        sessionStorage.setItem('openwa_api_key', res.token);
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
+    },
+  });
+}
+
+export function useChangePlanMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (plan: string) => accountApi.changePlan(plan),
+    onSuccess: (res) => {
+      if (res?.token) {
+        sessionStorage.setItem('zaptura_api_key', res.token);
+        sessionStorage.setItem('openwa_api_key', res.token);
+      }
+      queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
+    },
+  });
+}
+
+export function useChangePasswordMutation() {
+  return useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
+      accountApi.changePassword(currentPassword, newPassword),
+  });
+}
+

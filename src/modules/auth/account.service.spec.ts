@@ -260,7 +260,9 @@ describe('AccountService', () => {
       };
       usersRepo.findOne!.mockResolvedValue(user);
 
-      await expect(service.changePassword('u1', 'wrong-old-password', 'new-pass-123')).rejects.toThrow(UnauthorizedException);
+      await expect(service.changePassword('u1', 'wrong-old-password', 'new-pass-123')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('updates password hash and saves user when current password matches', async () => {
@@ -282,6 +284,36 @@ describe('AccountService', () => {
       );
       expect(updated.passwordHash).not.toBe(oldHash);
       expect(verifyPassword('brand-new-secret-123', updated.passwordHash)).toBe(true);
+    });
+  });
+
+  describe('updateProfile', () => {
+    it('throws UnauthorizedException if account is not found', async () => {
+      usersRepo.findOne!.mockResolvedValue(null);
+      await expect(service.updateProfile('missing-id', { name: 'New Name' })).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('throws ConflictException if email is already taken by another account', async () => {
+      const user = { id: 'u1', email: 'user@example.com', name: 'User' };
+      usersRepo.findOne!.mockImplementation((opts: { where: { id?: string; email?: string } }) =>
+        Promise.resolve(
+          opts.where.email === 'taken@example.com' ? { id: 'other-id', email: 'taken@example.com' } : user,
+        ),
+      );
+
+      await expect(service.updateProfile('u1', { email: 'taken@example.com' })).rejects.toThrow(ConflictException);
+    });
+
+    it('updates name and email successfully', async () => {
+      const user = { id: 'u1', email: 'user@example.com', name: 'Old Name' };
+      usersRepo.findOne!.mockResolvedValue(user);
+      usersRepo.save!.mockImplementation(u => Promise.resolve(u));
+
+      const updated = await service.updateProfile('u1', { name: 'New Name', email: 'new@example.com' });
+
+      expect(updated.name).toBe('New Name');
+      expect(updated.email).toBe('new@example.com');
+      expect(usersRepo.save).toHaveBeenCalled();
     });
   });
 });

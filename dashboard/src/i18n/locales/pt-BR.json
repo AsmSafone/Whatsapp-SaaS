@@ -65,7 +65,8 @@
     "infrastructure": "Infraestrutura",
     "plugins": "Plugins",
     "logs": "Registros",
-    "templates": "Modelos"
+    "templates": "Modelos",
+    "profile": "Perfil"
   },
   "chats": {
     "media": {
@@ -1086,4 +1087,3 @@
     "loading": "Pesquisando…"
   }
 }
-

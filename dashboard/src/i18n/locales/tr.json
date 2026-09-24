@@ -65,7 +65,8 @@
     "messageTester": "Mesaj Test Aracı",
     "infrastructure": "Altyapı",
     "plugins": "Eklentiler",
-    "logs": "Kayıtlar (Logs)"
+    "logs": "Kayıtlar (Logs)",
+    "profile": "Profil"
   },
   "chats": {
     "media": {
@@ -1086,4 +1087,3 @@
     "loading": "Aranıyor…"
   }
 }
-

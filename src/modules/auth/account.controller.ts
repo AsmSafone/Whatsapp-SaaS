@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AccountService } from './account.service';
-import { ChangePasswordDto, ChangePlanDto, LoginDto, RegisterDto } from './dto/account.dto';
+import { ChangePasswordDto, ChangePlanDto, LoginDto, RegisterDto, UpdateProfileDto } from './dto/account.dto';
 import { Public, CurrentApiKey } from './decorators/auth.decorators';
 import { PLAN_CATALOG, PLAN_LIMITS } from './saas-plans';
 import type { ApiKey } from './entities/api-key.entity';
@@ -91,5 +91,18 @@ export class AccountController {
     }
     await this.accounts.changePassword(actor.userId, dto.currentPassword, dto.newPassword);
     return { ok: true, message: 'Password updated successfully' };
+  }
+
+  @Patch('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update account profile' })
+  async updateProfile(@Body() dto: UpdateProfileDto, @CurrentApiKey() actor?: ApiKey) {
+    if (!actor?.userId) {
+      throw new UnauthorizedException('Profile updates apply to user accounts only');
+    }
+    const user = await this.accounts.updateProfile(actor.userId, dto);
+    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    const issued = this.accounts.issue(user);
+    return { ...issued, sessionCount };
   }
 }

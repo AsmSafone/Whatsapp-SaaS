@@ -473,6 +473,31 @@
         ]
       }
     },
+    "/api/account/profile": {
+      "patch": {
+        "operationId": "AccountController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update account profile",
+        "tags": [
+          "account"
+        ]
+      }
+    },
     "/api/sessions": {
       "post": {
         "operationId": "SessionController_create",
@@ -10506,6 +10531,19 @@
           "currentPassword",
           "newPassword"
         ]
+      },
+      "UpdateProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ada Lovelace"
+          },
+          "email": {
+            "type": "string",
+            "example": "dev@zaptura.io"
+          }
+        }
       },
       "CreateSessionDto": {
         "type": "object",

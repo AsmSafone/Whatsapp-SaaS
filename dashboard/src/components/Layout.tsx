@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Languages,
+  User,
 } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { type UserRole } from '../hooks/useRole';
@@ -47,6 +48,7 @@ const allNavItems = [
   { to: '/plugins', icon: Puzzle, key: 'plugins' as const, adminOnly: true },
   // Backend /audit is ADMIN-only too.
   { to: '/logs', icon: FileText, key: 'logs' as const, adminOnly: true },
+  { to: '/profile', icon: User, key: 'profile' as const, adminOnly: false },
 ];
 
 const themeIcons = { light: Sun, dark: Moon, system: Monitor };

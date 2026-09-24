@@ -65,7 +65,8 @@
     "messageTester": "Nachrichtentester",
     "infrastructure": "Infrastruktur",
     "plugins": "Plugins",
-    "logs": "Protokolle"
+    "logs": "Protokolle",
+    "profile": "Profil"
   },
   "chats": {
     "media": {
@@ -1086,4 +1087,3 @@
     "loading": "Suche läuft…"
   }
 }
-

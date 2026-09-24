@@ -65,7 +65,8 @@
     "messageTester": "訊息測試器",
     "infrastructure": "基礎架構",
     "plugins": "外掛",
-    "logs": "記錄"
+    "logs": "記錄",
+    "profile": "個人資料"
   },
   "chats": {
     "media": {
@@ -1086,4 +1087,3 @@
     "loading": "搜尋中…"
   }
 }
-

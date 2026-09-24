@@ -8,7 +8,7 @@ import { Session } from '../session/entities/session.entity';
 import { hashPassword, signUserToken, verifyPassword, verifyUserToken } from './user-token';
 import { PLAN_LIMITS } from './saas-plans';
 import { RegisterDto } from './dto/account.dto';
-import { writeBootstrapAccount } from './bootstrap-account-file';
+import { readBootstrapAccount, writeBootstrapAccount } from './bootstrap-account-file';
 
 export function resolveDefaultAdminEmail(): string {
   return (
@@ -94,6 +94,44 @@ export class AccountService {
     if (user.email === resolveDefaultAdminEmail()) {
       try {
         writeBootstrapAccount(user.email, newPassword);
+      } catch {
+        // file write non-fatal
+      }
+    }
+
+    return saved;
+  }
+
+  async updateProfile(userId: string, dto: { name?: string; email?: string }): Promise<User> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException('Account not found');
+
+    const oldEmail = user.email;
+
+    if (dto.name !== undefined && dto.name.trim().length > 0) {
+      user.name = dto.name.trim();
+    }
+
+    if (dto.email !== undefined && dto.email.trim().length > 0) {
+      const nextEmail = dto.email.trim().toLowerCase();
+      if (nextEmail !== user.email) {
+        const existing = await this.users.findOne({ where: { email: nextEmail } });
+        if (existing && existing.id !== user.id) {
+          throw new ConflictException('An account with this email already exists');
+        }
+        user.email = nextEmail;
+      }
+    }
+
+    const saved = await this.users.save(user);
+
+    // Keep data/.admin-account updated if default admin's email was changed
+    if (oldEmail === resolveDefaultAdminEmail() && user.email !== oldEmail) {
+      try {
+        const currentData = readBootstrapAccount({ warn: () => {} });
+        if (currentData?.password) {
+          writeBootstrapAccount(saved.email, currentData.password);
+        }
       } catch {
         // file write non-fatal
       }
