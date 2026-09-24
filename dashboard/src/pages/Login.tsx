@@ -80,7 +80,6 @@ export function Login({ onLogin }: LoginProps) {
       <div className="login-card">
         <div className="login-logo">
           <ZapturaLogo size={42} showText={true} subtitle="Cloud Gateway Portal" />
-
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

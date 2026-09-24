@@ -151,8 +151,6 @@ export function Register({ onLogin }: RegisterProps) {
           </button>
         </form>
 
-
-
         <p className="login-help">
           {t('login.hasAccount')} <Link to="/login">Sign in</Link>
         </p>

@@ -427,8 +427,6 @@ export function ApiKeys() {
             </table>
           )}
         </div>
-
-
       </div>
 
       {confirmAction && (

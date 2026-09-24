@@ -386,7 +386,7 @@ export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { name?: string; email?: string }) => accountApi.updateProfile(data),
-    onSuccess: (res) => {
+    onSuccess: res => {
       if (res?.token) {
         sessionStorage.setItem('zaptura_api_key', res.token);
         sessionStorage.setItem('openwa_api_key', res.token);
@@ -400,7 +400,7 @@ export function useChangePlanMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (plan: string) => accountApi.changePlan(plan),
-    onSuccess: (res) => {
+    onSuccess: res => {
       if (res?.token) {
         sessionStorage.setItem('zaptura_api_key', res.token);
         sessionStorage.setItem('openwa_api_key', res.token);
@@ -416,4 +416,3 @@ export function useChangePasswordMutation() {
       accountApi.changePassword(currentPassword, newPassword),
   });
 }
-

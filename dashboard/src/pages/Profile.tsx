@@ -232,7 +232,7 @@ export function Profile() {
           <div className="quota-summary-header">
             <span className="quota-label">
               <Smartphone size={14} />
-              WhatsApp Sessions Quota
+              Plan Usage
             </span>
             <span className="quota-numbers">
               <strong>{sessionCount}</strong> / {sessionLimit} used

@@ -135,7 +135,8 @@ export class ApiKeyGuard implements CanActivate {
       context.getClass(),
     ]);
     if (requireUnscoped && (apiKey.allowedSessions?.length ?? 0) > 0) {
-      const isRestricted = context.getClass().name.startsWith('Infra') || context.getClass().name.startsWith('Audit');
+      const className = context.getClass()?.name ?? '';
+      const isRestricted = className.startsWith('Infra') || className.startsWith('Audit');
       if (apiKey.id.startsWith('user:') && !isRestricted) {
         // User accounts are admin of their own tenant resources (api-keys, plugins, etc.)
       } else {
