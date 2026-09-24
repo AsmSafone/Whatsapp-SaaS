@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -75,7 +75,7 @@ export function Landing() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSimulateSend = (e?: React.FormEvent) => {
+  const handleSimulateSend = (e?: FormEvent) => {
     if (e) e.preventDefault();
     if (!simText.trim()) return;
 

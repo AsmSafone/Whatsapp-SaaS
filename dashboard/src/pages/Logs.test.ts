@@ -7,7 +7,7 @@
 import '../test-helpers/register-hooks.ts';
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { createElement } from 'react';
+import { createElement, type ReactElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { AuditLog } from '../services/api';
 
@@ -57,7 +57,7 @@ function installFetchStub(): void {
 }
 
 let rtl: typeof import('@testing-library/react');
-let Logs: () => React.ReactElement;
+let Logs: () => ReactElement;
 
 before(async () => {
   const { installJsdomGlobals } = await import('../test-helpers/jsdom.ts');

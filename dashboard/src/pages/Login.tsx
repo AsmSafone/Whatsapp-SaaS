@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, Languages, ArrowLeft, KeyRound, User, ShieldCheck } from 'lucide-react';
@@ -45,7 +45,7 @@ export function Login({ onLogin }: LoginProps) {
     onLogin(key, data.role);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizePlugin } from '../utils/localizePlugin';
 import { configUiSafeConfig, missingRequiredConfig, sparseSessionOverride } from '../utils/pluginConfigRules';
@@ -68,7 +68,7 @@ function ConfigField({
   // Per-instance id: ConfigField renders once per schema property (and recurses), so a hardcoded
   // id would collide on any schema with two boolean fields - the second label would toggle the
   // first checkbox. useId is stable across re-renders and unique per instance.
-  const fieldId = React.useId();
+  const fieldId = useId();
   const desc = field.description ? <small>{field.description}</small> : null;
   // Bound to the control it names. The boolean branch below builds its own pair because its caption
   // and its checkbox sit in different containers.

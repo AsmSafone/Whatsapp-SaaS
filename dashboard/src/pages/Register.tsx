@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, ShieldCheck, Sparkles } from 'lucide-react';
@@ -28,7 +28,7 @@ export function Register({ onLogin }: RegisterProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (name.trim().length < 2 || !email.trim() || password.length < 8) {
       setError(t('login.registerInvalid'));
