@@ -249,6 +249,31 @@ export function Landing() {
   const [voiceProgress, setVoiceProgress] = useState(0);
   const [apiViewTab, setApiViewTab] = useState<'request' | 'webhook'>('request');
   const chatBodyRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const el = heroRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const normX = (x / rect.width - 0.5) * 2;
+    const normY = (y / rect.height - 0.5) * 2;
+
+    el.style.setProperty('--mouse-x', `${x}px`);
+    el.style.setProperty('--mouse-y', `${y}px`);
+    el.style.setProperty('--mouse-tilt-x', `${normX * 24}px`);
+    el.style.setProperty('--mouse-tilt-y', `${normY * 18}px`);
+    el.style.setProperty('--mouse-opacity', '1');
+  };
+
+  const handleHeroMouseLeave = () => {
+    const el = heroRef.current;
+    if (!el) return;
+    el.style.setProperty('--mouse-opacity', '0');
+    el.style.setProperty('--mouse-tilt-x', '0px');
+    el.style.setProperty('--mouse-tilt-y', '0px');
+  };
 
   const [messagesList, setMessagesList] = useState<DemoMessage[]>(SCENARIOS.ecommerce.messages);
   const [lastPayload, setLastPayload] = useState<DemoPayload>({
@@ -632,8 +657,9 @@ export function Landing() {
   return (
     <MarketingShell>
       {/* ================= HERO SECTION ================= */}
-      <section className="zp-hero">
+      <section className="zp-hero" ref={heroRef} onMouseMove={handleHeroMouseMove} onMouseLeave={handleHeroMouseLeave}>
         <div className="zp-hero-bg" aria-hidden="true">
+          <div className="zp-hero-interactive-glow" />
           <div className="zp-mesh-glow zp-glow-top" />
           <div className="zp-mesh-glow zp-glow-bottom" />
           <div className="zp-hero-grid-pattern" />
