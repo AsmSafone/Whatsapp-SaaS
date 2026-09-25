@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, ArrowRight, ShieldCheck, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -11,7 +11,17 @@ interface MarketingShellProps {
 
 export function MarketingShell({ children }: MarketingShellProps) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="zp-shell">
@@ -19,7 +29,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
       <div className="zp-shell-ambient" aria-hidden="true" />
 
       {/* Navigation Header */}
-      <header className="zp-nav-wrap">
+      <header className={`zp-nav-wrap ${scrolled || open ? 'zp-nav-scrolled' : ''}`}>
         <nav className="zp-nav">
           <Link to="/" className="zp-brand" aria-label="Zaptura Home" onClick={close}>
             <ZapturaLogo size={32} showText={true} />
@@ -112,7 +122,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
           <div className="zp-footer-col">
             <h4>Developers</h4>
             <Link to="/docs">Quickstart Guide</Link>
-            <a href="/#code">Code Samples</a>
+            <a href="/#code">Supported SDKs</a>
             <a href="/#faq">Technical FAQ</a>
             <a href="/api/docs" target="_blank" rel="noreferrer">
               Swagger UI

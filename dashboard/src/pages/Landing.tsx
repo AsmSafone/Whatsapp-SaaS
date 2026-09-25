@@ -248,7 +248,6 @@ export function Landing() {
   const [playingVoiceId, setPlayingVoiceId] = useState<string | number | null>(null);
   const [voiceProgress, setVoiceProgress] = useState(0);
   const [apiViewTab, setApiViewTab] = useState<'request' | 'webhook'>('request');
-  const [toastNotice, setToastNotice] = useState<string | null>(null);
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
   const [messagesList, setMessagesList] = useState<DemoMessage[]>(SCENARIOS.ecommerce.messages);
@@ -300,11 +299,6 @@ export function Landing() {
     }
   }, [messagesList, simTyping]);
 
-  const showToast = (msg: string) => {
-    setToastNotice(msg);
-    setTimeout(() => setToastNotice(null), 2500);
-  };
-
   const loadScenario = (key: string) => {
     setActiveScenario(key);
     setSimTyping(false);
@@ -341,7 +335,6 @@ export function Landing() {
   const handleButtonClick = (btn: DemoButton) => {
     if (btn.action === 'copy_otp') {
       navigator.clipboard?.writeText('849-204');
-      showToast('Copied OTP Code: 849-204 to clipboard! 📋');
     }
 
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -735,9 +728,8 @@ export function Landing() {
         </div>
 
         {/* Quick Scenario Pills */}
-        <div className="zp-scenario-bar">
-          <span className="zp-scenario-label">Try Prebuilt Bot Scenarios:</span>
-          <div className="zp-scenario-pills">
+        <div className="zp-scenario-bar" style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="zp-scenario-pills" style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
             {Object.entries(SCENARIOS).map(([key, item]) => (
               <button
                 key={key}
@@ -750,14 +742,6 @@ export function Landing() {
             ))}
           </div>
         </div>
-
-        {/* Toast Feedback */}
-        {toastNotice && (
-          <div className="zp-demo-toast" role="status">
-            <Sparkles size={14} className="zp-text-emerald" />
-            <span>{toastNotice}</span>
-          </div>
-        )}
 
         <div className="zp-sim-layout">
           {/* Left: Composer & Real-Time JSON Payload (shown on desktop or when 'api' is selected on mobile) */}
@@ -902,7 +886,6 @@ export function Landing() {
                     className="zp-wa-icon-action"
                     onClick={() => {
                       loadScenario('ecommerce');
-                      showToast('Chat restarted');
                     }}
                     title="Restart Demo"
                     aria-label="Restart Demo"
@@ -1328,7 +1311,7 @@ export function Landing() {
                 {plan.popular && (
                   <div className="zp-popular-badge">
                     <Star size={12} fill="currentColor" />
-                    <span>Most Popular Choice</span>
+                    <span>Most Popular</span>
                   </div>
                 )}
 
