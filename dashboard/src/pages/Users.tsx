@@ -308,22 +308,25 @@ export function Users() {
                       <td style={{ textAlign: 'right' }}>
                         <div className="user-actions" style={{ justifyContent: 'flex-end' }}>
                           <button
+                            type="button"
                             className="btn-action-icon"
                             onClick={() => handleOpenPlanModal(user)}
                             title={t('users.actions.changePlan')}
                             aria-label={t('users.actions.changePlan')}
                           >
-                            <Pencil size={15} />
+                            <Pencil size={16} />
                           </button>
                           <button
+                            type="button"
                             className="btn-action-icon"
                             onClick={() => handleOpenPasswordModal(user)}
                             title={t('users.actions.resetPassword')}
                             aria-label={t('users.actions.resetPassword')}
                           >
-                            <KeyRound size={15} />
+                            <KeyRound size={16} />
                           </button>
                           <button
+                            type="button"
                             className="btn-action-icon danger"
                             onClick={() => handleOpenDeleteModal(user)}
                             disabled={isOwner || isCurrentUser}
@@ -334,7 +337,7 @@ export function Users() {
                             }
                             aria-label={t('users.actions.deleteUser')}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -497,7 +500,13 @@ export function Users() {
               <button
                 type="button"
                 className="btn-danger"
-                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem' }}
+                style={{
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.5rem 1rem',
+                }}
                 onClick={handleDeleteUser}
                 disabled={deleteUserMutation.isPending}
               >

@@ -1441,16 +1441,28 @@
 .zp-shell .zp-wa-send-btn {
   width: 34px;
   height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 !important;
   border-radius: 50%;
   background: #3b4a54;
   border: none;
-  color: #d1d7db;
-  display: flex;
+  color: #ffffff;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.zp-shell .zp-wa-send-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .zp-shell .zp-wa-send-btn.active {
@@ -2987,6 +2999,9 @@
   .zp-shell .zp-wa-send-btn {
     width: 30px;
     height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0 !important;
   }
   .zp-shell .zp-iphone-home-indicator {
     padding-bottom: 5px;

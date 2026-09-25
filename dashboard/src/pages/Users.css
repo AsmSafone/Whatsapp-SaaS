@@ -26,7 +26,9 @@
   align-items: center;
   gap: 1rem;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .user-stat-card:hover {
@@ -313,32 +315,50 @@
 .btn-action-icon {
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 !important;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: var(--bg-white);
-  color: var(--text-secondary);
-  display: flex;
+  color: var(--text-primary);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-.btn-action-icon:hover {
+.btn-action-icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.btn-action-icon:hover:not(:disabled) {
   background: var(--bg-light);
-  color: var(--text-primary);
-  border-color: var(--text-secondary);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
-.btn-action-icon.danger:hover {
-  background: rgba(239, 68, 68, 0.1);
+.btn-action-icon.danger {
+  color: var(--error-text, #ef4444);
+}
+
+.btn-action-icon.danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
   border-color: #ef4444;
 }
 
 .btn-action-icon:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
+  color: var(--text-muted);
 }
 
 /* Empty State */
@@ -422,4 +442,3 @@
   display: flex;
   align-items: center;
 }
-
