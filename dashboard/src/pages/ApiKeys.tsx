@@ -285,7 +285,7 @@ export function ApiKeys() {
         actions={
           <>
             <a href="/api/docs" target="_blank" rel="noopener noreferrer" className="btn-secondary">
-              <BookOpen size={16} />
+              <BookOpen size={18} />
               {t('apiKeys.documentation', 'Documentation')}
             </a>
             <button className="btn-primary" onClick={() => setShowModal(true)}>

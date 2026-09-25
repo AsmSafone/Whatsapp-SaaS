@@ -316,6 +316,7 @@ select:disabled {
 .btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: var(--bg-light, #f8fafc);
@@ -324,6 +325,8 @@ select:disabled {
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1.25;
+  box-sizing: border-box;
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
@@ -346,22 +349,27 @@ select:disabled {
 .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: var(--primary, #25d366);
   /* Dark text on the WhatsApp green: 9.0:1 (AAA). White was 1.98:1, failing even the AA
      large-text floor - the single worst contrast pair in the dashboard. */
   color: #0f172a;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1.25;
+  box-sizing: border-box;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-hover, #1da851);
+  border-color: transparent;
 }
 
 .btn-primary:disabled {
@@ -373,20 +381,25 @@ select:disabled {
 .btn-danger {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: var(--error, #ef4444);
   color: #fff;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
+  line-height: 1.25;
+  box-sizing: border-box;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 .btn-danger:hover:not(:disabled) {
   background: #b91c1c;
+  border-color: transparent;
 }
 
 .btn-danger:disabled {

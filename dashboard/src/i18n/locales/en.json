@@ -1103,7 +1103,7 @@
     "filterPlan": "All Plans",
     "noUsersFound": "No users found",
     "noUsersMatch": "No users match your search",
-    "ownerBadge": "Owner / Admin",
+    "ownerBadge": "Admin",
     "columns": {
       "user": "User",
       "role": "Role",
