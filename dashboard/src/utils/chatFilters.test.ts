@@ -32,12 +32,12 @@ test('search matches name or id, case-insensitively, and an absent name never th
 
 test('channels match on their own name and id', () => {
   const channels = [
-    { id: '111@newsletter', name: 'OpenWA News' },
+    { id: '111@newsletter', name: 'Zaptura News' },
     { id: '222@newsletter', name: 'Other' },
   ];
 
   assert.deepEqual(
-    filterChannels(channels, 'openwa').map(c => c.id),
+    filterChannels(channels, 'zaptura').map(c => c.id),
     ['111@newsletter'],
   );
   assert.deepEqual(

@@ -4,7 +4,7 @@
 
 > **Current Status: ✅ Implemented — opt-in, off by default**
 >
-> OpenWA can expose a curated set of its capabilities to AI agents over the
+> Zaptura can expose a curated set of its capabilities to AI agents over the
 > [Model Context Protocol](https://modelcontextprotocol.io). The server is **off by
 > default** and **purely additive**: when disabled, none of its code (or the MCP SDK)
 > is loaded and every REST route behaves exactly as before.
@@ -33,7 +33,7 @@
 ## 24.1 Overview
 
 MCP lets AI agents (Claude, Cursor, and other MCP clients) call external capabilities
-as first-class tools. OpenWA's MCP integration exposes a **focused, curated** slice of
+as first-class tools. Zaptura's MCP integration exposes a **focused, curated** slice of
 its functionality — listing sessions, sending messages, reading chats/contacts, basic
 group management — so an agent can drive WhatsApp through the same business logic the
 REST API uses.
@@ -69,7 +69,7 @@ flowchart TB
 2. **No vendor lock-in.** Core never imports the MCP SDK. The `@modelcontextprotocol/sdk`
    dependency lives in exactly one place (`src/modules/mcp/`) and is loaded only when MCP
    is enabled.
-3. **Curated surface.** Rather than reflecting every REST route, OpenWA exposes an
+3. **Curated surface.** Rather than reflecting every REST route, Zaptura exposes an
    intentional, named, read/write-tiered set of tools. A focused surface keeps agents from
    getting overwhelmed and keeps destructive/privileged operations off the agent path.
 4. **Reuse the pipeline.** Each tool runs through the **existing services** and the
@@ -129,10 +129,10 @@ code is a transferable join capability, so it sits at OPERATOR like the QR endpo
 | **Session**    | list, get, chats, stats, presence                       | mark read/unread, typing, subscribe presence                                                  |
 | **Message**    | list, history, reactions                                | send text/image/video/audio/document/location/contact/sticker/template, reply, forward, react |
 | **Contact**    | list, get, check-number, resolve-phone, profile-picture | block, unblock                                                                                |
-| **Group**      | list, get, invite-code (OPERATOR)                       | create, add participants, set subject, set description                                        |
-| **Webhook**    | list, get (OPERATOR)                                    | —                                                                                             |
+| **Group**      | list, get, invite-code                                  | create, add participants, set subject, set description                                        |
+| **Webhook**    | list, get                                               | —                                                                                             |
 | **Label**      | list, get, chats for a label, labels on a chat          | upsert, delete, add to chat, remove from chat                                                 |
-| **Automation** | rules list, get (OPERATOR)                              | —                                                                                             |
+| **Automation** | rules list, get                                         | —                                                                                             |
 
 > **Labels split across the engines**, and each tool's description says which way. Every label
 > _read_ needs whatsapp-web.js — Baileys exposes no label query at all. Editing a label (upsert,
@@ -162,7 +162,7 @@ only when an agent genuinely needs to send messages / mutate state.
   per-session `allowedSessions` scoping are enforced identically to REST. A key scoped to
   one session cannot act on another.
 - **Least-privilege keys.** Mint a **dedicated, non-admin, session-scoped** key for each
-  MCP client (`OPERATOR` role at most). The plaintext key is shown once on creation; to
+  MCP client (`USER` role). The plaintext key is shown once on creation; to
   rotate, create a new key and delete the old one.
 - **No IP allow-list over MCP.** There is no genuine client IP on a tool call, so a key
   that carries an `allowedIps` list will be rejected. Use a key without `allowedIps` for
@@ -208,7 +208,7 @@ Point an MCP client at `POST /mcp`. For Claude Code, a `.mcp.json` at your proje
 ```json
 {
   "mcpServers": {
-    "openwa": {
+    "zaptura": {
       "type": "http",
       "url": "http://localhost:2785/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_KEY" }
@@ -244,7 +244,7 @@ Guidelines:
   can leak fields the REST API deliberately strips.
 - Mark writes with `tier: 'write'` and the appropriate `requiredRole`. Give a read the same
   `requiredRole` as the REST route it mirrors: the webhook and automation-rule reads and
-  `GroupGetInviteCode` sit at OPERATOR because their REST routes do.
+  `GroupGetInviteCode` sit at USER because their REST routes do.
 - Use `sessionScoped: true` and a non-empty `sessionId` field for any per-session tool so
   the scope check applies.
 - A snapshot test (`tool-registry.spec.ts`) locks the public tool-name set; update it

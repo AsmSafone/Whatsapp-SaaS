@@ -33,7 +33,6 @@ describe('Webhooks (e2e)', () => {
   let webhookService: WebhookService;
   let sessionRepo: Repository<Session>;
   let apiKey: string;
-  let viewerKey: string;
   let received: Array<{ headers: http.IncomingHttpHeaders; raw: string; body: Record<string, unknown> }>;
   let receiver: http.Server;
   let receiverUrl: string;
@@ -91,10 +90,9 @@ describe('Webhooks (e2e)', () => {
     webhookService = app.get(WebhookService);
     sessionRepo = app.get(getRepositoryToken(Session, 'data'));
 
-    // Mint real keys so the suite doesn't depend on seed/DB state; ADMIN covers the OPERATOR routes.
+    // Mint real keys so the suite doesn't depend on seed/DB state; ADMIN covers the USER routes.
     const authService = app.get(AuthService);
     apiKey = (await authService.createApiKey({ name: 'e2e-admin', role: ApiKeyRole.ADMIN })).rawKey;
-    viewerKey = (await authService.createApiKey({ name: 'e2e-viewer', role: ApiKeyRole.VIEWER })).rawKey;
 
     received = [];
     receiver = http.createServer((req, res) => {
@@ -237,13 +235,22 @@ describe('Webhooks (e2e)', () => {
       await request(app.getHttpServer()).get(`/api/sessions/${session}/webhooks`).expect(401);
     });
 
-    it('forbids a viewer-role key from creating a webhook (403)', async () => {
-      const session = await nextSession();
+    it('rejects a key scoped to a different session (401)', async () => {
+      const sessionA = await nextSession();
+      const sessionB = await nextSession();
+      const authService = app.get(AuthService);
+      const scopedKey = (
+        await authService.createApiKey({
+          name: 'e2e-scoped-user',
+          role: ApiKeyRole.USER,
+          allowedSessions: [sessionA],
+        })
+      ).rawKey;
       await request(app.getHttpServer())
-        .post(`/api/sessions/${session}/webhooks`)
-        .set('X-API-Key', viewerKey)
+        .post(`/api/sessions/${sessionB}/webhooks`)
+        .set('X-API-Key', scopedKey)
         .send({ url: receiverUrl })
-        .expect(403);
+        .expect(401);
     });
   });
 
@@ -298,10 +305,10 @@ describe('Webhooks (e2e)', () => {
       await waitFor(() => received.length === 1);
 
       const { headers, raw, body } = received[0];
-      expect(headers['x-openwa-event']).toBe('message.received');
+      expect(headers['x-zaptura-event']).toBe('message.received');
       // Verify the signature over the exact bytes that were sent, not a re-serialization.
       const expected = `sha256=${crypto.createHmac('sha256', secret).update(raw).digest('hex')}`;
-      expect(headers['x-openwa-signature']).toBe(expected);
+      expect(headers['x-zaptura-signature']).toBe(expected);
       expect((body as { data: { from: string } }).data.from).toBe('boss@c.us');
     });
 
@@ -327,7 +334,7 @@ describe('Webhooks (e2e)', () => {
 
       await webhookService.dispatch(session, 'session.status', { status: 'connected' });
       await waitFor(() => received.length === 1);
-      expect(received[0].headers['x-openwa-event']).toBe('session.status');
+      expect(received[0].headers['x-zaptura-event']).toBe('session.status');
     });
 
     it('does not deliver to an inactive webhook', async () => {
@@ -348,14 +355,14 @@ describe('Webhooks (e2e)', () => {
     it('drops forged reserved headers but keeps custom ones on the wire', async () => {
       const session = await nextSession();
       await createWebhook(session, {
-        headers: { 'X-OpenWA-Event': 'forged', 'Content-Type': 'text/plain', 'X-Custom': 'ok' },
+        headers: { 'X-Zaptura-Event': 'forged', 'Content-Type': 'text/plain', 'X-Custom': 'ok' },
       });
 
       await webhookService.dispatch(session, 'message.received', {});
       await waitFor(() => received.length === 1);
 
       const { headers } = received[0];
-      expect(headers['x-openwa-event']).toBe('message.received'); // system value wins, not 'forged'
+      expect(headers['x-zaptura-event']).toBe('message.received'); // system value wins, not 'forged'
       expect(headers['content-type']).toBe('application/json');
       expect(headers['x-custom']).toBe('ok'); // legitimate custom header preserved
     });
@@ -391,9 +398,9 @@ describe('Webhooks (e2e)', () => {
         expect(body.event).toBe('message.received');
         expect(body.sessionId).toBe(session);
         expect(body.timestamp).not.toBe('1999-01-01T00:00:00.000Z');
-        expect(headers['x-openwa-event']).toBe('message.received');
+        expect(headers['x-zaptura-event']).toBe('message.received');
         const expected = `sha256=${crypto.createHmac('sha256', secret).update(raw).digest('hex')}`;
-        expect(headers['x-openwa-signature']).toBe(expected);
+        expect(headers['x-zaptura-signature']).toBe(expected);
         expect((body as { data: { from: string } }).data.from).toBe('boss@c.us'); // data stays hook-controlled
       } finally {
         hookManager.unregister(hookId);
@@ -443,7 +450,7 @@ describe('Webhooks (e2e)', () => {
       });
       // The signature verifies over the exact marker-form bytes the receiver got.
       const expected = `sha256=${crypto.createHmac('sha256', secret).update(raw).digest('hex')}`;
-      expect(headers['x-openwa-signature']).toBe(expected);
+      expect(headers['x-zaptura-signature']).toBe(expected);
     });
 
     it('keeps under-threshold media inline end-to-end', async () => {
@@ -477,7 +484,7 @@ describe('Webhooks (e2e)', () => {
 
       expect((res.body as { success: boolean }).success).toBe(true);
       await waitFor(() => received.length === 1);
-      expect(received[0].headers['x-openwa-event']).toBe('test');
+      expect(received[0].headers['x-zaptura-event']).toBe('test');
     });
   });
 });

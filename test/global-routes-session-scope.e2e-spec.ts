@@ -22,7 +22,7 @@ import { Session } from './../src/modules/session/entities/session.entity';
 describe('Global read and create routes reject session-scoped keys (e2e)', () => {
   let app: INestApplication<App>;
   let scopedAdminKey: string; // ADMIN, allowedSessions: [sessA]
-  let scopedOperatorKey: string; // OPERATOR, allowedSessions: [sessA]
+  let scopedUserKey: string; // USER, allowedSessions: [sessA]
   let adminKey: string; // ADMIN, unrestricted
   let scopedSessionId: string; // the session the scoped keys are confined to
 
@@ -40,8 +40,8 @@ describe('Global read and create routes reject session-scoped keys (e2e)', () =>
     scopedAdminKey = (
       await authService.createApiKey({ name: 'e2e-global-scoped', role: ApiKeyRole.ADMIN, allowedSessions: [a.id] })
     ).rawKey;
-    scopedOperatorKey = (
-      await authService.createApiKey({ name: 'e2e-global-op', role: ApiKeyRole.OPERATOR, allowedSessions: [a.id] })
+    scopedUserKey = (
+      await authService.createApiKey({ name: 'e2e-global-user', role: ApiKeyRole.USER, allowedSessions: [a.id] })
     ).rawKey;
     adminKey = (await authService.createApiKey({ name: 'e2e-global-admin', role: ApiKeyRole.ADMIN })).rawKey;
   });
@@ -74,11 +74,11 @@ describe('Global read and create routes reject session-scoped keys (e2e)', () =>
       .expect(403);
   });
 
-  it('rejects a scoped OPERATOR on POST /api/sessions (cannot create outside its allowlist)', async () => {
+  it('rejects a scoped USER on POST /api/sessions (cannot create outside its allowlist)', async () => {
     await request(app.getHttpServer())
       .post('/api/sessions')
-      .set('X-API-Key', scopedOperatorKey)
-      .send({ name: `e2e-escape-operator-${Date.now()}` })
+      .set('X-API-Key', scopedUserKey)
+      .send({ name: `e2e-escape-user-${Date.now()}` })
       .expect(403);
   });
 

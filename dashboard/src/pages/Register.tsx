@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
@@ -11,20 +11,18 @@ interface RegisterProps {
   onLogin: (apiKey: string, role?: string) => void;
 }
 
-const PLANS = [
-  { id: 'starter', name: 'Starter (1 Number)', price: '$6/mo' },
-  { id: 'pro', name: 'Pro (3 Numbers)', price: '$15/mo', popular: true },
-  { id: 'plus', name: 'Plus (6 Numbers)', price: '$30/mo' },
-  { id: 'business', name: 'Business (10 Numbers)', price: '$45/mo' },
-];
+const VALID_PLANS = ['starter', 'pro', 'plus', 'business'];
 
 export function Register({ onLogin }: RegisterProps) {
   const { t } = useTranslation();
   useDocumentTitle('Create Zaptura Account — Zaptura WA');
+  const [searchParams] = useSearchParams();
+  const planQuery = searchParams.get('plan')?.toLowerCase();
+  const selectedPlan = (VALID_PLANS.includes(planQuery || '') ? planQuery : 'starter') as string;
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState('pro');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -40,7 +38,7 @@ export function Register({ onLogin }: RegisterProps) {
       const response = await fetch(`${API_BASE_URL}/account/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password, plan: selectedPlan }),
       });
       const data = (await response.json().catch(() => ({}))) as { token?: string; message?: string };
       if (!response.ok || !data.token) {
@@ -51,7 +49,7 @@ export function Register({ onLogin }: RegisterProps) {
         headers: { 'Content-Type': 'application/json', 'X-API-Key': data.token },
       });
       const validated: { role?: string } = await validate.json().catch(() => ({}));
-      onLogin(data.token, validated.role || 'operator');
+      onLogin(data.token, validated.role || 'user');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('login.connectionError'));
     } finally {
@@ -77,23 +75,6 @@ export function Register({ onLogin }: RegisterProps) {
       <div className="login-card register-card">
         <div className="login-logo">
           <ZapturaLogo size={40} showText={true} subtitle="Create Developer Account" />
-        </div>
-
-        {/* Plan Selector Buttons */}
-        <div className="register-plan-select">
-          {PLANS.map(plan => (
-            <button
-              key={plan.id}
-              type="button"
-              className={`register-plan-btn ${selectedPlan === plan.id ? 'active' : ''}`}
-              onClick={() => setSelectedPlan(plan.id)}
-            >
-              <div className="register-plan-btn-top">
-                <span>{plan.name}</span>
-                <strong>{plan.price}</strong>
-              </div>
-            </button>
-          ))}
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

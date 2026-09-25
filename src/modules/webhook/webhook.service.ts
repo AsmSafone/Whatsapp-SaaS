@@ -282,15 +282,15 @@ export class WebhookService implements OnModuleInit, OnModuleDestroy {
       // Custom headers FIRST so the system headers below always win.
       ...this.delivery.sanitizeCustomHeaders(webhook.headers),
       'Content-Type': 'application/json',
-      'User-Agent': 'OpenWA-Webhook/1.0.0',
-      'X-OpenWA-Event': 'test',
-      'X-OpenWA-Idempotency-Key': testPayload.idempotencyKey,
-      'X-OpenWA-Delivery-Id': testPayload.deliveryId,
-      'X-OpenWA-Retry-Count': '0',
+      'User-Agent': 'Zaptura-Webhook/1.0.0',
+      'X-Zaptura-Event': 'test',
+      'X-Zaptura-Idempotency-Key': testPayload.idempotencyKey,
+      'X-Zaptura-Delivery-Id': testPayload.deliveryId,
+      'X-Zaptura-Retry-Count': '0',
     };
 
     if (webhook.secret) {
-      headers['X-OpenWA-Signature'] = this.delivery.generateSignature(body, webhook.secret);
+      headers['X-Zaptura-Signature'] = this.delivery.generateSignature(body, webhook.secret);
     }
 
     try {

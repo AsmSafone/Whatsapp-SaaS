@@ -31,7 +31,7 @@ export const DEFAULT_DATA_DIR = './data';
 export const DEFAULT_PLUGINS_DIR = path.join(DEFAULT_DATA_DIR, 'plugins');
 
 /**
- * The plugin package dir OpenWA ≤ 0.12.1 defaulted to. A host that ran on that default has working
+ * The plugin package dir Zaptura ≤ 0.12.1 defaulted to. A host that ran on that default has working
  * plugin code sitting here, so the loader still scans it (and says so, loudly) when PLUGINS_DIR is
  * unset — see PluginLoaderService.onModuleInit.
  */
@@ -175,14 +175,14 @@ export default () => ({
   dataDatabase: {
     type: process.env.DATABASE_TYPE || 'sqlite',
     // SQLite path (used when type is sqlite)
-    database: process.env.DATABASE_NAME || './data/openwa.sqlite',
+    database: process.env.DATABASE_NAME || './data/zaptura.sqlite',
     // Postgres database NAME (used when type is postgres). Resolved from the same
     // DATABASE_NAME env as the migration CLI (data-source.ts) so the runtime factory and
     // migrations never target different databases. Distinct sqlite-vs-pg defaults.
-    name: process.env.DATABASE_NAME || 'openwa',
+    name: process.env.DATABASE_NAME || 'zaptura',
     // PostgreSQL schema (used when type is postgres). Default 'public' preserves the historical
-    // behavior; set POSTGRES_SCHEMA to place OpenWA's tables + the TypeORM migration ledger in a
-    // dedicated schema (e.g. a managed-Postgres project schema, or to isolate OpenWA from other
+    // behavior; set POSTGRES_SCHEMA to place Zaptura's tables + the TypeORM migration ledger in a
+    // dedicated schema (e.g. a managed-Postgres project schema, or to isolate Zaptura from other
     // apps sharing the database). The schema must already exist — a missing one fails fast at
     // migration time rather than silently falling back to public. SQLite ignores this.
     schema: process.env.POSTGRES_SCHEMA || 'public',
@@ -341,10 +341,10 @@ export default () => ({
     // there keeps loading them. Null once PLUGINS_DIR is set — an operator who named the directory
     // has said where plugins live, and nothing may second-guess that.
     legacyDir: process.env.PLUGINS_DIR ? null : LEGACY_PLUGINS_DIR,
-    // Remote catalog of installable plugins (JSON array; the OpenWA-plugins repo's plugins.json).
+    // Remote catalog of installable plugins (JSON array; the Zaptura-plugins repo's plugins.json).
     // Fetched through the SSRF guard — add its host to SSRF_ALLOWED_HOSTS if it is not publicly resolvable.
     catalogUrl:
-      process.env.PLUGIN_CATALOG_URL || 'https://raw.githubusercontent.com/rmyndharis/OpenWA-plugins/main/plugins.json',
+      process.env.PLUGIN_CATALOG_URL || 'https://raw.githubusercontent.com/AsmSafone/Whatsapp-SaaS-plugins/main/plugins.json',
     // Cap on a plugin .zip downloaded by install-from-URL (matches the 5 MB upload limit). Fail-safe:
     // a non-numeric or non-positive value (parseInt → NaN/0/-n) falls back to the default rather than
     // silently disabling the cap (a downstream `??` would not catch NaN).

@@ -35,15 +35,14 @@ Content-Type: application/json       # required on requests with a JSON body
 
 ### Roles & Authorization
 
-API keys carry one of three roles, ordered by privilege:
+API keys carry one of two roles, ordered by privilege:
 
-| Role       | Rank | Can do                                                                                                                               |
-| ---------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `viewer`   | 1    | Read-only routes (no `@RequireRole`, or routes that only need a valid key)                                                           |
-| `operator` | 2    | Everything a viewer can, plus write/action routes guarded by `@RequireRole(OPERATOR)` (send messages, group/contact mutations, etc.) |
-| `admin`    | 3    | Everything, plus admin-only routes guarded by `@RequireRole(ADMIN)` (API-key management, settings)                                   |
+| Role    | Rank | Can do                                                                                                |
+| ------- | ---- | ----------------------------------------------------------------------------------------------------- |
+| `user`  | 1    | Standard customer role — access assigned sessions, send/read messages, webhooks, templates            |
+| `admin` | 2    | Everything, plus admin-only routes guarded by `@RequireRole(ADMIN)` (API-key management, settings)   |
 
-`@RequireRole(role)` enforces a **minimum** role using the hierarchy `VIEWER < OPERATOR < ADMIN`: a key satisfies the guard if its own rank is ≥ the required rank (so an `admin` key passes an `OPERATOR`-guarded route). A route with no `@RequireRole` accepts any valid key, including `viewer`. A key whose role is below the requirement gets `403 Forbidden`; a missing or invalid key gets `401 Unauthorized`.
+`@RequireRole(role)` enforces a **minimum** role using the hierarchy `USER < ADMIN`: a key satisfies the guard if its own rank is ≥ the required rank (so an `admin` key passes a `USER`-guarded route). A route with no `@RequireRole` accepts any valid key, including `user`. A key whose role is below the requirement gets `403 Forbidden`; a missing or invalid key gets `401 Unauthorized`.
 
 A key may additionally be scoped to specific sessions (`allowedSessions`) and/or source IPs (`allowedIps`). The scope/IP check runs in the guard **before** any role check, so a request outside that scope is rejected with `401` (not `403`) even if the role would otherwise allow it.
 
@@ -51,11 +50,11 @@ A key may also be restricted to selected chats (`allowedChats`: group `<id>@g.us
 
 ### API-Key Lifecycle
 
-OpenWA seeds an initial admin key on first run (printed to the startup log and written to `data/.api-key`, or `/app/data/.api-key` in Docker). Use it to mint scoped, lower-privilege keys for integrations. Full key creation, listing, rotation, and revocation are documented under the auth resource in **§6.4.9 (API Keys)**.
+Zaptura seeds an initial admin key on first run (printed to the startup log and written to `data/.api-key`, or `/app/data/.api-key` in Docker). Use it to mint scoped, lower-privilege keys for integrations. Full key creation, listing, rotation, and revocation are documented under the auth resource in **§6.4.9 (API Keys)**.
 
 ## 6.2 Response Format
 
-> **OpenWA returns the raw handler payload directly — there is NO `{ success, data, meta }` envelope.** A resource route returns the resource object as-is; a list route returns a **bare JSON array**. Read fields directly (`response.id`, not `response.data.id`).
+> **Zaptura returns the raw handler payload directly — there is NO `{ success, data, meta }` envelope.** A resource route returns the resource object as-is; a list route returns a **bare JSON array**. Read fields directly (`response.id`, not `response.data.id`).
 
 ### Success Response
 
@@ -114,7 +113,7 @@ Validation failures (`statusCode: 400`) return `message` as an **array** of fiel
 
 ### Timestamp Conventions
 
-OpenWA uses **two** timestamp representations — be careful which a field is:
+Zaptura uses **two** timestamp representations — be careful which a field is:
 
 - **Message timestamps are epoch numbers (Unix seconds), not ISO strings.** This applies to the `timestamp` field on messages returned by send responses, history, and persisted message records (the persisted column is stored as a bigint and surfaced as a `number`).
 - **Entity audit fields use ISO-8601 UTC strings** (example: `2026-02-02T10:00:00.000Z`). This applies to `createdAt` / `updatedAt` on persisted entities, `expiresAt`, batch `startedAt` / `completedAt`, and similar metadata fields.
@@ -315,7 +314,7 @@ only way back to unlimited reconnect attempts once a cap is set). `autoRejectCal
 every incoming call, so it applies immediately; the two reconnect settings are read once per start
 and therefore apply on the next start, leaving a reconnect sequence already in flight alone.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -370,7 +369,7 @@ When no proxy is configured, `enabled` is `false` and the other fields are `null
 
 Update per-session proxy settings. No restart is required or performed — changes apply on the **next** `POST /start`. Send `proxyUrl: null` to clear the proxy.
 
-**Auth:** API key (OPERATOR) that is not restricted to specific sessions. Redirecting a session's whole egress through a chosen host is a deployment-level act, and before this route existed `proxyUrl` could only be set through `POST /api/sessions`, which is unscoped for the same reason. A session-scoped key is rejected with `403` (`@RequireUnscopedKey`).
+**Auth:** API key (USER) that is not restricted to specific sessions. Redirecting a session's whole egress through a chosen host is a deployment-level act, and before this route existed `proxyUrl` could only be set through `POST /api/sessions`, which is unscoped for the same reason. A session-scoped key is rejected with `403` (`@RequireUnscopedKey`).
 
 **Path parameters**
 
@@ -396,7 +395,7 @@ Update per-session proxy settings. No restart is required or performed — chang
 
 Get the QR code (PNG data URL) for session authentication.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -520,7 +519,7 @@ Get session statistics for multi-session monitoring.
 
 Create a new WhatsApp session.
 
-**Auth:** API key (OPERATOR) that is not restricted to specific sessions. Creating a session is a deployment-level act: the new session is outside the caller's `allowedSessions` by construction, so a session-scoped key is rejected with `403` (`@RequireUnscopedKey`). An unscoped OPERATOR/ADMIN key may create a session.
+**Auth:** API key (USER) that is not restricted to specific sessions. Creating a session is a deployment-level act: the new session is outside the caller's `allowedSessions` by construction, so a session-scoped key is rejected with `403` (`@RequireUnscopedKey`). An unscoped OPERATOR/ADMIN key may create a session.
 
 **Request body** — `CreateSessionDto`
 
@@ -602,7 +601,7 @@ Like every other session route, this returns the `SessionResponseDto` shape (via
 
 Start a session and initialize the WhatsApp connection.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -638,7 +637,7 @@ Returned via `transformSession`. Status typically transitions to `initializing` 
 
 Stop a session and disconnect WhatsApp.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -706,7 +705,7 @@ it the same way, so none of those are auto-started on boot — an incomplete-log
 session must be started explicitly and the logout retried by hand. A session that must stay down can
 simply be left as-is.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -744,7 +743,7 @@ distinguishing an intentional unlink from a plain stop.
 
 Force-kill a stuck session (SIGKILL the wedged engine, then tear it down).
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -782,7 +781,7 @@ Request an 8-char pairing code to link via phone number (alternative to QR).
 
 > ⚠️ **On the whatsapp-web.js engine, only request a code for a number you are prepared to re-link.** A request for a number that already has a linked session has been observed to end with WhatsApp revoking that device: the linked session logs a LOGOUT, its credentials are deleted, and it falls back to `qr_ready` with no phone. Nothing here refuses such a request: the guards check the session's state, never the number. The request runs inside the shared WhatsApp Web page and resets its linking mode before asking for a code, so the blast radius is the account rather than the session. Baileys was not affected in the same tests. Link by QR when a session of that number must stay up.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -814,7 +813,7 @@ Request an 8-char pairing code to link via phone number (alternative to QR).
 
 Ask WhatsApp to start reporting who is online or typing in a chat.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped · **Engines:** Baileys only
+**Auth:** API key (USER) · **Scope:** session-scoped · **Engines:** Baileys only
 
 There is no synchronous answer: presence cannot be _fetched_ from either engine, only received.
 Updates arrive as the `presence.update` webhook and socket event; the latest is readable at
@@ -853,7 +852,7 @@ Two properties to design around:
 
 The last presence reported for a chat.
 
-**Auth:** API key (VIEWER) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Response** `200`
 
@@ -892,7 +891,7 @@ The setting belongs to the connection: it does not survive a restart or reconnec
 re-issued after `session.status` reports one. Not best-effort — a failure surfaces instead of
 leaving the account silently online.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Request body** — `SetOwnPresenceDto`
 
@@ -916,7 +915,7 @@ leaving the account silently online.
 
 Mark a chat as read/seen.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -956,7 +955,7 @@ Returns HTTP `200`, matching the OpenAPI contract.
 
 Mark a chat as unread.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -990,7 +989,7 @@ Returns HTTP `200`, matching the OpenAPI contract.
 
 Delete every message in a chat, keeping the chat itself in the list.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1015,7 +1014,7 @@ Delete every message in a chat, keeping the chat itself in the list.
 
 Archive or unarchive a chat.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1055,7 +1054,7 @@ Archive or unarchive a chat.
 
 Mute a chat's notifications until a given moment, or unmute it.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1107,7 +1106,7 @@ Mute a chat's notifications until a given moment, or unmute it.
 Pin a chat to the top of the chat list, or unpin it. Chat-level — distinct from
 `messages/pin`, which pins a message inside a chat.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1148,7 +1147,7 @@ Pin a chat to the top of the chat list, or unpin it. Chat-level — distinct fro
 
 Delete a chat from the chat list (e.g. a group you have left).
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1180,7 +1179,7 @@ Returns HTTP `200`, matching the OpenAPI contract.
 
 Send a typing/recording presence indicator to a chat (or clear it with `paused`).
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1213,7 +1212,7 @@ Always returns `{ "success": true }` (the service returns void; the controller h
 
 Delete a session.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Path parameters**
 
@@ -1227,7 +1226,7 @@ Delete a session.
 
 ### 6.4.2 Messages
 
-All routes are mounted under `/api/sessions/:sessionId/messages`. Reads (`GET` history, batch status, reactions) accept any valid API key (including VIEWER). All write/send routes require **API key (OPERATOR)** or higher. Single-recipient send routes return `MessageResponseDto { messageId, timestamp }` (`timestamp` is an epoch **number** in seconds; there is no `status` field); `POST send-bulk` instead returns `202` with `BulkMessageResponseDto`. The global ValidationPipe runs `whitelist` + `forbidNonWhitelisted`, so any body field not listed below is rejected with `400`.
+All routes are mounted under `/api/sessions/:sessionId/messages`. Reads (`GET` history, batch status, reactions) accept any valid API key (including USER). All write/send routes require **API key (USER)** or higher. Single-recipient send routes return `MessageResponseDto { messageId, timestamp }` (`timestamp` is an epoch **number** in seconds; there is no `status` field); `POST send-bulk` instead returns `202` with `BulkMessageResponseDto`. The global ValidationPipe runs `whitelist` + `forbidNonWhitelisted`, so any body field not listed below is rejected with `400`.
 
 #### GET /api/sessions/:sessionId/messages
 
@@ -1264,7 +1263,7 @@ Get persisted message history for a session from the local DB (paginated, filter
       "chatId": "628123456789@c.us",
       "from": "628123456789@c.us",
       "to": "628987654321@c.us",
-      "body": "Hello from OpenWA!",
+      "body": "Hello from Zaptura!",
       "type": "text",
       "direction": "outgoing",
       "timestamp": 1719312000,
@@ -1366,7 +1365,7 @@ Returns a bare array of `MessageReaction`:
 
 Cast a vote on a poll.
 
-**Auth:** API key (OPERATOR) · **Engines:** whatsapp-web.js only — Baileys returns `501`
+**Auth:** API key (USER) · **Engines:** whatsapp-web.js only — Baileys returns `501`
 
 **Body**
 
@@ -1396,7 +1395,7 @@ Cast a vote on a poll.
 
 Pin a message in its chat for a bounded window.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Body**
 
@@ -1418,7 +1417,7 @@ Pin a message in its chat for a bounded window.
 Star (bookmark) a message, or remove its star. Starring is private to the account — the other party
 never sees it — and unlike pinning it has no group-admin restriction and never expires.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Body**
 
@@ -1441,7 +1440,7 @@ never sees it — and unlike pinning it has no group-admin restriction and never
 
 Remove a message's pin. Takes no duration.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Body**
 
@@ -1582,14 +1581,14 @@ per-participant failures those endpoints report normally. No message is sent, so
 consumes the overall daily send allowance.
 
 Two consequences worth knowing: a paced-out send fires **no** `message:sending` plugin hook (see
-`docs/19-plugin-architecture.md`), and refusals are counted in the `openwa_send_pacing_refusals_total`
+`docs/19-plugin-architecture.md`), and refusals are counted in the `zaptura_send_pacing_refusals_total`
 Prometheus counter, labelled by rule.
 
 #### POST /api/sessions/:sessionId/messages/send-text
 
 Send a plain text message.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1609,7 +1608,7 @@ Send a plain text message.
 | quotedMessageId   | string   | No       | non-empty                      | Quote an earlier message, making this a reply. See [Quoted sends](#quoted-sends) below       |
 
 ```json
-{ "chatId": "628123456789@c.us", "text": "Hello from OpenWA!" }
+{ "chatId": "628123456789@c.us", "text": "Hello from Zaptura!" }
 ```
 
 ```json
@@ -1707,7 +1706,7 @@ quoted id that does not belong to the target chat, with `404`.
 
 Render a stored text template (header/body/footer joined by blank lines, `{{vars}}` substituted) and send it as text.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1748,7 +1747,7 @@ Delegates to the send-text path after rendering.
 
 Send an image (by URL or base64) with an optional caption.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1784,7 +1783,7 @@ Send an image (by URL or base64) with an optional caption.
 
 Send a video (by URL or base64) with an optional caption. Uses the same `SendMediaMessageDto` (and the same validation rules and errors) as `send-image`.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1810,7 +1809,7 @@ Send a video (by URL or base64) with an optional caption. Uses the same `SendMed
 
 Send an audio message (by URL or base64). Uses `SendAudioMessageDto`. A `caption` is accepted by the DTO but not persisted for audio. Set `ptt: true` to send a real WhatsApp **voice note** (microphone bubble + waveform) instead of a plain audio file. `ptt` is a JSON boolean, exclusive to this endpoint, and — because voice notes require `audio/ogg; codecs=opus` — the server defaults the mimetype to that when you set `ptt` without one; for reliable playback (especially on the Baileys engine, which does not transcode) supply OGG/Opus bytes. A `ptt` voice note is stored as message `type: "voice"`.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1836,7 +1835,7 @@ Send an audio message (by URL or base64). Uses `SendAudioMessageDto`. A `caption
 
 Send a document/file (by URL or base64). Uses `SendMediaMessageDto`; `filename` is used as the persisted body fallback.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1869,7 +1868,7 @@ Send a document/file (by URL or base64). Uses `SendMediaMessageDto`; `filename` 
 
 Send a location pin.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1910,7 +1909,7 @@ Send a location pin.
 
 Send a contact card (vCard).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1943,7 +1942,7 @@ Send a contact card (vCard).
 
 Send a sticker (by URL or base64; typically webp). Reuses `SendMediaMessageDto`.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -1969,7 +1968,7 @@ Send a sticker (by URL or base64; typically webp). Reuses `SendMediaMessageDto`.
 
 Send a native WhatsApp poll.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2008,7 +2007,7 @@ Send a native WhatsApp poll.
 
 Reply to a message, quoting a prior message.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2043,7 +2042,7 @@ The quoted body is best-effort resolved from the DB for the reply preview.
 
 Tap a choice on a WhatsApp Business button / list prompt by sending the structured reply proto WhatsApp expects.
 
-**Auth:** API key (OPERATOR) · **Engines:** Baileys only; whatsapp-web.js returns `501`
+**Auth:** API key (USER) · **Engines:** Baileys only; whatsapp-web.js returns `501`
 
 **Path parameters**
 
@@ -2086,7 +2085,7 @@ Tap a choice on a WhatsApp Business button / list prompt by sending the structur
 
 Forward a message from one chat to another.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2120,7 +2119,7 @@ Forward a message from one chat to another.
 
 Add or remove a reaction to a message (an empty emoji removes the reaction).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2154,7 +2153,7 @@ The controller hardcodes the result after the engine call. Note the `200` status
 
 Delete a message (for everyone by default); also flags the stored record as `revoked`.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2188,7 +2187,7 @@ After the engine delete, the stored message body is cleared and its `type` set t
 
 Edit the text of a message sent by this account; also updates the stored record's body.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2223,7 +2222,7 @@ Both fields describe the edited message rather than the edit itself, on both eng
 
 Send messages to multiple recipients as an async batch — returns immediately and processes in the background.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2288,7 +2287,7 @@ The rendered text is bounded the same way, by `TEMPLATE_RENDER_MAX_CHARS` (defau
 
 Cancel a running (pending/processing) bulk batch. No request body.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2540,7 +2539,7 @@ For inbound messages the gateway can attach this automatically instead: `RESOLVE
 Save a contact to the account's addressbook, or edit an existing entry. This is the WhatsApp
 contact record — it does not block, delete, or otherwise touch the chat.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2572,7 +2571,7 @@ contact record — it does not block, delete, or otherwise touch the chat.
 
 Remove a contact from the account's addressbook. Does not block the contact or delete the chat.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Response** `200` — `{ "success": true, "message": "Contact deleted" }`
 
@@ -2582,7 +2581,7 @@ Remove a contact from the account's addressbook. Does not block the contact or d
 
 Block a contact.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2607,7 +2606,7 @@ This route is annotated `@HttpCode(200)`, so it returns `200` rather than the PO
 
 Unblock a contact.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2723,7 +2722,7 @@ it is hidden by privacy settings.
 
 Set the group's picture. The account must be a group admin.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Request body** — `SetGroupPictureDto` (same shape as the profile-picture body)
 
@@ -2741,7 +2740,7 @@ Set the group's picture. The account must be a group admin.
 
 Remove the group's picture. The account must be a group admin.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Response** `200` — `{ "success": true, "message": "Group picture removed" }`
 
@@ -2751,7 +2750,7 @@ Remove the group's picture. The account must be a group admin.
 
 Get the group invite code and full invite link. The code is a transferable join capability rather than plain read data, so it sits at OPERATOR, like the QR endpoint.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2777,7 +2776,7 @@ Get the group invite code and full invite link. The code is a transferable join 
 
 Create a new group with an initial set of participants.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2819,7 +2818,7 @@ Returns the created `Group` directly (raw).
 
 Add participants to a group.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2861,7 +2860,7 @@ Each entry is a `ParticipantOperationResult`: `id` (the participant the outcome 
 
 Remove participants from a group. Note: this DELETE carries a JSON request body.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2898,7 +2897,7 @@ No `@HttpCode`, so NestJS uses the DELETE default of `200`. `results` carries th
 
 Promote participants to group admin.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2933,7 +2932,7 @@ Promote participants to group admin.
 
 Demote participants from group admin.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -2968,7 +2967,7 @@ Demote participants from group admin.
 
 Change the group name/subject.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3001,7 +3000,7 @@ No `@HttpCode`; PUT default is `200`.
 
 Change the group description. An empty string clears the description.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3034,7 +3033,7 @@ No `@HttpCode`; PUT default is `200`.
 
 Leave a group.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3057,7 +3056,7 @@ Leave a group.
 
 Revoke the current invite code and generate a new one.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3121,7 +3120,7 @@ object with no guaranteed shape and a defaulted `createdAt: 0` would read as "cr
 
 Join a group via an invite code (the part after `https://chat.whatsapp.com/`).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3179,7 +3178,7 @@ a boolean with the opposite sense). The adapters normalise both to these two val
 
 Update group settings. Each present field maps to one engine call; absent fields stay untouched. The caller must be a group admin for the change to take effect.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3257,7 +3256,7 @@ not paced by the cold-reachout governor: unlike `POST .../participants`, the peo
 the contact themselves. On whatsapp-web.js the engine pauses 250–500ms between requesters
 (upstream anti-abuse pacing), so acting on a large queue is a proportionally long request.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3316,7 +3315,7 @@ Reusable message templates scoped to a session, with `{{variable}}` placeholders
 
 List all templates for a session, newest first.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3335,7 +3334,7 @@ Bare `Template[]` array (no pagination, no envelope). Ordered by `createdAt` DES
     "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
     "name": "order-confirmation",
     "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-    "header": "OpenWA Store",
+    "header": "Zaptura Store",
     "footer": "Reply STOP to unsubscribe.",
     "createdAt": "2026-06-25T10:15:00.000Z",
     "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3349,7 +3348,7 @@ Bare `Template[]` array (no pagination, no envelope). Ordered by `createdAt` DES
 
 Get a single template by ID within the session.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3368,7 +3367,7 @@ Raw `Template` entity (no envelope).
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Zaptura Store",
   "footer": "Reply STOP to unsubscribe.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3381,7 +3380,7 @@ Raw `Template` entity (no envelope).
 
 Create a message template for the session (with `{{variable}}` placeholders in the body).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3402,7 +3401,7 @@ Create a message template for the session (with `{{variable}}` placeholders in t
 {
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Zaptura Store",
   "footer": "Reply STOP to unsubscribe."
 }
 ```
@@ -3417,7 +3416,7 @@ Returns the saved `Template` entity raw (no envelope). The lazy `session` relati
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Zaptura Store",
   "footer": "Reply STOP to unsubscribe.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3430,7 +3429,7 @@ Returns the saved `Template` entity raw (no envelope). The lazy `session` relati
 
 Update a template's name/body/header/footer (partial; only provided fields change).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3465,7 +3464,7 @@ Loads via lookup (`404` if missing), patches the provided fields, saves, and ret
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} is out for delivery.",
-  "header": "OpenWA Store",
+  "header": "Zaptura Store",
   "footer": "Thanks for shopping with us.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T11:02:00.000Z"
@@ -3478,7 +3477,7 @@ Loads via lookup (`404` if missing), patches the provided fields, saves, and ret
 
 Delete a template by ID.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3610,7 +3609,7 @@ Get a specific catalog product by id.
 
 Send a product message (catalog product card) to a chat. Note: this route lives under the `/messages` path but belongs to the catalog module.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3662,7 +3661,7 @@ List all channels/newsletters the session is subscribed to.
 [
   {
     "id": "120363000000000000@newsletter",
-    "name": "OpenWA Updates",
+    "name": "Zaptura Updates",
     "description": "Release notes and tips",
     "inviteCode": "ABC123xyz",
     "subscriberCount": 1042,
@@ -3695,7 +3694,7 @@ Get a single channel/newsletter by its id.
 ```json
 {
   "id": "120363000000000000@newsletter",
-  "name": "OpenWA Updates",
+  "name": "Zaptura Updates",
   "description": "Release notes and tips",
   "inviteCode": "ABC123xyz",
   "subscriberCount": 1042,
@@ -3754,7 +3753,7 @@ Bare array. `timestamp` is an epoch number (seconds).
 
 Create a channel. Supported on **both** engines.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 The account becomes the channel's owner, which is what makes deleting it possible later — neither
 engine can delete a channel it does not own.
@@ -3775,7 +3774,7 @@ engine can delete a channel it does not own.
 
 Delete a channel this account owns. Supported on **both** engines.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 Irreversible, and every subscriber loses the channel.
 
@@ -3792,7 +3791,7 @@ Irreversible, and every subscriber loses the channel.
 
 Mute or unmute a channel. Supported on **both** engines.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 Silences the channel's notifications for this account. The subscription is untouched — this is not a
 soft unsubscribe.
@@ -3812,7 +3811,7 @@ soft unsubscribe.
 Demote a channel admin back to a plain subscriber. **Baileys only** — the whatsapp-web.js engine
 answers `501`.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 Requires this account to own the channel. There is **no promote counterpart**, and that is an
 upstream limit rather than a gap here: neither engine library exposes one, so an admin is promoted
@@ -3837,7 +3836,7 @@ fails. Rather than ship a route that always errors on that engine, it answers `5
 Hand a channel this account owns to a new owner. **Baileys only** — the whatsapp-web.js engine
 answers `501`.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 > **Irreversible.** Once the transfer lands, this session is no longer the owner and cannot take the
 > channel back through this API.
@@ -3865,7 +3864,7 @@ repopulate. Rather than ship a route that always fails on that engine, it answer
 
 Subscribe to a channel using its invite code.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3888,7 +3887,7 @@ Subscribe to a channel using its invite code.
 ```json
 {
   "id": "120363000000000000@newsletter",
-  "name": "OpenWA Updates",
+  "name": "Zaptura Updates",
   "description": "Release notes and tips",
   "inviteCode": "ABC123xyz",
   "subscriberCount": 1042,
@@ -3904,7 +3903,7 @@ Subscribe to a channel using its invite code.
 
 Unsubscribe from a channel.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -3944,7 +3943,7 @@ create and update are the same operation and there is no server-assigned id to h
 why the route is `PUT /labels/:labelId` rather than `POST /labels`. Reusing an existing id **rewrites
 that label** instead of failing, because the protocol has no create-only form.
 
-**Reads are store-backed, not engine-direct.** `GET /status` and `GET /status/:id` no longer call the engine — they read from an OpenWA-side store that ingests inbound status/story broadcasts as they arrive (plus a best-effort backfill of currently-active stories on session connect), with a 24h TTL matching WhatsApp's own story expiry. This makes reads **identical on both engines**: `whatsapp-web.js` (which had a native `getBroadcasts()`/`getBroadcastById()` path) and Baileys (which never had one — `fetchStatus` only returns the _about_ text, not stories, so the raw engine methods still throw `501` if called directly, they're just no longer on the read path) now return the same shape from the same source. A status older than 24h, or received before the store existed, will not appear.
+**Reads are store-backed, not engine-direct.** `GET /status` and `GET /status/:id` no longer call the engine — they read from an Zaptura-side store that ingests inbound status/story broadcasts as they arrive (plus a best-effort backfill of currently-active stories on session connect), with a 24h TTL matching WhatsApp's own story expiry. This makes reads **identical on both engines**: `whatsapp-web.js` (which had a native `getBroadcasts()`/`getBroadcastById()` path) and Baileys (which never had one — `fetchStatus` only returns the _about_ text, not stories, so the raw engine methods still throw `501` if called directly, they're just no longer on the read path) now return the same shape from the same source. A status older than 24h, or received before the store existed, will not appear.
 
 #### GET /api/sessions/:sessionId/labels
 
@@ -4008,7 +4007,7 @@ Every chat carrying a label.
 
 Create or update a label.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped · **Engines:** Baileys only
+**Auth:** API key (USER) · **Scope:** session-scoped · **Engines:** Baileys only
 
 The label id is **yours to choose** and travels in the path. Whether this creates or updates depends
 only on whether that id already exists — reusing one rewrites that label rather than failing.
@@ -4043,7 +4042,7 @@ silently sets the wrong colour.
 
 Delete a label. It disappears from every chat it was on.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped · **Engines:** Baileys only
+**Auth:** API key (USER) · **Scope:** session-scoped · **Engines:** Baileys only
 
 **Response** `200`
 
@@ -4080,7 +4079,7 @@ Bare array — raw return of `engine.getChatLabels(chatId)`.
 
 Add a label to a chat.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4113,7 +4112,7 @@ The handler always returns the literal `{ "success": true }`.
 
 Remove a label from a chat.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4228,7 +4227,7 @@ Note: `:statusId/media` is a two-path-segment route, so it never collides with t
 
 Post a text status (story) to the session's status feed. The recipients allow-list is honored on Baileys only; whatsapp-web.js broadcasts to the account's status-privacy audience.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4246,7 +4245,7 @@ Post a text status (story) to the session's status feed. The recipients allow-li
 | font            | integer  | no       | `@IsIn([0, 1, 2, 6, 7, 8, 9, 10])` — `3`–`5` are rejected with `400` | WhatsApp status font index: `0` (default), `1`, `2`, `6` (bold), `7`, `8`, `9`, `10`. whatsapp-web.js honors only `0`–`7` and clamps anything above back to the default                                                                                                                                                   |
 
 ```json
-{ "text": "Hello from OpenWA!", "recipients": ["6281234567890@c.us"], "backgroundColor": "#25D366", "font": 2 }
+{ "text": "Hello from Zaptura!", "recipients": ["6281234567890@c.us"], "backgroundColor": "#25D366", "font": 2 }
 ```
 
 **Response** `201`
@@ -4271,7 +4270,7 @@ Returns the engine `StatusResult` directly (no wrapper). POST default status is 
 
 Post an image status (story) from a URL or base64 payload. The recipients allow-list is honored on Baileys only; whatsapp-web.js broadcasts to the account's status-privacy audience.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4320,7 +4319,7 @@ Returns the engine `StatusResult` directly. POST default status is `201`.
 
 Post a video status (story) from a URL or base64 payload. The recipients allow-list is honored on Baileys only; whatsapp-web.js broadcasts to the account's status-privacy audience.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4371,7 +4370,7 @@ Post an audio status (story) as a **voice note**, from a URL or base64 payload. 
 
 > **Format matters.** WhatsApp plays a status voice note only when it is Ogg/Opus, and neither engine transcodes — bytes are sent as supplied. Convert first via `POST /api/sessions/:sessionId/media/convert/voice` (§6.4.15) and post the `base64` it returns. Sending another format produces a bubble that will not play.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4406,7 +4405,7 @@ There is **no `caption`**: WhatsApp has nowhere to render one on a status voice 
 
 Delete one of the session's own posted statuses.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4434,7 +4433,7 @@ wire and a client replaying on `503` would publish the status a second time. The
 
 Webhooks are configured per session and managed under `/api/sessions/:sessionId/webhooks` (handled by `WebhookController`). Two cross-session endpoints live on `WebhooksListController`: `GET /api/webhooks` (list, **OPERATOR**) and `GET /api/webhooks/delivery-failures` (dead-letter log, **ADMIN**). Every other route requires an API key with **OPERATOR** role or higher.
 
-Two fields — `secret` and `headers` — are **write-only**: they are accepted on create/update but are never returned by any webhook route (the response DTO has no `@Expose` for them, so `fromEntity` drops them). `GET /api/infra/export-data` also omits both from its `webhooks` rows, so a backup no longer carries webhook credentials — a restored webhook comes back unsigned (`secret` null, `headers` `{}`) until you set them again. The `secret` is used to compute the `X-OpenWA-Signature: sha256=<hex>` HMAC-SHA256 header on deliveries.
+Two fields — `secret` and `headers` — are **write-only**: they are accepted on create/update but are never returned by any webhook route (the response DTO has no `@Expose` for them, so `fromEntity` drops them). `GET /api/infra/export-data` also omits both from its `webhooks` rows, so a backup no longer carries webhook credentials — a restored webhook comes back unsigned (`secret` null, `headers` `{}`) until you set them again. The `secret` is used to compute the `X-Zaptura-Signature: sha256=<hex>` HMAC-SHA256 header on deliveries.
 
 The `events` array accepts these members plus the `*` wildcard: `message.received`, `message.sent`, `message.ack`, `message.failed`, `message.revoked`, `message.reaction`, `message.edited`, `session.status`, `session.qr`, `session.authenticated`, `session.disconnected`, `session.reconnect_loop`, `session.restriction`, `presence.update`, `call.accepted`, `call.rejected`, `call.missed`, `group.join`, `group.leave`, `group.update`, `group.join_request`, `call.received`, `status.received`. All of them are actively dispatched by at least one engine — none is a reserved placeholder. Four are **Baileys only**, because whatsapp-web.js produces no callback behind them: `presence.update` (its prerequisite `POST .../presence/subscribe` answers `501` there, so this one announces itself) and `call.accepted` / `call.rejected` / `call.missed` (whatsapp-web.js has no call-outcome callback, so these three are accepted on subscribe and then simply never fire). `call.received` is dispatched by both engines but is not reliable on whatsapp-web.js: it fired there in a live test on 2026-09-17 and did not in one on 2026-08-10. See the per-event catalog below for engine scope.
 
@@ -4442,7 +4441,7 @@ The `events` array accepts these members plus the `*` wildcard: `message.receive
 
 List all webhooks for a session, ordered by `createdAt` descending.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4477,7 +4476,7 @@ Returns a bare array; empty array if the session has no webhooks. `secret` and `
 
 Get a single webhook by ID, scoped to the session.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4509,7 +4508,7 @@ Get a single webhook by ID, scoped to the session.
 
 List webhooks visible to the calling API key, scoped to its allowed sessions.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped — derived from the authenticated key, not from any param/query
+**Auth:** API key (USER) · **Scope:** session-scoped — derived from the authenticated key, not from any param/query
 
 **Query parameters**
 
@@ -4583,7 +4582,7 @@ Bare array of `WebhookDeliveryFailure` rows, ordered by `createdAt` descending. 
 
 Create a webhook for the session.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4597,8 +4596,8 @@ Create a webhook for the session.
 | ---------- | ---------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | url        | string                 | yes      | `@IsUrl({ require_tld: false })` (allows hostnames without a dot, e.g. `http://localhost:3000`); also run through the SSRF guard, which can reject with `400`. Entity column max 2048 chars.                                                                                                                                                                                                                                                                                                                                                                      | Webhook URL to receive events.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | events     | string[]               | no       | `@IsArray`, `@ArrayMinSize(1)`, `@IsIn([...WEBHOOK_EVENTS, '*'], { each: true })`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Event names to subscribe to (see allowed set above). Defaults to `["message.received"]` when omitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| secret     | string                 | no       | `@IsString`, `@MinLength(16)`, `@MaxLength(255)`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | HMAC-SHA256 signing key. **Write-only** — never returned by a webhook route (not returned by `GET /api/infra/export-data` either). Used for `X-OpenWA-Signature`. Defaults to `null`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| headers    | Record<string,string>  | no       | `@IsHeaderMap()` — flat object (not array), ≤50 entries, names match `/^[A-Za-z0-9-]+$/`, values are strings ≤1024 chars with no C0 control/DEL (CR/LF injection guard).                                                                                                                                                                                                                                                                                                                                                                                          | Custom headers added to deliveries. **Write-only** — never returned by a webhook route (not returned by `GET /api/infra/export-data` either). At delivery, `content-type` and `x-openwa-*` names are stripped. Defaults to `{}`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| secret     | string                 | no       | `@IsString`, `@MinLength(16)`, `@MaxLength(255)`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | HMAC-SHA256 signing key. **Write-only** — never returned by a webhook route (not returned by `GET /api/infra/export-data` either). Used for `X-Zaptura-Signature`. Defaults to `null`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| headers    | Record<string,string>  | no       | `@IsHeaderMap()` — flat object (not array), ≤50 entries, names match `/^[A-Za-z0-9-]+$/`, values are strings ≤1024 chars with no C0 control/DEL (CR/LF injection guard).                                                                                                                                                                                                                                                                                                                                                                                          | Custom headers added to deliveries. **Write-only** — never returned by a webhook route (not returned by `GET /api/infra/export-data` either). At delivery, `content-type` and `x-zaptura-*` names are stripped. Defaults to `{}`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | filters    | WebhookFilters \| null | no       | `@IsValidWebhookFilters()`, i.e. `{ conditions: [...] }`; each condition `{ field, operator('is'\|'isNot'\|'contains'\|'equals'), value(string\|string[]\|boolean), caseSensitive?:boolean }`; bounds: max 20 conditions, 100 values/condition, 1000-char text values. Message fields: `sender`, `recipient`, `chatId`, `body`, `type`, `isGroup`, `kind`, `fromMe`, `hasMedia`, `mentions`. An id-valued condition accepts a bare phone number, but a group must be written as its full `<id>@g.us` JID: bare digits canonicalise to `@c.us` and match no group. | Optional AND pre-filter; **all** conditions must match for the webhook to fire. Omit/null = fire on every subscribed event. Defaults to `null`. ⚠️ A condition whose field is DEFINED for the event family but absent from that event's payload does not scope the event, it decides it outright: an `is`, `contains` or `equals` condition cannot match and suppresses the event, while an `isNot` condition passes it, and so does a boolean field compared with `false`, because an absent boolean reads as `false` (a field with no definition for the family is skipped instead). `message.ack`/`message.failed` carry `{ id, messageId, status, ack }` and `message.reaction` carries `{ messageId, chatId, reaction, senderId }`, none of which has a sender or body, so a `sender` `is` filter silently drops all three and a `sender` `isNot` filter delivers all three. `message.ack`/`message.failed` carry no `chatId` either, so a `chatId` `isNot` exclusion does not keep that chat's acks and failures out. Scope the subscription with `events[]` rather than relying on a filter to be inert. Set `LOG_LEVEL=debug` to see each suppression and the payload fields that were available. |
 | retryCount | number (int)           | no       | `@IsInt`, `@Min(0)`, `@Max(5)`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Total delivery attempts per event, including the first: `0` and `1` both mean a single attempt with no retry. An event that exhausts them is recorded in `GET /api/webhooks/delivery-failures`; the webhook stays active. Defaults to `3`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
@@ -4648,7 +4647,7 @@ Create a webhook for the session.
 
 Update a webhook. Partial — only fields present in the body are changed.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4703,7 +4702,7 @@ Returns the saved entity; `secret` and `headers` excluded.
 
 Send a synthetic test payload to the webhook URL and report the result. No request body.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4718,7 +4717,7 @@ Send a synthetic test payload to the webhook URL and report the result. No reque
 { "success": true, "statusCode": 200 }
 ```
 
-On a reachable endpoint the response is `{ success: <response.ok>, statusCode: <response.status> }` — so a non-2xx target returns `200` HTTP with `success: false` and the target's `statusCode`. On an SSRF/timeout/network error the response is `{ "success": false, "error": "<message>" }`. The endpoint never throws on delivery failure; the failure is reflected in the body, not the HTTP status. The test POST sends `{ "event": "test", ... }` with headers `Content-Type`, `User-Agent: OpenWA-Webhook/1.0.0`, `X-OpenWA-Event: test`, `X-OpenWA-Idempotency-Key`, `X-OpenWA-Delivery-Id`, `X-OpenWA-Retry-Count: 0`, and `X-OpenWA-Signature` when a secret is set. Timeout defaults to 10000 ms (`webhook.timeout` config).
+On a reachable endpoint the response is `{ success: <response.ok>, statusCode: <response.status> }` — so a non-2xx target returns `200` HTTP with `success: false` and the target's `statusCode`. On an SSRF/timeout/network error the response is `{ "success": false, "error": "<message>" }`. The endpoint never throws on delivery failure; the failure is reflected in the body, not the HTTP status. The test POST sends `{ "event": "test", ... }` with headers `Content-Type`, `User-Agent: Zaptura-Webhook/1.0.0`, `X-Zaptura-Event: test`, `X-Zaptura-Idempotency-Key`, `X-Zaptura-Delivery-Id`, `X-Zaptura-Retry-Count: 0`, and `X-Zaptura-Signature` when a secret is set. Timeout defaults to 10000 ms (`webhook.timeout` config).
 
 **Errors:** `401` missing/invalid API key · `403` insufficient role · `404` webhook not found in this session
 
@@ -4726,7 +4725,7 @@ On a reachable endpoint the response is `{ success: <response.ok>, statusCode: <
 
 Delete a webhook, scoped to the session.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -4743,7 +4742,7 @@ No content (empty body; explicit `@HttpCode(204)`).
 
 ### 6.4.9 API Keys
 
-API keys are managed under `/api/auth/api-keys`. All management routes (create/list/get/update/delete/revoke) require an **ADMIN** key **with no session scope**: the controller is fenced with `@RequireUnscopedKey`, so a key whose `allowedSessions` is non-empty is rejected with `403` whatever its role — otherwise a confined admin key could mint an unrestricted one. The guard evaluates the role requirement _before_ that fence, so a scoped VIEWER/OPERATOR key is refused with `Insufficient permissions. Required: admin`; only a scoped ADMIN key reaches the fence and sees `Session-scoped API keys are not permitted on this route`. Both are `403`. A key restricted with `allowedChats` that passes the role check is refused next, before the session fence, with `403 "API key is restricted to selected chats"`: no management route is open to a chat-scoped key. The plaintext key string is returned **only once**, at creation. Validation of the caller's own key lives at `POST /api/auth/validate` (a separate controller, not fenced) and accepts any valid key except one restricted with `allowedChats`, which it refuses with `403` like every route not open to a chat-scoped key.
+API keys are managed under `/api/auth/api-keys`. All management routes (create/list/get/update/delete/revoke) require an **ADMIN** key **with no session scope**: the controller is fenced with `@RequireUnscopedKey`, so a key whose `allowedSessions` is non-empty is rejected with `403` whatever its role — otherwise a confined admin key could mint an unrestricted one. The guard evaluates the role requirement _before_ that fence, so a scoped USER key is refused with `Insufficient permissions. Required: admin`; only a scoped ADMIN key reaches the fence and sees `Session-scoped API keys are not permitted on this route`. Both are `403`. A key restricted with `allowedChats` that passes the role check is refused next, before the session fence, with `403 "API key is restricted to selected chats"`: no management route is open to a chat-scoped key. The plaintext key string is returned **only once**, at creation. Validation of the caller's own key lives at `POST /api/auth/validate` (a separate controller, not fenced) and accepts any valid key except one restricted with `allowedChats`, which it refuses with `403` like every route not open to a chat-scoped key.
 
 #### GET /api/auth/api-keys
 
@@ -4818,7 +4817,7 @@ Create a new API key; returns the full plaintext key exactly once.
 | Field             | Type                                   | Required | Constraints                                                                                              | Description                                                                       |
 | ----------------- | -------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `name`            | string                                 | yes      | length 3–100                                                                                             | Friendly name for the key.                                                        |
-| `role`            | enum `admin` \| `operator` \| `viewer` | no       | `@IsEnum`                                                                                                | Defaults to `operator` when omitted.                                              |
+| `role`            | enum `admin` \| `user` | no       | `@IsEnum`                                                                                                | Defaults to `user` when omitted.                                              |
 | `allowedIps`      | string[]                               | no       | each entry a valid **IPv4** address or IPv4 CIDR `/0-32`; IPv6 rejected                                  | IP whitelist (IPv4-only by design).                                               |
 | `allowedSessions` | string[]                               | no       | each `@IsString`                                                                                         | Session IDs this key may access.                                                  |
 | `allowedChats`    | string[]                               | no       | unique entries, each a group `<id>@g.us`, a contact `<phone>@c.us` / `<lid>@lid`, or a bare phone number | Chat IDs this key may reach (see [Roles & Authorization](#roles--authorization)). |
@@ -4873,7 +4872,7 @@ Update mutable fields of an API key. `isActive` is **not** updatable here — us
 | Field             | Type                                   | Required | Constraints              | Description                                                               |
 | ----------------- | -------------------------------------- | -------- | ------------------------ | ------------------------------------------------------------------------- |
 | `name`            | string                                 | no       | length 3–100             | Applied only if truthy.                                                   |
-| `role`            | enum `admin` \| `operator` \| `viewer` | no       | `@IsEnum`                | Applied only if truthy.                                                   |
+| `role`            | enum `admin` \| `user` | no       | `@IsEnum`                | Applied only if truthy.                                                   |
 | `allowedIps`      | string[]                               | no       | IPv4 address / CIDR only | Applied if not `undefined` (can be set to `[]` to clear).                 |
 | `allowedSessions` | string[]                               | no       | each `@IsString`         | Applied if not `undefined`.                                               |
 | `allowedChats`    | string[]                               | no       | same as create           | Applied if not `undefined` (`[]` clears it, making the key unrestricted). |
@@ -4882,7 +4881,7 @@ Update mutable fields of an API key. `isActive` is **not** updatable here — us
 ```json
 {
   "name": "Renamed Bot",
-  "role": "viewer",
+  "role": "user",
   "allowedIps": ["203.0.113.5"],
   "expiresAt": "2028-01-01T00:00:00Z"
 }
@@ -4897,7 +4896,7 @@ Returns the updated key (no plaintext).
   "id": "3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33",
   "name": "Renamed Bot",
   "keyPrefix": "zap_k1_a1b2",
-  "role": "viewer",
+  "role": "user",
   "allowedIps": ["203.0.113.5"],
   "isActive": true,
   "expiresAt": "2028-01-01T00:00:00.000Z",
@@ -4960,7 +4959,7 @@ Permanently delete an API key (hard delete). Also drops any un-flushed usage acc
 
 Validate the supplied `X-API-Key` and report its validity and role.
 
-**Auth:** API key (any valid role — VIEWER+)
+**Auth:** API key (any valid role — USER+)
 
 The key is read from the `X-API-Key` header, not the body; send an empty body. This route sits behind the global guard (it is not `@Public`), so a missing/invalid/revoked/expired key is rejected with `401` at the guard before the handler runs. On success it returns the caller's role. A key restricted with `allowedChats` is refused with `403 "API key is restricted to selected chats"`: the route is not open to a chat-scoped key.
 
@@ -5041,7 +5040,7 @@ During shutdown the `details` instead read `{ "shutdown": { "status": "draining"
 
 #### GET /api/metrics
 
-Prometheus exposition scrape of OpenWA process + session + message metrics; gated by a `METRICS_TOKEN` bearer (disabled when the token is unset).
+Prometheus exposition scrape of Zaptura process + session + message metrics; gated by a `METRICS_TOKEN` bearer (disabled when the token is unset).
 
 **Auth:** Bearer METRICS_TOKEN — `Authorization: Bearer <METRICS_TOKEN>`. This route is `@Public()` (it bypasses the `X-API-Key` guard); access is instead validated inside the service with a constant-time compare. The `Bearer ` prefix is stripped case-insensitively. Hidden from Swagger.
 
@@ -5049,35 +5048,35 @@ Prometheus exposition scrape of OpenWA process + session + message metrics; gate
 
 Content-Type `text/plain; version=0.0.4; charset=utf-8`, `Cache-Control: no-store`. Raw text (no JSON envelope):
 
-When the data database cannot be read the database-derived series (`openwa_sessions*`,
-`openwa_messages*`) are OMITTED rather than reported as zero — a zero would fire an alert
-claiming every session had dropped. `openwa_stats_available` is what tells the two cases apart,
+When the data database cannot be read the database-derived series (`zaptura_sessions*`,
+`zaptura_messages*`) are OMITTED rather than reported as zero — a zero would fire an alert
+claiming every session had dropped. `zaptura_stats_available` is what tells the two cases apart,
 so alert on it rather than reading a missing series as zero. `docs/10` lists every series.
 
 ```
-# HELP openwa_up 1 if the OpenWA process is running
-# TYPE openwa_up gauge
-openwa_up 1
-# TYPE openwa_process_uptime_seconds gauge
-openwa_process_uptime_seconds 3600
-# TYPE openwa_process_resident_memory_bytes gauge
-openwa_process_resident_memory_bytes 187432960
-# TYPE openwa_process_heap_used_bytes gauge
-openwa_process_heap_used_bytes 64512000
-# TYPE openwa_stats_available gauge
-openwa_stats_available 1
-# TYPE openwa_sessions_total gauge
-openwa_sessions_total 3
-# TYPE openwa_sessions_active gauge
-openwa_sessions_active 2
-# TYPE openwa_sessions gauge
-openwa_sessions{status="ready"} 2
-openwa_sessions{status="disconnected"} 1
-# TYPE openwa_messages_total gauge
-openwa_messages_total{direction="outgoing"} 1280
-openwa_messages_total{direction="incoming"} 940
-# TYPE openwa_messages_failed_total gauge
-openwa_messages_failed_total 4
+# HELP zaptura_up 1 if the Zaptura process is running
+# TYPE zaptura_up gauge
+zaptura_up 1
+# TYPE zaptura_process_uptime_seconds gauge
+zaptura_process_uptime_seconds 3600
+# TYPE zaptura_process_resident_memory_bytes gauge
+zaptura_process_resident_memory_bytes 187432960
+# TYPE zaptura_process_heap_used_bytes gauge
+zaptura_process_heap_used_bytes 64512000
+# TYPE zaptura_stats_available gauge
+zaptura_stats_available 1
+# TYPE zaptura_sessions_total gauge
+zaptura_sessions_total 3
+# TYPE zaptura_sessions_active gauge
+zaptura_sessions_active 2
+# TYPE zaptura_sessions gauge
+zaptura_sessions{status="ready"} 2
+zaptura_sessions{status="disconnected"} 1
+# TYPE zaptura_messages_total gauge
+zaptura_messages_total{direction="outgoing"} 1280
+zaptura_messages_total{direction="incoming"} 940
+# TYPE zaptura_messages_failed_total gauge
+zaptura_messages_failed_total 4
 ```
 
 Values come from `StatsService.getOverview()` plus `process.memoryUsage()`/`process.uptime()`. The render is memoized for 5000 ms to avoid re-running the overview query on every scrape.
@@ -5146,7 +5145,7 @@ Notes: raw handler return. `timeSeries.timestamp` is a DB-formatted bucket strin
 
 Get statistics for a single session: identity, message counts, top chats, and 24 h hourly activity.
 
-**Auth:** API key — any valid key (VIEWER and up); there is no `@RequireRole`. Scope still applies: the global guard feeds the `:sessionId` route param to the key's `allowedSessions`, so a session-scoped key asking for a session outside its list gets `401 "API key not authorized for this session"`. Only an unscoped key can read any session's stats.
+**Auth:** API key — any valid key (USER and up); there is no `@RequireRole`. Scope still applies: the global guard feeds the `:sessionId` route param to the key's `allowedSessions`, so a session-scoped key asking for a session outside its list gets `401 "API key not authorized for this session"`. Only an unscoped key can read any session's stats.
 
 **Path parameters**
 
@@ -5304,7 +5303,7 @@ Aggregate infrastructure status (database, Redis, queue, storage, engine).
 
 The `queue.webhooks` counters are live BullMQ job counts (`pending` = waiting + active + delayed; plus `completed`/`failed`), degrading to zeros when the queue is disabled or Redis is unreachable. `redis.connected` is a live probe.
 
-`builtIn` (on `database`/`redis`/`storage`) reports whether OpenWA's own bundled container is actually running _and_ backing this service, detected live from the labelled container; when Docker is unreachable it falls back to the saved `*_BUILTIN` intent from `data/.env.generated`. In S3 mode `storage` additionally carries `bucket` (when one is configured) and `s3Available` (a throttled re-probe); in local mode neither key is present. `engine.webVersion`/`engine.webVersionSource` (`pinned` / `auto` / `native`) appear only on `whatsapp-web.js`; `webVersion` is `null` until the auto-resolve first succeeds.
+`builtIn` (on `database`/`redis`/`storage`) reports whether Zaptura's own bundled container is actually running _and_ backing this service, detected live from the labelled container; when Docker is unreachable it falls back to the saved `*_BUILTIN` intent from `data/.env.generated`. In S3 mode `storage` additionally carries `bucket` (when one is configured) and `s3Available` (a throttled re-probe); in local mode neither key is present. `engine.webVersion`/`engine.webVersionSource` (`pinned` / `auto` / `native`) appear only on `whatsapp-web.js`; `webVersion` is `null` until the auto-resolve first succeeds.
 
 **Errors:** `401` missing/invalid key · `403` key role < ADMIN
 
@@ -5354,7 +5353,7 @@ Get the currently active engine type.
 
 #### GET /api/infra/update-check
 
-Compare the running version with the latest published OpenWA release. The dashboard uses it to show
+Compare the running version with the latest published Zaptura release. The dashboard uses it to show
 admins a link to the release notes next to the version. The gateway reads GitHub's latest release
 through the SSRF-guarded fetch and caches the answer for six hours (fifteen minutes after a failure).
 The request goes out directly, not through `HTTP(S)_PROXY`. A pre-release or draft is never offered. A
@@ -5377,7 +5376,7 @@ release number until the next release bumps it.
   "current": "0.23.5",
   "latest": "0.23.6",
   "updateAvailable": true,
-  "releaseUrl": "https://github.com/rmyndharis/OpenWA/releases/tag/v0.23.6"
+  "releaseUrl": "https://github.com/AsmSafone/Whatsapp-SaaS/releases/tag/v0.23.6"
 }
 ```
 
@@ -5447,7 +5446,7 @@ Merge-save infrastructure config to `data/.env.generated` (a `0600` secret file)
 | `database`                                            | object                   | No                       | —                                         | DB section (see nested)                                                                                                                 |
 | `database.type`                                       | `'sqlite' \| 'postgres'` | If `database` is present | enum                                      | `sqlite` drops stale postgres keys; `postgres` writes connection keys                                                                   |
 | `database.builtIn`                                    | boolean                  | No                       | —                                         | When `true`+postgres, forces the bundled `postgres` container creds + pushes `postgres` Docker profile                                  |
-| `database.host` / `.port` / `.username` / `.database` | string                   | No                       | `port` is a string                        | External postgres connection (defaults `localhost`/`5432`/`postgres`/`openwa`)                                                          |
+| `database.host` / `.port` / `.username` / `.database` | string                   | No                       | `port` is a string                        | External postgres connection (defaults `localhost`/`5432`/`postgres`/`zaptura`)                                                          |
 | `database.schema`                                     | string                   | No                       | lower-case, no `pg_` prefix (else 400)    | Postgres schema, saved as `POSTGRES_SCHEMA`; an empty value writes `public` (also forced to `public` when switching to the built-in DB) |
 | `database.password`                                   | string                   | No                       | secret                                    | Empty/omitted keeps the existing stored secret                                                                                          |
 | `database.poolSize`                                   | number                   | No                       | —                                         | Default 10                                                                                                                              |
@@ -5474,9 +5473,9 @@ Merge-save infrastructure config to `data/.env.generated` (a `0600` secret file)
     "builtIn": false,
     "host": "db.example.com",
     "port": "5432",
-    "username": "openwa",
+    "username": "zaptura",
     "password": "s3cret",
-    "database": "openwa",
+    "database": "zaptura",
     "poolSize": 10,
     "sslEnabled": true,
     "sslRejectUnauthorized": false
@@ -5818,7 +5817,7 @@ List all loaded plugins (built-in + installed), with secret config values redact
     "version": "1.0.0",
     "type": "extension",
     "description": "Visual reply flows",
-    "author": "openwa-plugins",
+    "author": "zaptura-plugins",
     "status": "enabled",
     "config": { "apiKey": "********" },
     "builtIn": false,
@@ -5853,8 +5852,8 @@ List the remote plugin catalog annotated with this instance's install state. (De
     "version": "1.2.0",
     "type": "extension",
     "description": "Auto-translate group messages",
-    "author": "openwa-plugins",
-    "download": "https://github.com/openwa-plugins/group-translate/releases/download/v1.2.0/group-translate.zip",
+    "author": "zaptura-plugins",
+    "download": "https://github.com/zaptura-plugins/group-translate/releases/download/v1.2.0/group-translate.zip",
     "installed": true,
     "installedVersion": "1.1.0",
     "updateAvailable": true
@@ -5966,7 +5965,7 @@ Content pinning: append `#sha256=<64 hex>` (URL fragment — never sent to the s
 | `url` | string | Yes      | `@IsUrl({ protocols:['http','https'], require_protocol:true })` | Absolute URL of the package; https as-is, plain http only with a `#sha256=` digest pin |
 
 ```json
-{ "url": "https://github.com/openwa-plugins/chat-flow/releases/download/v1.0.0/chat-flow.zip" }
+{ "url": "https://github.com/zaptura-plugins/chat-flow/releases/download/v1.0.0/chat-flow.zip" }
 ```
 
 **Response** `201` — the newly installed `PluginDto`.
@@ -6340,7 +6339,7 @@ Manage the linked account's own profile. All routes are nested under `/api/sessi
 
 Set the account display name (max 25 chars).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 ```json
 { "name": "ACME Support" }
@@ -6354,7 +6353,7 @@ Set the account display name (max 25 chars).
 
 Set the account about/status text (max 139 chars; empty string clears it).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 ```json
 { "status": "We reply within one business day" }
@@ -6368,7 +6367,7 @@ Set the account about/status text (max 139 chars; empty string clears it).
 
 Set the account profile picture from a URL or base64 image (same media DTO conventions as message sends, §6.3).
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 ```json
 { "url": "https://example.com/avatar.png" }
@@ -6388,7 +6387,7 @@ or
 
 Remove the account profile picture, leaving the account with WhatsApp's default avatar.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 No request body.
 
@@ -6409,7 +6408,7 @@ Incoming-call management. A `call.received` webhook/socket event (§6.6) announc
 
 Generate a shareable WhatsApp call link.
 
-**Auth:** API key (OPERATOR) · **Scope:** session-scoped
+**Auth:** API key (USER) · **Scope:** session-scoped
 
 **Request body** — `CreateCallLinkDto`
 
@@ -6447,7 +6446,7 @@ Generate a shareable WhatsApp call link.
 
 Reject a currently ringing incoming call. **Baileys only**: the whatsapp-web.js engine answers `501`. Only a live call can be rejected: the id is valid while the call rings (a short server-side cache); afterwards it expires.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Path parameters**
 
@@ -6496,7 +6495,7 @@ between converting server-side and converting before it sends.
 Convert audio (or the audio track of a video) into a WhatsApp voice note: Ogg/Opus, mono, 48 kHz,
 tuned for speech. Post the returned `base64` to `send-audio` with `ptt: true`.
 
-**Auth:** API key (OPERATOR)
+**Auth:** API key (USER)
 
 **Request body**
 
@@ -6562,7 +6561,7 @@ cannot match another bot's replies. The cooldown state is in-process: it resets 
 
 #### POST /api/sessions/:sessionId/automation-rules
 
-Create a rule. **Auth:** API key (OPERATOR)
+Create a rule. **Auth:** API key (USER)
 
 **Request body**
 
@@ -6594,19 +6593,19 @@ Create a rule. **Auth:** API key (OPERATOR)
 
 #### GET /api/sessions/:sessionId/automation-rules
 
-List the session's rules in evaluation order. **Auth:** API key (OPERATOR) · **Response** `200` — array of the shape above.
+List the session's rules in evaluation order. **Auth:** API key (USER) · **Response** `200` — array of the shape above.
 
 #### GET /api/sessions/:sessionId/automation-rules/:ruleId
 
-Get one rule. **Auth:** API key (OPERATOR) · `200` or `404` when the rule does not belong to the session.
+Get one rule. **Auth:** API key (USER) · `200` or `404` when the rule does not belong to the session.
 
 #### PUT /api/sessions/:sessionId/automation-rules/:ruleId
 
-Partial update (any subset of the create fields). **Auth:** API key (OPERATOR) · `200` or `404`.
+Partial update (any subset of the create fields). **Auth:** API key (USER) · `200` or `404`.
 
 #### DELETE /api/sessions/:sessionId/automation-rules/:ruleId
 
-Delete a rule. **Auth:** API key (OPERATOR) · **Response** `204`.
+Delete a rule. **Auth:** API key (USER) · **Response** `204`.
 
 ### 6.4.17 Integration fabric (ingress & instances)
 
@@ -6908,7 +6907,7 @@ A subscribe request whose `events` array contains no recognized name (after filt
 - The API key is **re-validated on every `subscribe`** (not just at connect), so a key revoked or expired mid-connection is caught — the server replies `UNAUTHORIZED` and disconnects.
 - **Per-key session scope is enforced** against the fresh key: a key restricted via `allowedSessions` may NOT subscribe to `"*"` and may NOT subscribe to a session outside its allowlist — either is rejected with `FORBIDDEN_SESSION`. An unrestricted key (no `allowedSessions`) may subscribe to anything, including `"*"`.
 - **Live sockets are re-validated against the database once a minute**, with no client activity required. A socket carries the key as it stood when it connected, and rooms joined earlier are never revisited, so that snapshot is what the sweep compares against the current row, along with any later `subscribe` whose key no longer matched it (what that `subscribe` granted outlives the change, so putting the row back does not spare the socket). It closes the key's sockets with an `UNAUTHORIZED` frame naming the cause: `API key has been deleted`, `API key has been revoked`, `API key has expired`, or `API key authorization changed; please reconnect` when `role`, `allowedIps`, `allowedSessions`, `allowedChats` or `expiresAt` moved. A change made through this API still evicts synchronously in the same request; the sweep is what catches a change made on another node, written straight to the database, or committed in the instant a socket was connecting. A rename, and the usage counters the gateway itself writes, evict nobody. Treat these frames as "reconnect and resubscribe", not as fatal.
-- **`session.qr` requires the OPERATOR role**, matching `GET /api/sessions/{sessionId}/qr`. A VIEWER key may still subscribe to it, by name or through a wildcard, but the QR is never delivered to its sockets; every other event is. The role is read from the key re-validated on each `subscribe`, so a key narrowed to VIEWER stops receiving the QR from its next `subscribe`. Between subscribes the QR gate rests on the same snapshot as every other event: a key demoted right after a `subscribe` keeps receiving the QR until its sockets are evicted, which is immediate on the node processing the change and within the sweep's minute anywhere else.
+- **`session.qr` requires the USER role**, matching `GET /api/sessions/{sessionId}/qr`. The QR is delivered to authorized user and admin sockets.
 
 ### Example (socket.io-client)
 
@@ -6916,7 +6915,7 @@ A subscribe request whose `events` array contains no recognized name (after filt
 import { io } from 'socket.io-client';
 
 const socket = io('ws://localhost:2785/events', {
-  auth: { apiKey: process.env.OPENWA_API_KEY },
+  auth: { apiKey: process.env.ZAPTURA_API_KEY },
 });
 
 socket.on('connect', () => {
@@ -6952,11 +6951,11 @@ Every registered webhook receives an HTTP `POST` with a JSON body of this shape:
 }
 ```
 
-`event`, `timestamp` (ISO-8601 dispatch time), `sessionId`, `idempotencyKey`, and `deliveryId` are always present; `data` holds the event-specific payload. The same values are mirrored into request headers (below). The HMAC `signature` is **not** in the body — it travels in the `X-OpenWA-Signature` header.
+`event`, `timestamp` (ISO-8601 dispatch time), `sessionId`, `idempotencyKey`, and `deliveryId` are always present; `data` holds the event-specific payload. The same values are mirrored into request headers (below). The HMAC `signature` is **not** in the body — it travels in the `X-Zaptura-Signature` header.
 
 ### Event catalog
 
-These are the events OpenWA actually emits. A webhook is registered with an `events` list; an event is delivered to a webhook when its `events` array includes the event name or `"*"`.
+These are the events Zaptura actually emits. A webhook is registered with an `events` list; an event is delivered to a webhook when its `events` array includes the event name or `"*"`.
 
 | Event                                             | When it fires                                                                                                                                                                                                                         | `data` payload sketch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -7003,16 +7002,16 @@ Webhook delivery is **at-least-once**. A consumer can legitimately receive the s
 - The underlying WhatsApp engine can re-fire an event for a single message.
 - A failed delivery (non-2xx response, timeout, or network error) is retried.
 
-**Crash boundary.** Every delivery is recorded before it is attempted, and the record is retired once something durable owns it: the queue job in queued mode, the completed send in direct mode. A hard crash (SIGKILL, OOM) therefore leaves the record behind, and a bounded sweep (`WEBHOOK_RECONCILE_INTERVAL_MS`, default 60s) replays whatever is still stranded, reusing the stored `X-OpenWA-Idempotency-Key` so the retry stays deduplicable at your receiver. A delivery that keeps failing exhausts `WEBHOOK_RECONCILE_MAX_ATTEMPTS` and goes terminal rather than replaying forever. One window remains open: a crash between persisting the message and writing that record loses the delivery, because the two are not yet one transaction. The failure table records exhausted retries, plus over-budget, dispatch-capacity-exceeded, and shutdown-rejected deliveries with attempts 0. Read the last two as a report rather than a verdict: a delivery the dispatcher shed for capacity or refused during the drain was rejected before its POST, so it keeps its record and is replayed by the same sweep, and a row there can belong to an event that was later delivered. A node's sweep also leaves alone a delivery that the same node is still waiting to dispatch or retrying, however long that takes; with several nodes on one database, another node can still replay it, and the stored idempotency key keeps that duplicate deduplicable. Enabling the queue (`QUEUE_ENABLED=true`, needs Redis) makes the dispatch durable from the enqueue onward. In both modes, a graceful shutdown drains in-flight deliveries first: the queued path waits for each worker's current job, and the direct path waits up to `WEBHOOK_SHUTDOWN_DRAIN_MS` (default 5s; raise it to at least `WEBHOOK_TIMEOUT`, default 10s, if a slow receiver must finish).
+**Crash boundary.** Every delivery is recorded before it is attempted, and the record is retired once something durable owns it: the queue job in queued mode, the completed send in direct mode. A hard crash (SIGKILL, OOM) therefore leaves the record behind, and a bounded sweep (`WEBHOOK_RECONCILE_INTERVAL_MS`, default 60s) replays whatever is still stranded, reusing the stored `X-Zaptura-Idempotency-Key` so the retry stays deduplicable at your receiver. A delivery that keeps failing exhausts `WEBHOOK_RECONCILE_MAX_ATTEMPTS` and goes terminal rather than replaying forever. One window remains open: a crash between persisting the message and writing that record loses the delivery, because the two are not yet one transaction. The failure table records exhausted retries, plus over-budget, dispatch-capacity-exceeded, and shutdown-rejected deliveries with attempts 0. Read the last two as a report rather than a verdict: a delivery the dispatcher shed for capacity or refused during the drain was rejected before its POST, so it keeps its record and is replayed by the same sweep, and a row there can belong to an event that was later delivered. A node's sweep also leaves alone a delivery that the same node is still waiting to dispatch or retrying, however long that takes; with several nodes on one database, another node can still replay it, and the stored idempotency key keeps that duplicate deduplicable. Enabling the queue (`QUEUE_ENABLED=true`, needs Redis) makes the dispatch durable from the enqueue onward. In both modes, a graceful shutdown drains in-flight deliveries first: the queued path waits for each worker's current job, and the direct path waits up to `WEBHOOK_SHUTDOWN_DRAIN_MS` (default 5s; raise it to at least `WEBHOOK_TIMEOUT`, default 10s, if a slow receiver must finish).
 
-**Design your handler to be idempotent**, keyed on the `X-OpenWA-Idempotency-Key` header (see below). As a server-side safety net, OpenWA de-duplicates inbound `message.received` before dispatch (a re-fired event for an already-persisted message is dropped), so one webhook normally sees each inbound message once — but this is best-effort defense-in-depth and does not remove the need for consumer-side idempotency.
+**Design your handler to be idempotent**, keyed on the `X-Zaptura-Idempotency-Key` header (see below). As a server-side safety net, Zaptura de-duplicates inbound `message.received` before dispatch (a re-fired event for an already-persisted message is dropped), so one webhook normally sees each inbound message once — but this is best-effort defense-in-depth and does not remove the need for consumer-side idempotency.
 
 ### HMAC signature
 
 When a webhook is registered with a `secret`, each delivery carries:
 
 ```
-X-OpenWA-Signature: sha256=<hex>
+X-Zaptura-Signature: sha256=<hex>
 ```
 
 The hex is an HMAC-SHA256 computed over the **raw JSON request body** (exactly the bytes sent) using the webhook's `secret`. Verify by recomputing over the raw body — not over a re-serialized parse — and compare in constant time:
@@ -7026,7 +7025,7 @@ function verify(rawBody, header, secret) {
 }
 ```
 
-If no `secret` is configured the `X-OpenWA-Signature` header is omitted entirely.
+If no `secret` is configured the `X-Zaptura-Signature` header is omitted entirely.
 
 ### Idempotency & delivery headers
 
@@ -7034,11 +7033,11 @@ Every delivery includes:
 
 | Header                     | Meaning                                                                                                      |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `X-OpenWA-Event`           | The event name (mirrors `event`)                                                                             |
-| `X-OpenWA-Idempotency-Key` | Content-derived key; **stable across retries** of the same occurrence — dedupe on this                       |
-| `X-OpenWA-Delivery-Id`     | A fresh `dlv_<uuid>` generated **per delivery** (differs per retry and per webhook) — for tracing, not dedup |
-| `X-OpenWA-Retry-Count`     | Retry attempt number (`0` = first attempt)                                                                   |
-| `X-OpenWA-Signature`       | HMAC (only when a secret is set)                                                                             |
+| `X-Zaptura-Event`           | The event name (mirrors `event`)                                                                             |
+| `X-Zaptura-Idempotency-Key` | Content-derived key; **stable across retries** of the same occurrence — dedupe on this                       |
+| `X-Zaptura-Delivery-Id`     | A fresh `dlv_<uuid>` generated **per delivery** (differs per retry and per webhook) — for tracing, not dedup |
+| `X-Zaptura-Retry-Count`     | Retry attempt number (`0` = first attempt)                                                                   |
+| `X-Zaptura-Signature`       | HMAC (only when a secret is set)                                                                             |
 
 **Idempotency key derivation.** The key is content-derived so duplicates of the same logical event collapse to one value:
 
@@ -7062,8 +7061,8 @@ Recurring lifecycle events (and `message.reaction` / `message.edited`) carry the
 
 ### Retries with exponential backoff
 
-When the queue is enabled, a non-2xx response, timeout (`WEBHOOK_TIMEOUT`, default `10000` ms), or network error schedules a retry. The number of attempts comes from the webhook's `retryCount` (default `3`) and the delay grows **exponentially** from a base of `WEBHOOK_RETRY_DELAY` (default `5000` ms). Each retry reuses the same `idempotencyKey` and increments `X-OpenWA-Retry-Count`. If Redis/BullMQ rejects the initial enqueue, OpenWA logs a `webhook:error` hook event and falls back to direct delivery with the same inline retry budget. When the queue is disabled, delivery is direct with the same retry budget applied inline.
+When the queue is enabled, a non-2xx response, timeout (`WEBHOOK_TIMEOUT`, default `10000` ms), or network error schedules a retry. The number of attempts comes from the webhook's `retryCount` (default `3`) and the delay grows **exponentially** from a base of `WEBHOOK_RETRY_DELAY` (default `5000` ms). Each retry reuses the same `idempotencyKey` and increments `X-Zaptura-Retry-Count`. If Redis/BullMQ rejects the initial enqueue, Zaptura logs a `webhook:error` hook event and falls back to direct delivery with the same inline retry budget. When the queue is disabled, delivery is direct with the same retry budget applied inline.
 
 ### SSRF guard on registration
 
-Webhook URLs are validated at **registration time**, not just at delivery. When SSRF protection is enabled (the default), creating or updating a webhook with a URL that resolves to a private/internal/loopback address is rejected synchronously with `400 Bad Request` instead of failing silently later at delivery. The `SSRF_ALLOWED_HOSTS` escape-hatch applies equally to registration and delivery. Independently of the SSRF flag, a URL embedding credentials (`https://user:pass@host/hook`) is rejected with `400` — such credentials would otherwise be persisted and echoed into delivery logs and dead-letter rows. Operator-supplied custom headers that target reserved names (`Content-Type` or any `X-OpenWA-*`) are stripped, so a webhook config cannot forge the signature, event, or idempotency headers.
+Webhook URLs are validated at **registration time**, not just at delivery. When SSRF protection is enabled (the default), creating or updating a webhook with a URL that resolves to a private/internal/loopback address is rejected synchronously with `400 Bad Request` instead of failing silently later at delivery. The `SSRF_ALLOWED_HOSTS` escape-hatch applies equally to registration and delivery. Independently of the SSRF flag, a URL embedding credentials (`https://user:pass@host/hook`) is rejected with `400` — such credentials would otherwise be persisted and echoed into delivery logs and dead-letter rows. Operator-supplied custom headers that target reserved names (`Content-Type` or any `X-Zaptura-*`) are stripped, so a webhook config cannot forge the signature, event, or idempotency headers.

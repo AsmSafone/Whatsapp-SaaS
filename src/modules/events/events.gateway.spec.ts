@@ -521,8 +521,8 @@ describe('EventsGateway.emitToRooms fan-out', () => {
   });
 });
 
-// session.qr is a pairing credential: GET /sessions/:sessionId/qr requires OPERATOR, so the socket push
-// must not hand it to a VIEWER key under any subscribe form. The stub below stands in for the Socket.IO
+// session.qr is a pairing credential: GET /sessions/:sessionId/qr requires USER, so the socket push
+// must not hand it to an unauthorized / invalid role key under any subscribe form. The stub below stands in for the Socket.IO
 // adapter: it tracks each socket's rooms and resolves to()/except() like a real broadcast (union of the
 // target rooms, minus sockets in an excluded room, one copy per socket).
 describe('EventsGateway session.qr role gate', () => {
@@ -590,8 +590,8 @@ describe('EventsGateway session.qr role gate', () => {
   beforeEach(() => {
     sockets = [];
     keys = {
-      viewer: { id: 'k-viewer', name: 'viewer', role: 'viewer', allowedSessions: null },
-      operator: { id: 'k-operator', name: 'operator', role: 'operator', allowedSessions: null },
+      unauthorized: { id: 'k-unauth', name: 'unauth', role: 'none', allowedSessions: null },
+      user: { id: 'k-user', name: 'user', role: 'user', allowedSessions: null },
       admin: { id: 'k-admin', name: 'admin', role: 'admin', allowedSessions: null },
     };
     gateway = new EventsGateway(
@@ -602,46 +602,46 @@ describe('EventsGateway session.qr role gate', () => {
     (gateway as unknown as { server: unknown }).server = { to: (room: string) => broadcast([room], []) };
   });
 
-  it('never delivers the QR to a VIEWER socket, whatever it subscribed to, while OPERATOR and ADMIN get it', async () => {
-    const viewerByName = await connect('viewer');
-    const viewerSessionWildcard = await connect('viewer');
-    const viewerGlobalWildcard = await connect('viewer');
-    const viewerEventWildcard = await connect('viewer');
-    const operator = await connect('operator');
+  it('never delivers the QR to an unauthorized socket, whatever it subscribed to, while USER and ADMIN get it', async () => {
+    const unauthByName = await connect('unauthorized');
+    const unauthSessionWildcard = await connect('unauthorized');
+    const unauthGlobalWildcard = await connect('unauthorized');
+    const unauthEventWildcard = await connect('unauthorized');
+    const user = await connect('user');
     const admin = await connect('admin');
-    await subscribe(viewerByName, 'sess-1', ['session.qr']);
-    await subscribe(viewerSessionWildcard, 'sess-1', ['*']);
-    await subscribe(viewerGlobalWildcard, '*', ['*']);
-    await subscribe(viewerEventWildcard, '*', ['session.qr']);
-    await subscribe(operator, '*', ['*']);
+    await subscribe(unauthByName, 'sess-1', ['session.qr']);
+    await subscribe(unauthSessionWildcard, 'sess-1', ['*']);
+    await subscribe(unauthGlobalWildcard, '*', ['*']);
+    await subscribe(unauthEventWildcard, '*', ['session.qr']);
+    await subscribe(user, '*', ['*']);
     await subscribe(admin, 'sess-1', ['session.qr']);
 
     gateway.emitQRCode('sess-1', 'data:image/png;base64,QR');
 
-    for (const viewer of [viewerByName, viewerSessionWildcard, viewerGlobalWildcard, viewerEventWildcard]) {
-      expect(qrEvents(viewer)).toEqual([]);
+    for (const unauth of [unauthByName, unauthSessionWildcard, unauthGlobalWildcard, unauthEventWildcard]) {
+      expect(qrEvents(unauth)).toEqual([]);
     }
-    expect(qrEvents(operator)).toHaveLength(1);
-    expect(qrEvents(operator)[0].payload.data).toEqual({ qrCode: 'data:image/png;base64,QR' });
+    expect(qrEvents(user)).toHaveLength(1);
+    expect(qrEvents(user)[0].payload.data).toEqual({ qrCode: 'data:image/png;base64,QR' });
     expect(qrEvents(admin)).toHaveLength(1);
   });
 
-  it('keeps delivering every other event to a VIEWER wildcard subscription', async () => {
-    const viewer = await connect('viewer');
-    await subscribe(viewer, '*', ['*']);
+  it('keeps delivering every other event to an unprivileged wildcard subscription', async () => {
+    const unauth = await connect('unauthorized');
+    await subscribe(unauth, '*', ['*']);
 
     gateway.emitSessionStatus('sess-1', 'qr_ready');
 
-    expect(viewer.received.map(m => m.payload.event)).toEqual(['session.status']);
+    expect(unauth.received.map(m => m.payload.event)).toEqual(['session.status']);
   });
 
   it('follows the role re-validated on subscribe: a narrowed key stops receiving the QR, a widened one starts', async () => {
-    const narrowed = await connect('operator');
-    const widened = await connect('viewer');
+    const narrowed = await connect('user');
+    const widened = await connect('unauthorized');
     await subscribe(widened, 'sess-1', ['*']);
     expect(widened.rooms.has(QR_DENIED_ROOM)).toBe(true);
-    keys.operator.role = 'viewer';
-    keys.viewer.role = 'operator';
+    keys.user.role = 'none';
+    keys.unauthorized.role = 'user';
     await subscribe(narrowed, 'sess-1', ['*']);
     await subscribe(widened, 'sess-1', ['*']);
 
@@ -652,8 +652,8 @@ describe('EventsGateway session.qr role gate', () => {
   });
 
   it('denies the QR to a key with an unrecognised role', async () => {
-    keys.viewer.role = 'unknown';
-    const sock = await connect('viewer');
+    keys.unauthorized.role = 'unknown';
+    const sock = await connect('unauthorized');
     await subscribe(sock, 'sess-1', ['session.qr']);
 
     gateway.emitQRCode('sess-1', 'data:image/png;base64,QR');

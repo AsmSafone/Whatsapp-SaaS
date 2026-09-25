@@ -1194,7 +1194,7 @@ export function Sessions() {
                 <div className="qr-placeholder">
                   <QrCode size={80} className="qr-icon" />
                   <p>{session.status === 'qr_ready' ? t('sessions.qr.scanToConnect') : t('sessions.qr.preparing')}</p>
-                  {/* The QR is operator-only over REST and the socket, so a read-only key would open a
+                  {/* The QR requires write permission over REST and the socket, so a read-only key would open a
                       modal that never gets a code. */}
                   {canWrite && (
                     <button

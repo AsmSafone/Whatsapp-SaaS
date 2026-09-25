@@ -139,6 +139,20 @@ describe('AccountService', () => {
       expect(typeof res.token).toBe('string');
     });
 
+    it('registers with specified plan when provided', async () => {
+      usersRepo.findOne!.mockResolvedValue(null);
+      usersRepo.save!.mockImplementation(u => Promise.resolve({ ...u, id: 'u1' }));
+
+      const res = await service.register({
+        name: 'Alice',
+        email: 'alice2@example.com',
+        password: 'secretpassword123',
+        plan: 'pro',
+      });
+
+      expect(res.plan).toBe('pro');
+    });
+
     it('throws ConflictException on duplicate email', async () => {
       usersRepo.findOne!.mockResolvedValue({ id: 'existing' });
 

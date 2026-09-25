@@ -1,12 +1,12 @@
 // Role gating of the Logs page under the bare `node --test` runner, rendered through the real App so
 // both halves are covered: the sidebar entry (Layout) and the route itself (App). GET /audit is
-// ADMIN-only, so an operator or viewer reaching /logs only ever saw a load error over an empty table.
+// ADMIN-only, so a regular user reaching /logs only ever saw a load error over an empty table.
 import './test-helpers/register-hooks.ts';
 import { test, before, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 
-let role = 'operator';
+let role = 'user';
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -62,18 +62,18 @@ afterEach(() => {
 function renderAt(path: string, as: string): void {
   role = as;
   window.history.replaceState(null, '', path);
-  window.sessionStorage.setItem('openwa_api_key', 'test-key');
-  window.localStorage.setItem('openwa_user_role', as);
+  window.sessionStorage.setItem('zaptura_api_key', 'test-key');
+  window.localStorage.setItem('zaptura_user_role', as);
   rtl.render(createElement(App));
 }
 
 const logsLink = (): Element | null => document.querySelector('a[href="/logs"]');
 
-test('an operator gets no Logs entry and /logs sends them home', async () => {
-  renderAt('/logs', 'operator');
+test('a user gets no Logs entry and /logs sends them home', async () => {
+  renderAt('/logs', 'user');
   // The sidebar renders once the lazy route resolves; wait for a nav entry every role has.
   await rtl.waitFor(() => assert.ok(document.querySelector('a[href="/sessions"]')));
-  assert.equal(logsLink() === null, true, 'the Logs nav entry is shown to an operator');
+  assert.equal(logsLink() === null, true, 'the Logs nav entry is shown to a non-admin user');
   await rtl.waitFor(() => assert.equal(window.location.pathname, '/'));
 });
 

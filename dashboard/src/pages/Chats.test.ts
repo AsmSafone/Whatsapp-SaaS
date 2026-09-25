@@ -342,10 +342,10 @@ before(async () => {
   installFetchStub();
   // RoleProvider initializes from localStorage; 'admin' makes canWrite true so the composer
   // controls render enabled.
-  window.localStorage.setItem('openwa_user_role', 'admin');
+  window.localStorage.setItem('zaptura_user_role', 'admin');
   // useWebSocket.connect() bails without this, so no socket would exist to receive a frame. It
   // dials nothing: the client is the double above.
-  window.sessionStorage.setItem('openwa_api_key', 'test-key');
+  window.sessionStorage.setItem('zaptura_api_key', 'test-key');
   // The real i18n instance, and then its readiness promise: catalogues are fetched rather than
   // bundled, so importing the module only STARTS the load. Every `getByText` below is English copy
   // out of en.json, which renders as a raw key until it lands. Awaiting is what makes that
@@ -622,16 +622,16 @@ test('Escape dismisses the message search results instead of the conversation be
 
 test('a read-only key is offered no status compose trigger', async () => {
   const { screen, fireEvent } = rtl;
-  window.localStorage.setItem('openwa_user_role', 'viewer');
+  window.localStorage.removeItem('zaptura_user_role');
   try {
     renderChats();
     await screen.findByText('Main (15551234567)');
     fireEvent.click(screen.getByRole('tab', { name: 'Status' }));
-    // Reading statuses stays open to a viewer; only posting one is withheld.
+    // Reading statuses stays open; only posting one is withheld when canWrite is false.
     await screen.findByText('No contacts have an active status.');
-    assert.ok(!screen.queryByRole('button', { name: 'Post a status' }), 'a viewer key was offered status compose');
+    assert.ok(!screen.queryByRole('button', { name: 'Post a status' }), 'a read-only key was offered status compose');
   } finally {
-    window.localStorage.setItem('openwa_user_role', 'admin');
+    window.localStorage.setItem('zaptura_user_role', 'admin');
   }
 });
 
@@ -648,7 +648,7 @@ test('a writer key opening a chat clears its unread badge', async () => {
 test('a read-only key opening a chat sends no mark-as-read', async () => {
   const { screen, fireEvent, within, waitFor } = rtl;
   resetFetchCalls();
-  window.localStorage.setItem('openwa_user_role', 'viewer');
+  window.localStorage.removeItem('zaptura_user_role');
   try {
     const { container } = renderChats();
     await screen.findByText('Main (15551234567)');
@@ -656,7 +656,7 @@ test('a read-only key opening a chat sends no mark-as-read', async () => {
     await within(container.querySelector('.room-messages') as HTMLElement).findByText('hello from alice');
     // Past the mark-as-read quiet window, so a queued call would have gone out.
     await new Promise(resolve => setTimeout(resolve, 1_000));
-    assert.ok(!findFetchCall('POST', `/api/sessions/${SESSION.id}/chats/read`), 'a viewer key marked the chat read');
+    assert.ok(!findFetchCall('POST', `/api/sessions/${SESSION.id}/chats/read`), 'a read-only key marked the chat read');
     // The chat is still unread on the gateway, so the sidebar badge keeps its count.
     assert.ok(
       screen.queryByLabelText('2 unread messages'),
@@ -672,7 +672,7 @@ test('a read-only key opening a chat sends no mark-as-read', async () => {
         event: 'message.received',
         sessionId: SESSION.id,
         data: {
-          id: 'wamid.live.viewer',
+          id: 'wamid.live.msg-2',
           chatId: CHAT.id,
           from: CHAT.id,
           to: 'me',
@@ -687,7 +687,7 @@ test('a read-only key opening a chat sends no mark-as-read', async () => {
       assert.ok(screen.queryByLabelText('3 unread messages'), 'the open chat did not count the arrival'),
     );
   } finally {
-    window.localStorage.setItem('openwa_user_role', 'admin');
+    window.localStorage.setItem('zaptura_user_role', 'admin');
   }
 });
 

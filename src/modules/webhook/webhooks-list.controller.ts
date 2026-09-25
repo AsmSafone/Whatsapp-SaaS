@@ -41,7 +41,7 @@ export class WebhooksListController {
   }
 
   @Get()
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'List webhooks visible to the calling key (scoped to its allowed sessions)' })
   @ApiResponse({
     status: 200,

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Resources;
+namespace Zaptura\Resources;
 
-use OpenWA\Http\HttpExecutor;
+use Zaptura\Http\HttpExecutor;
 
 /**
  * Messages resource — sending and querying messages.

@@ -1,11 +1,10 @@
 // Role types for RBAC
-export type UserRole = 'admin' | 'operator' | 'viewer';
+export type UserRole = 'admin' | 'user';
 
 export interface RoleContextType {
   role: UserRole | null;
   setRole: (role: UserRole | null) => void;
   isAdmin: boolean;
-  isOperator: boolean;
-  isViewer: boolean;
+  isUser: boolean;
   canWrite: boolean;
 }

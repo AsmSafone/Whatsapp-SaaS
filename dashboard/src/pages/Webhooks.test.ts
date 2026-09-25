@@ -1,6 +1,5 @@
 // Render test for the Webhooks page under the bare `node --test` runner, on the Templates.test.ts
-// harness. GET /webhooks is OPERATOR-only, so a viewer key always gets 403 there; a failed read must
-// say so instead of rendering the "no webhooks configured" empty state.
+// harness. A 403 on GET /webhooks must say so instead of rendering the "no webhooks configured" empty state.
 import '../test-helpers/register-hooks.ts';
 import { test, before, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,7 +20,7 @@ function installFetchStub(): void {
     if (path === '/api/sessions') return Promise.resolve(jsonResponse([]));
     if (path === '/api/webhooks') {
       if (webhooksStatus === 403) {
-        return Promise.resolve(jsonResponse({ message: 'Insufficient permissions. Required: operator' }, 403));
+        return Promise.resolve(jsonResponse({ message: 'Insufficient permissions. Required: user' }, 403));
       }
       if (webhooksStatus !== 200) return Promise.resolve(jsonResponse({ message: 'database offline' }, 500));
       return Promise.resolve(jsonResponse(webhookList));
@@ -40,7 +39,7 @@ before(async () => {
   const { installJsdomGlobals } = await import('../test-helpers/jsdom.ts');
   await installJsdomGlobals();
   installFetchStub();
-  window.localStorage.setItem('openwa_user_role', 'viewer');
+  window.localStorage.setItem('zaptura_user_role', 'user');
   const { i18nReady } = await import('../i18n/index.ts');
   await i18nReady;
   rtl = await import('@testing-library/react');

@@ -210,7 +210,7 @@
     "connectionError": "సర్వర్‌కు కనెక్ట్ కాలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి.",
     "help": "సహాయం కావాలా?",
     "viewDocs": "డాక్యుమెంటేషన్ చూడండి",
-    "footer": "Yudhi Armyndharis మరియు Zaptura కమ్యూనిటీ ద్వారా ❤️ తో తయారు చేయబడింది",
+    "footer": "Yudhi Aasmsafone మరియు Zaptura కమ్యూనిటీ ద్వారా ❤️ తో తయారు చేయబడింది",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -600,13 +600,11 @@
     "rolesTitle": "పాత్రల సూచిక (Roles Reference)",
     "roles": {
       "admin": "అడ్మిన్",
-      "operator": "ఆపరేటర్",
-      "viewer": "వీక్షకుడు (Viewer)"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "అన్ని వనరులకు పూర్తి యాక్సెస్",
-      "operator": "సెషన్ & సందేశాల నిర్వహణ",
-      "viewer": "చదవడానికి మాత్రమే యాక్సెస్ (Read-only)"
+      "user": "User access"
     },
     "columns": {
       "name": "పేరు",

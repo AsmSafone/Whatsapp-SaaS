@@ -25,7 +25,7 @@ before(async () => {
 
 afterEach(() => {
   rtl.cleanup();
-  window.localStorage.removeItem('openwa_user_role');
+  window.localStorage.removeItem('zaptura_user_role');
 });
 
 const CHAT: Chat = {
@@ -55,8 +55,12 @@ const PROMPT: ChatMessageView = {
   metadata: { buttons: [{ id: 'y', text: 'Yes' }] },
 };
 
-function renderThread(role: string): { clicks: string[]; container: HTMLElement } {
-  window.localStorage.setItem('openwa_user_role', role);
+function renderThread(role: string | null): { clicks: string[]; container: HTMLElement } {
+  if (role) {
+    window.localStorage.setItem('zaptura_user_role', role);
+  } else {
+    window.localStorage.removeItem('zaptura_user_role');
+  }
   const clicks: string[] = [];
   const noop = () => {};
   const { container } = rtl.render(
@@ -89,7 +93,7 @@ function renderThread(role: string): { clicks: string[]; container: HTMLElement 
 }
 
 test('a read-only key sees prompt choices disabled and no reply, react or delete actions', () => {
-  const { clicks, container } = renderThread('viewer');
+  const { clicks, container } = renderThread(null);
   const yes = rtl.screen.getByRole('button', { name: 'Yes' });
   assert.equal(yes.matches(':disabled'), true);
   rtl.fireEvent.click(yes);
@@ -97,8 +101,8 @@ test('a read-only key sees prompt choices disabled and no reply, react or delete
   assert.ok(!container.querySelector('.message-actions-menu'));
 });
 
-test('an operator key can tap a prompt choice and gets the message actions', async () => {
-  const { clicks, container } = renderThread('operator');
+test('a user key can tap a prompt choice and gets the message actions', async () => {
+  const { clicks, container } = renderThread('user');
   const yes = rtl.screen.getByRole('button', { name: 'Yes' });
   assert.equal(yes.matches(':disabled'), false);
   rtl.fireEvent.click(yes);

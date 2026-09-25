@@ -23,7 +23,6 @@ describe('Automation rules (e2e)', () => {
   let app: INestApplication<App>;
   let sessionRepo: Repository<Session>;
   let apiKey: string;
-  let viewerKey: string;
 
   let sessionSeq = 0;
   const nextSession = async (): Promise<string> => {
@@ -57,7 +56,6 @@ describe('Automation rules (e2e)', () => {
     sessionRepo = app.get(getRepositoryToken(Session, 'data'));
     const authService = app.get(AuthService);
     apiKey = (await authService.createApiKey({ name: 'e2e-automation-admin', role: ApiKeyRole.ADMIN })).rawKey;
-    viewerKey = (await authService.createApiKey({ name: 'e2e-automation-viewer', role: ApiKeyRole.VIEWER })).rawKey;
   });
 
   afterAll(async () => {
@@ -135,14 +133,9 @@ describe('Automation rules (e2e)', () => {
     await request(app.getHttpServer()).delete(base).set('X-API-Key', apiKey).expect(404);
   });
 
-  it('requires an API key (401) and the OPERATOR role (403 for a viewer)', async () => {
+  it('requires an API key (401)', async () => {
     const session = await nextSession();
     await request(app.getHttpServer()).get(`/api/sessions/${session}/automation-rules`).expect(401);
-    await request(app.getHttpServer())
-      .post(`/api/sessions/${session}/automation-rules`)
-      .set('X-API-Key', viewerKey)
-      .send({ name: 'x', replyText: 'y' })
-      .expect(403);
   });
 
   it('rejects invalid rules: missing reply, unknown condition field, out-of-range cooldown', async () => {

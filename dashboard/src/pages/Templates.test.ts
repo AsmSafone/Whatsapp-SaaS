@@ -1,6 +1,5 @@
 // Render test for the Templates page under the bare `node --test` runner, on the Sessions.test.ts
-// harness. The template list route is OPERATOR-only, so a viewer key always gets 403 there; a failed
-// read must say so instead of rendering the "no templates saved" empty state.
+// harness. A 403 on the template list route must say so instead of rendering the "no templates saved" empty state.
 import '../test-helpers/register-hooks.ts';
 import { test, before, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +33,7 @@ function installFetchStub(): void {
     }
     if (path === '/api/sessions/sess-1/templates') {
       if (templatesStatus === 403) {
-        return Promise.resolve(jsonResponse({ message: 'Insufficient permissions. Required: operator' }, 403));
+        return Promise.resolve(jsonResponse({ message: 'Insufficient permissions. Required: user' }, 403));
       }
       if (templatesStatus !== 200)
         return Promise.resolve(jsonResponse({ message: 'database offline' }, templatesStatus));
@@ -60,7 +59,7 @@ before(async () => {
   const { installJsdomGlobals } = await import('../test-helpers/jsdom.ts');
   await installJsdomGlobals();
   installFetchStub();
-  window.localStorage.setItem('openwa_user_role', 'viewer');
+  window.localStorage.setItem('zaptura_user_role', 'user');
   const { i18nReady } = await import('../i18n/index.ts');
   await i18nReady;
   rtl = await import('@testing-library/react');
@@ -88,13 +87,13 @@ function renderTemplates(): void {
 
 // The row button exists so a template can be deleted without opening it in the editor first, and it
 // is gated on the same write permission as the editor's own delete. Both halves are pinned here.
-test('a write key can delete a template from its row, and a read-only key cannot', async () => {
+test('a write key can delete a template from its row, and an unauthenticated key cannot', async () => {
   const { screen, fireEvent, within, waitFor } = rtl;
   templatesStatus = 200;
   templates = [{ id: 'tpl-1', name: 'invoice-reminder', body: 'Hi {{name}}' }];
   deleted.length = 0;
 
-  window.localStorage.setItem('openwa_user_role', 'operator');
+  window.localStorage.setItem('zaptura_user_role', 'user');
   renderTemplates();
 
   const row = (await screen.findByText('invoice-reminder')).closest('.template-list-row') as HTMLElement;
@@ -107,7 +106,7 @@ test('a write key can delete a template from its row, and a read-only key cannot
   await waitFor(() => assert.deepEqual(deleted, ['tpl-1'], 'the delete never reached the API'));
 
   rtl.cleanup();
-  window.localStorage.setItem('openwa_user_role', 'viewer');
+  window.localStorage.removeItem('zaptura_user_role');
   templates = [{ id: 'tpl-1', name: 'invoice-reminder', body: 'Hi {{name}}' }];
   renderTemplates();
 

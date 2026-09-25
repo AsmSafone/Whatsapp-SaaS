@@ -246,7 +246,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       name: dto.name,
       keyHash,
       keyPrefix,
-      role: dto.role || ApiKeyRole.OPERATOR,
+      role: dto.role || ApiKeyRole.USER,
       allowedIps: dto.allowedIps || null,
       allowedSessions: normalizeScopeList(dto.allowedSessions),
       allowedChats: normalizeChatAllowList(dto.allowedChats),
@@ -578,9 +578,8 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
   hasPermission(apiKey: ApiKey, requiredRole: ApiKeyRole): boolean {
     const roleHierarchy: Record<ApiKeyRole, number> = {
-      [ApiKeyRole.VIEWER]: 1,
-      [ApiKeyRole.OPERATOR]: 2,
-      [ApiKeyRole.ADMIN]: 3,
+      [ApiKeyRole.USER]: 1,
+      [ApiKeyRole.ADMIN]: 2,
     };
 
     return roleHierarchy[apiKey.role] >= roleHierarchy[requiredRole];

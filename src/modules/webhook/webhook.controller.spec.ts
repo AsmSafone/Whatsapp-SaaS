@@ -120,23 +120,23 @@ describe('Webhook controllers (secret leak + read authz)', () => {
     expect(result.url).toBe('https://new.example.com/hook');
   });
 
-  // ── read routes require OPERATOR+ (VIEWER → 403 via guard) ─────
+  // ── read routes require USER role ─────
 
-  it('findBySession requires OPERATOR role', () => {
+  it('findBySession requires USER role', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method -- reading route metadata, not invoking
     const role = reflector.get<ApiKeyRole>(REQUIRED_ROLE_KEY, controller.findBySession);
-    expect(role).toBe(ApiKeyRole.OPERATOR);
+    expect(role).toBe(ApiKeyRole.USER);
   });
 
-  it('findOne requires OPERATOR role', () => {
+  it('findOne requires USER role', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method -- reading route metadata, not invoking
     const role = reflector.get<ApiKeyRole>(REQUIRED_ROLE_KEY, controller.findOne);
-    expect(role).toBe(ApiKeyRole.OPERATOR);
+    expect(role).toBe(ApiKeyRole.USER);
   });
 
-  it('cross-session findAll requires OPERATOR role', () => {
+  it('cross-session findAll requires USER role', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method -- reading route metadata, not invoking
     const role = reflector.get<ApiKeyRole>(REQUIRED_ROLE_KEY, listController.findAll);
-    expect(role).toBe(ApiKeyRole.OPERATOR);
+    expect(role).toBe(ApiKeyRole.USER);
   });
 });

@@ -104,8 +104,8 @@ html {
   /* Guarded with :not([data-theme='dark']): when the OS prefers light but the user explicitly
      picked the dark theme, the app's own choice must win (otherwise the root is force-whitened). */
   :root:not([data-theme='dark']) {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--text-primary);
+    background-color: var(--bg-light);
   }
 }
 

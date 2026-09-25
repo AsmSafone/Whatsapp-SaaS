@@ -2,7 +2,7 @@
 
 ## 5.1 Overview
 
-OpenWA uses a database to store:
+Zaptura uses a database to store:
 
 - Session configuration & state
 - Webhook configurations
@@ -12,7 +12,7 @@ OpenWA uses a database to store:
 
 ### Database Support
 
-OpenWA supports two database backends that can be selected at deployment time:
+Zaptura supports two database backends that can be selected at deployment time:
 
 | Database       | Use Case                                    | Sessions | Horizontal Scaling |
 | -------------- | ------------------------------------------- | -------- | ------------------ |
@@ -33,11 +33,11 @@ OpenWA supports two database backends that can be selected at deployment time:
 
 ### Dual-Database Architecture
 
-OpenWA v0.2+ implements a **dual-database architecture** that separates boot configuration from user data:
+Zaptura v0.2+ implements a **dual-database architecture** that separates boot configuration from user data:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        OpenWA Application                        │
+│                        Zaptura Application                        │
 ├─────────────────────────────┬───────────────────────────────────┤
 │      Main DB (SQLite)       │        Data DB (Pluggable)        │
 │  Default ./data/main.sqlite │   SQLite or PostgreSQL (config)   │
@@ -79,32 +79,32 @@ The main DB is unconditionally SQLite, but its _path_ is not fixed: `MAIN_DATABA
 
 #### Built-in PostgreSQL Orchestration
 
-When using PostgreSQL Built-in mode (`DATABASE_TYPE=postgres` with `POSTGRES_BUILTIN=true`), `main.ts` starts the managed `postgres` container (creating it if it does not exist) **before** `NestFactory.create`. It has to run that early: the `data` connection is opened while Nest instantiates providers, before any `onModuleInit` hook, so a stopped `openwa-postgres` would otherwise fail every boot. The step is bounded at 15 seconds and never fails boot on its own. `DockerService.onModuleInit()` later runs the same orchestration for `redis` / `minio` when their own `REDIS_BUILTIN` / `MINIO_BUILTIN` flags are set.
+When using PostgreSQL Built-in mode (`DATABASE_TYPE=postgres` with `POSTGRES_BUILTIN=true`), `main.ts` starts the managed `postgres` container (creating it if it does not exist) **before** `NestFactory.create`. It has to run that early: the `data` connection is opened while Nest instantiates providers, before any `onModuleInit` hook, so a stopped `zaptura-postgres` would otherwise fail every boot. The step is bounded at 15 seconds and never fails boot on its own. `DockerService.onModuleInit()` later runs the same orchestration for `redis` / `minio` when their own `REDIS_BUILTIN` / `MINIO_BUILTIN` flags are set.
 
 The container can still be coming up when the `data` connection first dials it, so that connection is configured with `retryAttempts: 10` and `retryDelay: 3000` (`src/app.module.ts`), giving the database roughly 30 seconds to become reachable.
 
 > [!NOTE]
-> If the Docker API is unreachable, the start is skipped with a warning: no container is started, and the `data` connection then fails its retries against whatever `DATABASE_HOST` points at. Start the container by hand (`docker start openwa-postgres`) and restart OpenWA.
+> If the Docker API is unreachable, the start is skipped with a warning: no container is started, and the `data` connection then fails its retries against whatever `DATABASE_HOST` points at. Start the container by hand (`docker start zaptura-postgres`) and restart Zaptura.
 
 #### PostgreSQL Schema Selection
 
-When using PostgreSQL, OpenWA can place its tables and migration ledger in a dedicated schema via the `POSTGRES_SCHEMA` environment variable:
+When using PostgreSQL, Zaptura can place its tables and migration ledger in a dedicated schema via the `POSTGRES_SCHEMA` environment variable:
 
 | Setting           | Default  | Description                                                                                                   |
 | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
-| `POSTGRES_SCHEMA` | `public` | PostgreSQL schema for OpenWA tables and TypeORM migration ledger (lower-case letters, digits and underscores) |
+| `POSTGRES_SCHEMA` | `public` | PostgreSQL schema for Zaptura tables and TypeORM migration ledger (lower-case letters, digits and underscores) |
 
 **Use Cases:**
 
 - **Managed PostgreSQL:** Use your cloud provider's project schema (e.g., a schema provisioned by the provider)
-- **Multi-tenant databases:** Isolate OpenWA from other applications sharing the same database
-- **Clean separation:** Keep OpenWA's tables organized separately from other schemas
+- **Multi-tenant databases:** Isolate Zaptura from other applications sharing the same database
+- **Clean separation:** Keep Zaptura's tables organized separately from other schemas
 
 **Configuration:**
 
 ```bash
 # .env or dashboard Infrastructure page
-POSTGRES_SCHEMA=openwa  # Use a dedicated schema
+POSTGRES_SCHEMA=zaptura  # Use a dedicated schema
 POSTGRES_SCHEMA=public   # Default behavior (historical)
 ```
 
@@ -122,11 +122,11 @@ POSTGRES_SCHEMA=public   # Default behavior (historical)
 - Invalid values cause fast boot failure rather than migration-time errors
 
 > [!NOTE]
-> TypeORM's `schema` option alone does not set the session `search_path`. OpenWA additionally sets `search_path=<schema>,public` via PostgreSQL's startup `options` parameter so raw, unqualified migration DDL resolves to the configured schema. The migration ledger and all tables land in the specified schema while keeping `public` accessible for `pg_catalog` and helpers.
+> TypeORM's `schema` option alone does not set the session `search_path`. Zaptura additionally sets `search_path=<schema>,public` via PostgreSQL's startup `options` parameter so raw, unqualified migration DDL resolves to the configured schema. The migration ledger and all tables land in the specified schema while keeping `public` accessible for `pg_catalog` and helpers.
 
 #### Data Migration API
 
-OpenWA provides endpoints for migrating data between database types:
+Zaptura provides endpoints for migrating data between database types:
 
 | Endpoint                 | Method | Description                          |
 | ------------------------ | ------ | ------------------------------------ |
@@ -153,7 +153,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 
 #### Cross-Database Date Portability
 
-To ensure date/time values work across both SQLite and PostgreSQL, OpenWA uses a `DateTransformer` that stores dates as ISO 8601 text strings:
+To ensure date/time values work across both SQLite and PostgreSQL, Zaptura uses a `DateTransformer` that stores dates as ISO 8601 text strings:
 
 ```typescript
 // src/common/transformers/date.transformer.ts
@@ -172,7 +172,7 @@ connectedAt: Date | null;
 
 #### Timestamps on PostgreSQL are UTC
 
-Every timestamp column on the PostgreSQL data connection is `timestamp without time zone`, which stores no zone: the value means whatever the writer intended. OpenWA pins that meaning to **UTC**, on the connection rather than on the deployment (`src/database/postgres-utc.ts`):
+Every timestamp column on the PostgreSQL data connection is `timestamp without time zone`, which stores no zone: the value means whatever the writer intended. Zaptura pins that meaning to **UTC**, on the connection rather than on the deployment (`src/database/postgres-utc.ts`):
 
 - a JS `Date` parameter is bound as UTC (`parseInputDatesAsUTC`), so an app-written column such as `sessions.connectedAt` holds UTC wall-clock time whatever zone the host runs in;
 - a naive timestamp is parsed back as UTC, through a parser registered for the scalar `timestamp` OID only (the `timestamp[]` OID keeps the driver's array parser; the schema has no such column);
@@ -516,7 +516,7 @@ CREATE UNIQUE INDEX "UQ_messages_sessionId_waMessageId"
 ```
 
 > [!NOTE]
-> There is **no** PostgreSQL RANGE partitioning, `create_messages_partition()` function, or `pg_cron` schedule in OpenWA. `messages` is a single plain table on both backends. The `timestamp` column uses a `bigint→number` value transformer so the REST/SDK/MCP contract returns a JS number on both SQLite and PostgreSQL.
+> There is **no** PostgreSQL RANGE partitioning, `create_messages_partition()` function, or `pg_cron` schedule in Zaptura. `messages` is a single plain table on both backends. The `timestamp` column uses a `bigint→number` value transformer so the REST/SDK/MCP contract returns a JS number on both SQLite and PostgreSQL.
 
 > [!NOTE]
 > Message rows carry no separate `media`/`ack`/`from_me`/`is_group` columns. Media and other engine-specific details are stored in the `metadata` JSON column; delivery state is the `status` enum and `direction` distinguishes inbound vs. outbound.
@@ -540,7 +540,7 @@ CREATE TABLE api_keys (
     name VARCHAR(100) NOT NULL,
     "keyHash" VARCHAR(64) NOT NULL,                -- UNIQUE index
     "keyPrefix" VARCHAR(12) NOT NULL,              -- shown in the UI; the full key is never stored
-    role VARCHAR(20) NOT NULL DEFAULT 'operator',  -- admin | operator | viewer
+    role VARCHAR(20) NOT NULL DEFAULT 'user',      -- admin | user
     "allowedIps" TEXT,                             -- simple-array (comma-joined), null = any IP
     "allowedSessions" TEXT,                        -- simple-array, null = all sessions
     "allowedChats" TEXT,                           -- simple-array, null = all chats
@@ -556,7 +556,7 @@ CREATE UNIQUE INDEX "IDX_df3b25181df0b4b59bd93f16e1" ON api_keys("keyHash");
 ```
 
 > [!NOTE]
-> Access control is **role-based** (`admin` / `operator` / `viewer`), optionally scoped by `allowedIps`, `allowedSessions` and `allowedChats`. There is no granular `permissions` string array — see [04 - Security Design](./04-security-design.md) for what each role can do.
+> Access control is **role-based** (`admin` / `user`), optionally scoped by `allowedIps`, `allowedSessions` and `allowedChats`. There is no granular `permissions` string array — see [04 - Security Design](./04-security-design.md) for what each role can do.
 
 ---
 
@@ -791,7 +791,7 @@ flowchart LR
 
 ## 5.6 Migration Strategy
 
-OpenWA runs **two separate TypeORM connections**, each with its own migrations directory and CLI DataSource:
+Zaptura runs **two separate TypeORM connections**, each with its own migrations directory and CLI DataSource:
 
 | Connection | DataSource            | Migrations dir                  | Owns                                                                                                                                                                                                                                                                                                     |
 | ---------- | --------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -929,7 +929,7 @@ The 24-hour TTL itself is a fixed constant (`STATUS_TTL_MS`) and is not configur
 ## 5.8 Backup Strategy
 
 > [!NOTE]
-> This section is **operational guidance**, not a built-in feature. OpenWA ships no scheduler, encryption step, or S3 uploader for backups — the diagram and script below are a recommended setup you wire up externally (cron, your host's backup tooling, etc.). For SQLite, back up the `./data/*.sqlite` files (including `./data/main.sqlite`); for PostgreSQL, use `pg_dump`. The JSON export/import endpoints in §5.1 are a portability path, not a backup mechanism.
+> This section is **operational guidance**, not a built-in feature. Zaptura ships no scheduler, encryption step, or S3 uploader for backups — the diagram and script below are a recommended setup you wire up externally (cron, your host's backup tooling, etc.). For SQLite, back up the `./data/*.sqlite` files (including `./data/main.sqlite`); for PostgreSQL, use `pg_dump`. The JSON export/import endpoints in §5.1 are a portability path, not a backup mechanism.
 > The authoritative full-system backup is [`scripts/backup.sh`](../scripts/backup.sh), documented in the [operational runbook](./11-operational-runbooks.md#runbook-database-backup); it also captures engine auth state, including `BAILEYS_AUTH_DIR` for Baileys.
 
 ### Backup Components
@@ -959,16 +959,16 @@ flowchart TB
 
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="/backups"
-DB_NAME="openwa"
+DB_NAME="zaptura"
 
 # Create backup
-pg_dump -Fc $DB_NAME > $BACKUP_DIR/openwa_$DATE.dump
+pg_dump -Fc $DB_NAME > $BACKUP_DIR/zaptura_$DATE.dump
 
 # Compress
-gzip $BACKUP_DIR/openwa_$DATE.dump
+gzip $BACKUP_DIR/zaptura_$DATE.dump
 
 # Upload to S3 (optional)
-aws s3 cp $BACKUP_DIR/openwa_$DATE.dump.gz s3://backups/openwa/
+aws s3 cp $BACKUP_DIR/zaptura_$DATE.dump.gz s3://backups/zaptura/
 
 # Cleanup old backups (keep last 7 days)
 find $BACKUP_DIR -name "*.dump.gz" -mtime +7 -delete

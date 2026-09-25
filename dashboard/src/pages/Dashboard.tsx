@@ -39,7 +39,7 @@ export function Dashboard() {
   const loading = loadingSessions;
   const error =
     sessionsError instanceof Error ? sessionsError.message : sessionsError ? t('dashboard.loadError') : null;
-  // GET /webhooks is OPERATOR-only, so a viewer key always fails it: a failed read is not zero webhooks.
+  // A failed read is not zero webhooks.
   // A failed background refetch keeps the cached list, which still counts.
   const webhookCount = webhooksFailed && !webhooks ? unavailable : (webhooks ?? []).length;
 

@@ -39,7 +39,7 @@ describe('AuthController — API-key lifecycle audit logging', () => {
       id: 'k1',
       name: 'new-key',
       role: 'user',
-      keyPrefix: 'ow_',
+      keyPrefix: 'zap_',
       isActive: true,
       usageCount: 0,
       createdAt: new Date(),
@@ -49,7 +49,7 @@ describe('AuthController — API-key lifecycle audit logging', () => {
       findOne: jest.fn().mockResolvedValue({
         id: 'k1',
         name: 'target-key',
-        role: 'viewer',
+        role: 'user',
         allowedIps: null,
         allowedSessions: null,
         expiresAt: null,
@@ -105,7 +105,7 @@ describe('AuthController — API-key lifecycle audit logging', () => {
     const ctx = lastContextFor(AuditAction.API_KEY_UPDATED);
     expect(ctx?.apiKey).toBe(actor);
     expect(ctx?.metadata?.targetKeyId).toBe('k1');
-    expect(ctx?.metadata?.before?.role).toBe('viewer');
+    expect(ctx?.metadata?.before?.role).toBe('user');
     expect(ctx?.metadata?.after?.role).toBe('admin');
   });
 

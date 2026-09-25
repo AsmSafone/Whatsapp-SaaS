@@ -63,8 +63,8 @@ function ChatThread({
   onClickButton,
 }: ChatThreadProps) {
   const { t } = useTranslation();
-  // Reply, react, delete and prompt taps all need an operator key, like the composer; a viewer
-  // would only reach a 403.
+  // Reply, react, delete and prompt taps all need write permission, like the composer; a read-only
+  // context would only reach a 403.
   const { canWrite } = useRole();
 
   // Media the message list did not inline. The route serves the bytes as an attachment

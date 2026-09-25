@@ -6,14 +6,14 @@ import { WebhookDeliveryFailure } from '../entities/webhook-delivery-failure.ent
 import { recordWebhookDeliveryFailure, statusCodeFromError } from './record-delivery-failure';
 
 /**
- * Drop operator-supplied custom headers that target reserved names (Content-Type or any
- * X-OpenWA-* header) so a webhook config cannot forge the signature/event/idempotency
+ * Drop tenant-supplied custom headers that target reserved names (Content-Type or any
+ * X-Zaptura-* header) so a webhook config cannot forge the signature/event/idempotency
  * headers. Spread the result BEFORE the system headers so system always wins.
  */
 export function sanitizeCustomHeaders(custom: Record<string, string> | null | undefined): Record<string, string> {
   const safe: Record<string, string> = {};
   for (const [key, value] of Object.entries(custom ?? {})) {
-    if (!/^(content-type|x-openwa-)/i.test(key)) {
+    if (!/^(content-type|x-zaptura-|x-zaptura-)/i.test(key)) {
       safe[key] = value;
     }
   }
@@ -43,14 +43,14 @@ export function buildDeliveryHeaders(
   const headers: Record<string, string> = {
     ...sanitizeCustomHeaders(webhook.headers),
     'Content-Type': 'application/json',
-    'User-Agent': 'OpenWA-Webhook/1.0.0',
-    'X-OpenWA-Event': event,
-    'X-OpenWA-Idempotency-Key': idempotencyKey,
-    'X-OpenWA-Delivery-Id': deliveryId,
-    'X-OpenWA-Retry-Count': String(retryCount),
+    'User-Agent': 'Zaptura-Webhook/1.0.0',
+    'X-Zaptura-Event': event,
+    'X-Zaptura-Idempotency-Key': idempotencyKey,
+    'X-Zaptura-Delivery-Id': deliveryId,
+    'X-Zaptura-Retry-Count': String(retryCount),
   };
   if (webhook.secret) {
-    headers['X-OpenWA-Signature'] = generateSignature(body, webhook.secret);
+    headers['X-Zaptura-Signature'] = generateSignature(body, webhook.secret);
   }
   return headers;
 }

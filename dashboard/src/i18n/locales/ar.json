@@ -221,7 +221,7 @@
     "connectionError": "تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.",
     "help": "هل تحتاج مساعدة؟",
     "viewDocs": "عرض التوثيق",
-    "footer": "صُنع بـ ❤️ بواسطة Yudhi Armyndharis ومجتمع Zaptura",
+    "footer": "صُنع بـ ❤️ بواسطة Yudhi Aasmsafone ومجتمع Zaptura",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -615,13 +615,11 @@
     "rolesTitle": "مرجع الأدوار",
     "roles": {
       "admin": "مدير",
-      "operator": "مشغّل",
-      "viewer": "مشاهد"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "وصول كامل لجميع الموارد",
-      "operator": "إدارة الجلسات والرسائل",
-      "viewer": "وصول للقراءة فقط"
+      "user": "User access"
     },
     "columns": {
       "name": "الاسم",

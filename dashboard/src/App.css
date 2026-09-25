@@ -57,9 +57,52 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
 }
 
-/* Explicit light toggle: keep native controls light even if the OS prefers dark. */
+/* Light Mode: explicit toggle */
 [data-theme='light'] {
   color-scheme: light;
+  --primary: #0284c7;
+  --primary-text: #0369a1;
+  --primary-hover: #0ea5e9;
+  --primary-soft: rgba(2, 132, 199, 0.09);
+  --bg-light: #f8fafc;
+  --bg-white: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --info: #2563eb;
+  --error-text: #dc2626;
+  --success-text: #15803d;
+  --warning-text: #b45309;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* System preference light mode */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --primary: #0284c7;
+    --primary-text: #0369a1;
+    --primary-hover: #0ea5e9;
+    --primary-soft: rgba(2, 132, 199, 0.09);
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --info: #2563eb;
+    --error-text: #dc2626;
+    --success-text: #15803d;
+    --warning-text: #b45309;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
 }
 
 /* System preference dark mode */

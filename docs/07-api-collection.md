@@ -2,7 +2,7 @@
 
 ## 07.1 Overview
 
-This collection gives a runnable cURL for the primary OpenWA REST endpoints; the complete route list lives in `openapi.json` at the repository root. The Swagger UI at `/api/docs` serves the same schema, but it defaults off under `NODE_ENV=production` — set `ENABLE_SWAGGER=true` to serve it there. The examples assume two environment variables — set them once and reuse them:
+This collection gives a runnable cURL for the primary Zaptura REST endpoints; the complete route list lives in `openapi.json` at the repository root. The Swagger UI at `/api/docs` serves the same schema, but it defaults off under `NODE_ENV=production` — set `ENABLE_SWAGGER=true` to serve it there. The examples assume two environment variables — set them once and reuse them:
 
 ```bash
 export BASE=http://localhost:2785
@@ -418,7 +418,7 @@ Send a plain text message.
 curl -X POST "$BASE/api/sessions/$SESSION_ID/messages/send-text" \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{ "chatId": "628123456789@c.us", "text": "Hello from OpenWA!" }'
+  -d '{ "chatId": "628123456789@c.us", "text": "Hello from Zaptura!" }'
 ```
 
 #### POST /api/sessions/:sessionId/messages/send-template
@@ -900,7 +900,7 @@ curl -X POST "$BASE/api/sessions/$SESSION_ID/templates" \
   -d '{
     "name": "order-confirmation",
     "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-    "header": "OpenWA Store",
+    "header": "Zaptura Store",
     "footer": "Reply STOP to unsubscribe."
   }'
 ```
@@ -1068,7 +1068,7 @@ curl -X GET "$BASE/api/sessions/$SESSION_ID/status/6281234567890@c.us" \
 curl -X POST "$BASE/api/sessions/$SESSION_ID/status/send-text" \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{ "text": "Hello from OpenWA!", "backgroundColor": "#25D366", "font": 2 }'
+  -d '{ "text": "Hello from Zaptura!", "backgroundColor": "#25D366", "font": 2 }'
 ```
 
 ```bash
@@ -1098,14 +1098,14 @@ curl -X POST "$BASE/api/sessions/$SESSION_ID/status/send-voice" \
 ```
 
 ```bash
-# Delete one of the session's own posted statuses (OPERATOR)
+# Delete one of the session's own posted statuses (USER)
 curl -X DELETE "$BASE/api/sessions/$SESSION_ID/status/false_status@broadcast_3A1F" \
   -H "X-API-Key: $API_KEY"
 ```
 
 ### 07.10 Webhooks (management)
 
-All routes require an API key with OPERATOR role or higher. `secret` and `headers` are write-only (never returned by these routes; `GET /api/infra/export-data` omits them from webhook rows too). The per-session routes live under `/api/sessions/:sessionId/webhooks`; the cross-session list is `/api/webhooks`.
+All routes require an API key with USER role or higher. `secret` and `headers` are write-only (never returned by these routes; `GET /api/infra/export-data` omits them from webhook rows too). The per-session routes live under `/api/sessions/:sessionId/webhooks`; the cross-session list is `/api/webhooks`.
 
 #### GET /api/sessions/:sessionId/webhooks
 
@@ -1235,7 +1235,7 @@ curl -X POST "$BASE/api/auth/api-keys" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Production Bot",
-    "role": "operator",
+    "role": "user",
     "allowedIps": ["192.168.1.1", "10.0.0.0/8"],
     "allowedSessions": ["session-uuid-1"],
     "expiresAt": "2027-12-31T23:59:59Z"
@@ -1252,7 +1252,7 @@ curl -X PUT "$BASE/api/auth/api-keys/3f2a1c9e-1b2d-4a5f-9c8e-aa11bb22cc33" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Renamed Bot",
-    "role": "viewer",
+    "role": "user",
     "allowedIps": ["203.0.113.5"],
     "expiresAt": "2028-01-01T00:00:00Z"
   }'
@@ -1428,7 +1428,7 @@ curl -X PUT "$BASE/api/infra/config" \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "database": { "type": "postgres", "host": "db.example.com", "port": "5432", "username": "openwa", "password": "s3cret", "database": "openwa", "poolSize": 10, "sslEnabled": true, "sslRejectUnauthorized": false },
+    "database": { "type": "postgres", "host": "db.example.com", "port": "5432", "username": "zaptura", "password": "s3cret", "database": "zaptura", "poolSize": 10, "sslEnabled": true, "sslRejectUnauthorized": false },
     "redis": { "enabled": true, "builtIn": true },
     "queue": { "enabled": true },
     "storage": { "type": "s3", "s3Bucket": "my-bucket", "s3Region": "ap-southeast-1", "s3AccessKey": "AKIA...", "s3SecretKey": "...", "s3Endpoint": "https://s3.example.com" },
@@ -1568,7 +1568,7 @@ Install a plugin by downloading its .zip from a URL (SSRF-guarded).
 curl -X POST "$BASE/api/plugins/install-url" \
   -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{ "url": "https://github.com/openwa-plugins/chat-flow/releases/download/v1.0.0/chat-flow.zip" }'
+  -d '{ "url": "https://github.com/zaptura-plugins/chat-flow/releases/download/v1.0.0/chat-flow.zip" }'
 ```
 
 #### POST /api/plugins/:id/enable
@@ -1651,7 +1651,7 @@ MCP JSON-RPC 2.0 transport (no `/api` prefix; gated by `MCP_ENABLED=true`). The 
 curl -X POST "$BASE/mcp" \
   -H "X-Api-Key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{ "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": { "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": { "name": "openwa-collection", "version": "1.0.0" } } }'
+  -d '{ "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": { "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": { "name": "zaptura-collection", "version": "1.0.0" } } }'
 
 # List available tools
 curl -X POST "$BASE/mcp" \
@@ -1717,7 +1717,7 @@ curl -X DELETE "$BASE/api/sessions/$SESSION_ID/profile/picture" \
 
 ### 07.15 Search
 
-Cross-session full-text message search (OPERATOR or higher). On by default; `SEARCH_ENABLED=false`
+Cross-session full-text message search (USER or higher). On by default; `SEARCH_ENABLED=false`
 removes the route and module entirely. A scoped key's `allowedSessions` is applied server-side and
 cannot be widened via the query. See doc 26 for the provider contract.
 
@@ -1752,7 +1752,7 @@ curl "$BASE/api/sessions/$SESSION_ID/media/convert" \
 #### POST /api/sessions/:sessionId/media/convert/voice
 
 Convert audio (or a video's audio track) into a WhatsApp voice note — Ogg/Opus, mono, 48 kHz
-(OPERATOR). Exactly one of `url` / `base64`. Post the returned `base64` to `messages/send-audio`
+(USER). Exactly one of `url` / `base64`. Post the returned `base64` to `messages/send-audio`
 with `ptt: true` (or to `status/send-voice`).
 
 ```bash
@@ -1764,7 +1764,7 @@ curl -X POST "$BASE/api/sessions/$SESSION_ID/media/convert/voice" \
 
 #### POST /api/sessions/:sessionId/media/convert/video
 
-Convert video into a baseline H.264/AAC MP4 every WhatsApp client accepts (OPERATOR); same request
+Convert video into a baseline H.264/AAC MP4 every WhatsApp client accepts (USER); same request
 body and errors as the voice endpoint. Both responses are bounded by
 `MEDIA_CONVERSION_MAX_OUTPUT_BYTES` (default 50 MiB).
 

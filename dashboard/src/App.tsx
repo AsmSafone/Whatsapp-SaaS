@@ -45,7 +45,7 @@ function AppContent() {
   // double the /auth/validate request on every sign-in — the effect is for genuine page
   // refreshes with a saved key only.
   const [savedKey] = useState(
-    () => localStorage.getItem('zaptura_api_key') || localStorage.getItem('openwa_api_key'),
+    () => localStorage.getItem('zaptura_api_key') || localStorage.getItem('zaptura_api_key'),
   );
   const [isAuthenticated, setIsAuthenticated] = useState(!!savedKey);
   const [, setApiKey] = useState(savedKey || '');
@@ -54,12 +54,11 @@ function AppContent() {
   const handleLogin = (key: string, validatedRole?: string) => {
     setApiKey(key);
     localStorage.setItem('zaptura_api_key', key);
-    localStorage.setItem('openwa_api_key', key);
+    localStorage.setItem('zaptura_api_key', key);
 
     // The login page's validate response already carried the role, so no second /auth/validate
-    // round-trip is needed here. An absent or unrecognized role falls back to viewer, the
-    // least-privileged default.
-    setRole(isUserRole(validatedRole) ? validatedRole : 'viewer');
+    // round-trip is needed here. An absent or unrecognized role falls back to user.
+    setRole(isUserRole(validatedRole) ? validatedRole : 'user');
 
     if (window.location.pathname !== '/') {
       window.history.replaceState(null, '', '/');
@@ -72,9 +71,9 @@ function AppContent() {
     setIsAuthenticated(false);
     setRole(null);
     localStorage.removeItem('zaptura_api_key');
-    localStorage.removeItem('openwa_api_key');
+    localStorage.removeItem('zaptura_api_key');
     sessionStorage.removeItem('zaptura_api_key');
-    sessionStorage.removeItem('openwa_api_key');
+    sessionStorage.removeItem('zaptura_api_key');
     // Wipe the React Query cache too: it is keyed by resource, not actor, so without a full
     // clear a logout → login in the same tab with a different key/scope shows the previous
     // actor's sessions/messages/apiKeys/audit rows.

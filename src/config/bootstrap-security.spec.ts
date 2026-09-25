@@ -138,7 +138,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'development',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
         storageType: 's3',
         s3AccessKey: 'minioadmin',
         s3SecretKey: 'minioadmin',
@@ -155,7 +155,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       /ALLOW_DEV_API_KEY/,
     );
     expect(() =>
-      assertNoDefaultSecretsInProduction({ nodeEnv: 'staging', databaseType: 'postgres', databasePassword: 'openwa' }),
+      assertNoDefaultSecretsInProduction({ nodeEnv: 'staging', databaseType: 'postgres', databasePassword: 'zaptura' }),
     ).toThrow(/DATABASE_PASSWORD/);
   });
 
@@ -179,7 +179,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'production',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
       }),
     ).toThrow(/DATABASE_PASSWORD/);
   });
@@ -192,12 +192,12 @@ describe('assertNoDefaultSecretsInProduction', () => {
 
   it('allows the built-in Postgres/MinIO default credentials in prod (internal-only network) (#488 review)', () => {
     // The bundled containers are reachable only on the internal Docker network (not published), so the
-    // known 'openwa'/'minioadmin' creds the built-in flow provisions must not crash-loop a prod boot.
+    // known 'zaptura'/'minioadmin' creds the built-in flow provisions must not crash-loop a prod boot.
     expect(() =>
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'production',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
         postgresBuiltIn: 'true',
         storageType: 's3',
         s3AccessKey: 'minioadmin',
@@ -225,7 +225,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'production',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
         postgresBuiltIn: 'false',
       }),
     ).toThrow(/DATABASE_PASSWORD/);
@@ -237,7 +237,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'production',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
         postgresBuiltIn: 'true',
         databaseHost: 'db.example.com',
       }),
@@ -260,7 +260,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
       assertNoDefaultSecretsInProduction({
         nodeEnv: 'production',
         databaseType: 'postgres',
-        databasePassword: 'openwa',
+        databasePassword: 'zaptura',
         postgresBuiltIn: 'true',
         databaseHost: 'postgres',
         storageType: 's3',
@@ -377,7 +377,7 @@ describe('assertNoDefaultSecretsInProduction', () => {
   it('does not check the DB password when using sqlite', () => {
     // DATABASE_PASSWORD is irrelevant for sqlite, so a leftover default must not block boot.
     expect(() =>
-      assertNoDefaultSecretsInProduction({ nodeEnv: 'production', databaseType: 'sqlite', databasePassword: 'openwa' }),
+      assertNoDefaultSecretsInProduction({ nodeEnv: 'production', databaseType: 'sqlite', databasePassword: 'zaptura' }),
     ).not.toThrow();
   });
 

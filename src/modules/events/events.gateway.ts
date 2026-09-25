@@ -78,7 +78,7 @@ export function isSessionSubscriptionAllowed(allowedSessions: string[] | null | 
 
 /**
  * Room holding every socket whose key may NOT read a session's pairing QR over REST
- * (`GET /sessions/:sessionId/qr` requires OPERATOR). `session.qr` is broadcast with this room
+ * (`GET /sessions/:sessionId/qr` requires USER). `session.qr` is broadcast with this room
  * excluded, which covers the explicit event name and both wildcard subscribe forms. Membership is
  * set from the re-validated key on every subscribe, before any subscription room is joined, so a
  * socket can never hold a subscription room without it.
@@ -86,7 +86,7 @@ export function isSessionSubscriptionAllowed(allowedSessions: string[] | null | 
 export const QR_DENIED_ROOM = 'role:qr-denied';
 
 /** Roles allowed to receive `session.qr`. Anything else, including an unknown role, is denied. */
-const QR_ALLOWED_ROLES: ReadonlySet<string> = new Set([ApiKeyRole.OPERATOR, ApiKeyRole.ADMIN]);
+const QR_ALLOWED_ROLES: ReadonlySet<string> = new Set([ApiKeyRole.USER, ApiKeyRole.ADMIN]);
 
 /** Why an API key's live WebSocket sockets are being torn down — drives the client-facing message. */
 export type ApiKeyEvictionReason = 'revoked' | 'deleted' | 'authorization_changed' | 'expired';

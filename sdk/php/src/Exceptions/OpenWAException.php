@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Exceptions;
+namespace Zaptura\Exceptions;
 
 /**
- * Base class for every error thrown by the OpenWA SDK.
+ * Base class for every error thrown by the Zaptura SDK.
  */
-class OpenWAException extends \Exception
+class ZapturaException extends \Exception
 {
 }

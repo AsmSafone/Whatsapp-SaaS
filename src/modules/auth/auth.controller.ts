@@ -46,8 +46,8 @@ export class AuthController {
   }
 
   @Post()
-  @RequireRole(ApiKeyRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new API key (admin only)' })
+  @RequireRole(ApiKeyRole.USER)
+  @ApiOperation({ summary: 'Create a new API key' })
   @ApiResponse({
     status: 201,
     description: 'API key created',
@@ -58,6 +58,9 @@ export class AuthController {
     @Req() req: Request,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyCreatedResponseDto> {
+    if (actor?.role !== ApiKeyRole.ADMIN) {
+      dto.role = ApiKeyRole.USER;
+    }
     const { apiKey, rawKey } = await this.authService.createApiKey(dto, { userId: actor?.userId ?? null });
     await this.auditService.logInfo(AuditAction.API_KEY_CREATED, {
       ...this.auditContext(req, actor),
@@ -81,8 +84,8 @@ export class AuthController {
   }
 
   @Get()
-  @RequireRole(ApiKeyRole.ADMIN)
-  @ApiOperation({ summary: 'List all API keys (admin only)' })
+  @RequireRole(ApiKeyRole.USER)
+  @ApiOperation({ summary: 'List all API keys' })
   @ApiResponse({
     status: 200,
     description: 'All API keys (the plaintext key is never returned; only the keyPrefix).',
@@ -107,15 +110,18 @@ export class AuthController {
   }
 
   @Get(':id')
-  @RequireRole(ApiKeyRole.ADMIN)
-  @ApiOperation({ summary: 'Get API key details (admin only)' })
+  @RequireRole(ApiKeyRole.USER)
+  @ApiOperation({ summary: 'Get API key details' })
   @ApiResponse({
     status: 200,
     description: 'The API key (plaintext never returned; only the keyPrefix).',
     type: ApiKeyResponseDto,
   })
-  async findOne(@Param('id') id: string): Promise<ApiKeyResponseDto> {
+  async findOne(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<ApiKeyResponseDto> {
     const k = await this.authService.findOne(id);
+    if (actor?.userId && k.userId && k.userId !== actor.userId) {
+      throw new ForbiddenException('Cannot access another account API key');
+    }
     return {
       id: k.id,
       name: k.name,
@@ -133,8 +139,8 @@ export class AuthController {
   }
 
   @Put(':id')
-  @RequireRole(ApiKeyRole.ADMIN)
-  @ApiOperation({ summary: 'Update API key (admin only)' })
+  @RequireRole(ApiKeyRole.USER)
+  @ApiOperation({ summary: 'Update API key' })
   @ApiResponse({ status: 200, description: 'The updated API key.', type: ApiKeyResponseDto })
   @ApiResponse({ status: 409, description: 'The change would remove the last usable admin key.' })
   async update(
@@ -144,6 +150,12 @@ export class AuthController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyResponseDto> {
     const before = await this.authService.findOne(id);
+    if (actor?.userId && before.userId && before.userId !== actor.userId) {
+      throw new ForbiddenException('Cannot update another account API key');
+    }
+    if (actor?.role !== ApiKeyRole.ADMIN) {
+      delete dto.role;
+    }
     const k = await this.authService.update(id, dto);
     const authzSnapshot = (key: ApiKey) => ({
       role: key.role,
@@ -178,9 +190,9 @@ export class AuthController {
   }
 
   @Delete(':id')
-  @RequireRole(ApiKeyRole.ADMIN)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete API key (admin only)' })
+  @ApiOperation({ summary: 'Delete API key' })
   @ApiResponse({ status: 204, description: 'API key deleted' })
   @ApiResponse({ status: 409, description: 'The key is the last usable admin key.' })
   async delete(@Param('id') id: string, @Req() req: Request, @CurrentApiKey() actor?: ApiKey): Promise<void> {
@@ -196,9 +208,9 @@ export class AuthController {
   }
 
   @Post(':id/revoke')
-  @RequireRole(ApiKeyRole.ADMIN)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Revoke API key (admin only)' })
+  @ApiOperation({ summary: 'Revoke API key' })
   @ApiResponse({ status: 200, description: 'The revoked API key (isActive now false).', type: ApiKeyResponseDto })
   @ApiResponse({ status: 409, description: 'The key is the last usable admin key.' })
   async revoke(

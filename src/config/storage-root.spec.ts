@@ -59,7 +59,7 @@ describe('isStorageRootWritable', () => {
   let tmp: string;
 
   beforeEach(() => {
-    tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'openwa-storage-root-'));
+    tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'zaptura-storage-root-'));
   });
 
   afterEach(() => {

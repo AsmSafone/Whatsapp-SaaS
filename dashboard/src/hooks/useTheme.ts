@@ -2,10 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
-const THEME_KEY = 'openwa_theme';
-// Legacy key from the removed palette picker (pre-0.9.0). Cleaned up on mount so old installs
-// don't carry dead state; the picker was dropped for being hard to maintain and off-brand.
-const LEGACY_PALETTE_KEY = 'openwa_palette';
+const THEME_KEY = 'zaptura_theme';
+const LEGACY_PALETTE_KEY = 'zaptura_palette';
 
 function isTheme(value: string | null): value is Theme {
   return value === 'light' || value === 'dark' || value === 'system';
@@ -16,6 +14,19 @@ export function useTheme() {
     const saved = localStorage.getItem(THEME_KEY);
     return isTheme(saved) ? saved : 'system';
   });
+
+  const [systemIsDark, setSystemIsDark] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return true;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => setSystemIsDark(e.matches);
+    media.addEventListener('change', handler);
+    return () => media.removeEventListener('change', handler);
+  }, []);
 
   const applyTheme = useCallback((newTheme: Theme) => {
     const root = document.documentElement;
@@ -43,17 +54,15 @@ export function useTheme() {
     setThemeState(newTheme);
   }, []);
 
+  const resolvedTheme: 'light' | 'dark' =
+    theme === 'system' ? (systemIsDark ? 'dark' : 'light') : theme;
+
   const toggleTheme = useCallback(() => {
     setThemeState(prev => {
-      if (prev === 'light') return 'dark';
-      if (prev === 'dark') return 'system';
-      return 'light';
+      const current = prev === 'system' ? (systemIsDark ? 'dark' : 'light') : prev;
+      return current === 'dark' ? 'light' : 'dark';
     });
-  }, []);
-
-  // Get the resolved theme (what's actually displayed)
-  const resolvedTheme =
-    theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
+  }, [systemIsDark]);
 
   return { theme, setTheme, toggleTheme, resolvedTheme };
 }

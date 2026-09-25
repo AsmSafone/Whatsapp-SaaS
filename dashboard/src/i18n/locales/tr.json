@@ -210,7 +210,7 @@
     "connectionError": "Sunucuya bağlanılamadı. Lütfen tekrar deneyin.",
     "help": "Yardıma mı ihtiyacınız var?",
     "viewDocs": "Dokümantasyonu Görüntüle",
-    "footer": "Yudhi Armyndharis ve Zaptura Topluluğu tarafından ❤️ ile yapılmıştır",
+    "footer": "Yudhi Aasmsafone ve Zaptura Topluluğu tarafından ❤️ ile yapılmıştır",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -600,13 +600,11 @@
     "rolesTitle": "Roller Referansı",
     "roles": {
       "admin": "Yönetici (Admin)",
-      "operator": "Operatör",
-      "viewer": "İzleyici"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "Tüm kaynaklara tam erişim",
-      "operator": "Oturum ve mesaj yönetimi",
-      "viewer": "Salt okunur erişim"
+      "user": "User access"
     },
     "columns": {
       "name": "Ad",

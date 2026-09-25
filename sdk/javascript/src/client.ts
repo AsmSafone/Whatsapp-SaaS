@@ -1,14 +1,14 @@
 /**
- * OpenWA JavaScript/TypeScript SDK — client core.
+ * Zaptura JavaScript/TypeScript SDK — client core.
  *
- * The {@link OpenWAClient} is the single entry point. It holds configuration
+ * The {@link ZapturaClient} is the single entry point. It holds configuration
  * (base URL, API key, timeout, injectable transport) and exposes domain
  * resources as properties:
  *
  * ```typescript
- * import { OpenWAClient } from '@rmyndharis/openwa';
+ * import { ZapturaClient } from '@asmsafone/zaptura';
  *
- * const client = new OpenWAClient({
+ * const client = new ZapturaClient({
  *   baseUrl: 'http://localhost:2785',
  *   apiKey: 'zap_k1_…',
  * });
@@ -16,7 +16,7 @@
  * await client.sessions.start('my-session');
  * await client.messages.sendText('my-session', {
  *   chatId: '628123456789@c.us',
- *   text: 'Hello from the OpenWA SDK!',
+ *   text: 'Hello from the Zaptura SDK!',
  * });
  * ```
  *
@@ -42,8 +42,8 @@ import { TemplatesResource } from './resources/templates.js';
 import { WebhooksResource } from './resources/webhooks.js';
 import type { AuthValidateResponse, MessageResponse, SendMediaRequest } from './types.js';
 
-export interface OpenWAClientOptions {
-  /** Base URL of the OpenWA API, e.g. `http://localhost:2785`. */
+export interface ZapturaClientOptions {
+  /** Base URL of the Zaptura API, e.g. `http://localhost:2785`. */
   baseUrl: string;
   /** API key sent as `X-API-Key`. */
   apiKey: string;
@@ -55,12 +55,12 @@ export interface OpenWAClientOptions {
   fetch?: FetchLike;
 }
 
-export class OpenWAClient {
+export class ZapturaClient {
   private readonly config: Required<Omit<ClientConfig, 'fetch'>> & { fetch: FetchLike };
 
-  constructor(options: OpenWAClientOptions) {
-    if (!options.baseUrl) throw new Error('OpenWAClient: baseUrl is required');
-    if (!options.apiKey) throw new Error('OpenWAClient: apiKey is required');
+  constructor(options: ZapturaClientOptions) {
+    if (!options.baseUrl) throw new Error('ZapturaClient: baseUrl is required');
+    if (!options.apiKey) throw new Error('ZapturaClient: apiKey is required');
 
     this.config = {
       baseUrl: options.baseUrl,
@@ -124,4 +124,4 @@ export class OpenWAClient {
   }
 }
 
-export default OpenWAClient;
+export default ZapturaClient;

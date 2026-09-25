@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import Docker from 'dockerode';
 
 /**
- * The only Docker profiles OpenWA manages (and may start/stop). Used to bound teardown so a
+ * The only Docker profiles Zaptura manages (and may start/stop). Used to bound teardown so a
  * caller-supplied profile name can never reach stopManagedService for an unrelated container.
  */
 export const MANAGED_DOCKER_PROFILES: readonly string[] = ['postgres', 'redis', 'minio'];
@@ -132,7 +132,7 @@ export class DockerService implements OnModuleInit {
   }
 
   /**
-   * List all OpenWA-related containers
+   * List all Zaptura-related containers
    */
   async listContainers(): Promise<ContainerInfo[]> {
     if (!this.docker || !this.isAvailable) {
@@ -143,9 +143,9 @@ export class DockerService implements OnModuleInit {
       const containers = await this.docker.listContainers({ all: true });
       return containers
         .filter(c => {
-          // Filter by OpenWA labels or name prefix
+          // Filter by Zaptura labels or name prefix
           const labels = c.Labels || {};
-          return labels['com.openwa.service'] || c.Names?.some(n => n.startsWith('/openwa-'));
+          return labels['com.zaptura.service'] || c.Names?.some(n => n.startsWith('/zaptura-'));
         })
         .map(c => ({
           id: c.Id.substring(0, 12),
@@ -161,8 +161,8 @@ export class DockerService implements OnModuleInit {
   }
 
   /**
-   * Which bundled (OpenWA-managed) service containers are currently RUNNING, keyed by the
-   * `com.openwa.service` label (`database` | `cache` | `storage`). Lets the dashboard show the real
+   * Which bundled (Zaptura-managed) service containers are currently RUNNING, keyed by the
+   * `com.zaptura.service` label (`database` | `cache` | `storage`). Lets the dashboard show the real
    * built-in state instead of the saved intent. All false when Docker is unavailable or none run.
    */
   async getRunningBuiltinServices(): Promise<{ database: boolean; cache: boolean; storage: boolean }> {
@@ -170,7 +170,7 @@ export class DockerService implements OnModuleInit {
     const isRunning = (svc: string): boolean =>
       containers.some(
         c =>
-          c.labels['com.openwa.service'] === svc && c.labels['com.openwa.builtin'] === 'true' && c.state === 'running',
+          c.labels['com.zaptura.service'] === svc && c.labels['com.zaptura.builtin'] === 'true' && c.state === 'running',
       );
     return { database: isRunning('database'), cache: isRunning('cache'), storage: isRunning('storage') };
   }
@@ -187,7 +187,7 @@ export class DockerService implements OnModuleInit {
       const containers = await this.docker.listContainers({
         all: true,
         filters: {
-          label: [`com.openwa.service=${service}`],
+          label: [`com.zaptura.service=${service}`],
         },
       });
 
@@ -196,8 +196,8 @@ export class DockerService implements OnModuleInit {
       }
 
       // Fallback: try by EXACT name (never a substring — a substring, and especially the empty
-      // string, would resolve an arbitrary container). OpenWA-managed containers are `openwa-<service>`.
-      const target = `openwa-${service}`;
+      // string, would resolve an arbitrary container). Zaptura-managed containers are `zaptura-<service>`.
+      const target = `zaptura-${service}`;
       const allContainers = await this.docker.listContainers({ all: true });
       const match = allContainers.find(c => c.Names?.some(n => n === target || n === `/${target}`));
 
@@ -222,7 +222,7 @@ export class DockerService implements OnModuleInit {
    *  - Credentials: the compose services are the MANUAL operator path and deliberately ship no
    *    default secret (empty POSTGRES_PASSWORD / MINIO_ROOT_* fail fast on boot). The specs below
    *    are the dashboard built-in path: they provision the fixed built-in credentials
-   *    (openwa/openwa, minioadmin/minioadmin) that infra-config.controller writes to data/.env.generated
+   *    (zaptura/zaptura, minioadmin/minioadmin) that infra-config.controller writes to data/.env.generated
    *    and that the production boot guard (bootstrap-security.ts) exempts only while the
    *    *_BUILTIN flag is set AND the datastore host resolves to the internal-only container.
    *  - Postgres init script: compose bind-mounts scripts/postgres-init-schema.sh from the host
@@ -230,7 +230,7 @@ export class DockerService implements OnModuleInit {
    *    to mount, and the built-in flow always pins POSTGRES_SCHEMA=public, so no init script (or
    *    POSTGRES_SCHEMA env) is set here.
    *  - Resource limits: neither path sets CPU/memory/PID limits on the datastore containers;
-   *    only openwa-api carries mem_limit/pids_limit (in compose).
+   *    only zaptura-api carries mem_limit/pids_limit (in compose).
    */
   private getContainerSpec(profile: string): {
     image: string;
@@ -247,12 +247,12 @@ export class DockerService implements OnModuleInit {
     const specs: Record<string, ReturnType<typeof this.getContainerSpec>> = {
       redis: {
         image: 'redis:7-alpine',
-        name: 'openwa-redis',
+        name: 'zaptura-redis',
         alias: 'redis', // DNS alias for resolution
         // noeviction mirrors docker-compose.yml: BullMQ requires it, or Redis may evict queue keys
         // once maxmemory is reached and silently drop queued jobs.
         cmd: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction'],
-        volumes: [{ name: 'openwa_redis-data', path: '/data' }],
+        volumes: [{ name: 'zaptura_redis-data', path: '/data' }],
         healthcheck: {
           test: ['CMD', 'redis-cli', 'ping'],
           interval: 5000000000, // 5s in nanoseconds
@@ -260,36 +260,36 @@ export class DockerService implements OnModuleInit {
           retries: 5,
         },
         labels: {
-          'com.openwa.service': 'cache',
-          'com.openwa.builtin': 'true',
+          'com.zaptura.service': 'cache',
+          'com.zaptura.builtin': 'true',
         },
         securityOpt: ['no-new-privileges:true'],
       },
       postgres: {
         image: 'postgres:16-alpine',
-        name: 'openwa-postgres',
+        name: 'zaptura-postgres',
         alias: 'postgres',
         // Fixed built-in credentials — the dashboard saves these same values to
         // data/.env.generated (infra-config.controller) and the production boot guard exempts them only
         // for the built-in, internal-host deployment (see the getContainerSpec docblock).
-        env: ['POSTGRES_USER=openwa', 'POSTGRES_PASSWORD=openwa', 'POSTGRES_DB=openwa'],
-        volumes: [{ name: 'openwa_postgres-data', path: '/var/lib/postgresql/data' }],
+        env: ['POSTGRES_USER=zaptura', 'POSTGRES_PASSWORD=zaptura', 'POSTGRES_DB=zaptura'],
+        volumes: [{ name: 'zaptura_postgres-data', path: '/var/lib/postgresql/data' }],
         healthcheck: {
-          test: ['CMD-SHELL', 'pg_isready -U openwa'],
+          test: ['CMD-SHELL', 'pg_isready -U zaptura'],
           interval: 5000000000,
           timeout: 3000000000,
           retries: 5,
         },
         labels: {
-          'com.openwa.service': 'database',
-          'com.openwa.builtin': 'true',
+          'com.zaptura.service': 'database',
+          'com.zaptura.builtin': 'true',
         },
         securityOpt: ['no-new-privileges:true'],
       },
       minio: {
         // Same pin as the compose minio service — never track the floating `latest` tag.
         image: 'minio/minio:RELEASE.2025-09-07T16-13-09Z',
-        name: 'openwa-minio',
+        name: 'zaptura-minio',
         alias: 'minio',
         cmd: ['server', '/data', '--console-address', ':9001'],
         env: [
@@ -298,7 +298,7 @@ export class DockerService implements OnModuleInit {
           `MINIO_ROOT_USER=${process.env.S3_ACCESS_KEY_ID || process.env.S3_ACCESS_KEY || 'minioadmin'}`,
           `MINIO_ROOT_PASSWORD=${process.env.S3_SECRET_ACCESS_KEY || process.env.S3_SECRET_KEY || 'minioadmin'}`,
         ],
-        volumes: [{ name: 'openwa_minio-data', path: '/data' }],
+        volumes: [{ name: 'zaptura_minio-data', path: '/data' }],
         ports: [
           { container: 9000, host: 9000 },
           { container: 9001, host: 9001 },
@@ -310,8 +310,8 @@ export class DockerService implements OnModuleInit {
           retries: 3,
         },
         labels: {
-          'com.openwa.service': 'storage',
-          'com.openwa.builtin': 'true',
+          'com.zaptura.service': 'storage',
+          'com.zaptura.builtin': 'true',
         },
         securityOpt: ['no-new-privileges:true'],
       },
@@ -383,7 +383,7 @@ export class DockerService implements OnModuleInit {
         Env: spec.env,
         Labels: spec.labels,
         HostConfig: {
-          NetworkMode: 'openwa-network',
+          NetworkMode: 'zaptura-network',
           RestartPolicy: { Name: 'unless-stopped' },
           Binds: spec.volumes?.map(v => `${v.name}:${v.path}`),
           SecurityOpt: spec.securityOpt,
@@ -402,7 +402,7 @@ export class DockerService implements OnModuleInit {
           : undefined,
         NetworkingConfig: {
           EndpointsConfig: {
-            'openwa-network': {
+            'zaptura-network': {
               Aliases: [spec.alias, profile], // Add DNS aliases for network resolution
             },
           },
@@ -621,7 +621,7 @@ export class DockerService implements OnModuleInit {
 /**
  * Start the built-in PostgreSQL container before Nest builds the module graph. The data connection
  * dials the database while providers are instantiated, before any onModuleInit runs, so a stopped
- * openwa-postgres would otherwise fail every boot before DockerService could start it. Bounded
+ * zaptura-postgres would otherwise fail every boot before DockerService could start it. Bounded
  * because dockerode sets no connect timeout; never throws, so on any failure boot proceeds as it
  * would without it and the data connection's retries decide.
  */

@@ -20,7 +20,7 @@ export class CreateAuthAuditTables1779900000000 implements MigrationInterface {
         `"name" varchar(100) NOT NULL, ` +
         `"keyHash" varchar(64) NOT NULL, ` +
         `"keyPrefix" varchar(12) NOT NULL, ` +
-        `"role" varchar(20) NOT NULL DEFAULT ('operator'), ` +
+        `"role" varchar(20) NOT NULL DEFAULT ('user'), ` +
         `"allowedIps" text, ` +
         `"allowedSessions" text, ` +
         `"isActive" boolean NOT NULL DEFAULT (1), ` +

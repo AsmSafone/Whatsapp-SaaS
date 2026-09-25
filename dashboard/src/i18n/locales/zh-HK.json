@@ -210,7 +210,7 @@
     "connectionError": "無法連線到伺服器。請再試一次。",
     "help": "需要協助？",
     "viewDocs": "查看文件",
-    "footer": "由 Yudhi Armyndharis 及 Zaptura 社群用 ❤️ 打造",
+    "footer": "由 Yudhi Aasmsafone 及 Zaptura 社群用 ❤️ 打造",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -600,13 +600,11 @@
     "rolesTitle": "角色參考",
     "roles": {
       "admin": "管理員",
-      "operator": "操作員",
-      "viewer": "檢視者"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "可完整存取所有資源",
-      "operator": "工作階段及訊息管理",
-      "viewer": "唯讀存取"
+      "user": "User access"
     },
     "columns": {
       "name": "名稱",

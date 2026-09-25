@@ -389,7 +389,6 @@ export function useUpdateProfileMutation() {
     onSuccess: res => {
       if (res?.token) {
         sessionStorage.setItem('zaptura_api_key', res.token);
-        sessionStorage.setItem('openwa_api_key', res.token);
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
     },
@@ -403,7 +402,6 @@ export function useChangePlanMutation() {
     onSuccess: res => {
       if (res?.token) {
         sessionStorage.setItem('zaptura_api_key', res.token);
-        sessionStorage.setItem('openwa_api_key', res.token);
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
     },

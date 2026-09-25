@@ -401,7 +401,7 @@
             "description": ""
           }
         },
-        "summary": "List mocked subscription plans",
+        "summary": "List subscription plans",
         "tags": [
           "account"
         ],
@@ -442,7 +442,7 @@
             "description": ""
           }
         },
-        "summary": "Change plan (mocked, no payment)",
+        "summary": "Change current plan",
         "tags": [
           "account"
         ]
@@ -2538,7 +2538,7 @@
                   "summary": "Plain text message",
                   "value": {
                     "chatId": "628123456789@c.us",
-                    "text": "Hello from OpenWA!"
+                    "text": "Hello from Zaptura!"
                   }
                 },
                 "withMentions": {
@@ -4431,7 +4431,7 @@
             }
           }
         },
-        "summary": "Compare the running version with the latest OpenWA release",
+        "summary": "Compare the running version with the latest Zaptura release",
         "tags": [
           "infrastructure"
         ]
@@ -10210,10 +10210,9 @@
             "description": "Role/permission level",
             "enum": [
               "admin",
-              "operator",
-              "viewer"
+              "user"
             ],
-            "default": "operator"
+            "default": "user"
           },
           "allowedIps": {
             "description": "Allowed IP addresses (whitelist)",
@@ -10275,8 +10274,7 @@
             "type": "string",
             "enum": [
               "admin",
-              "operator",
-              "viewer"
+              "user"
             ]
           },
           "allowedIps": {
@@ -10349,8 +10347,7 @@
             "type": "string",
             "enum": [
               "admin",
-              "operator",
-              "viewer"
+              "user"
             ]
           },
           "allowedIps": {
@@ -10410,8 +10407,7 @@
             "type": "string",
             "enum": [
               "admin",
-              "operator",
-              "viewer"
+              "user"
             ]
           },
           "allowedIps": {
@@ -10449,8 +10445,7 @@
             "type": "string",
             "enum": [
               "admin",
-              "operator",
-              "viewer"
+              "user"
             ],
             "description": "The key's role; present only when valid."
           }
@@ -11395,14 +11390,14 @@
           },
           "secret": {
             "type": "string",
-            "description": "Secret key for HMAC signature verification. Never returned by any webhook route; it is used to compute the `X-OpenWA-Signature: sha256=<hex>` header on every delivery.",
+            "description": "Secret key for HMAC signature verification. Never returned by any webhook route; it is used to compute the `X-Zaptura-Signature: sha256=<hex>` header on every delivery.",
             "minLength": 16,
             "maxLength": 255,
             "example": "your-webhook-signing-secret"
           },
           "headers": {
             "type": "object",
-            "description": "Custom headers to include in webhook requests. Never returned by any webhook route. At delivery, `content-type` and `x-openwa-*` names are stripped so a custom header cannot shadow a system one.",
+            "description": "Custom headers to include in webhook requests. Never returned by any webhook route. At delivery, `content-type` and `x-zaptura-*` names are stripped so a custom header cannot shadow a system one.",
             "example": {
               "X-Custom-Header": "value"
             }
@@ -12006,7 +12001,7 @@
           "text": {
             "type": "string",
             "description": "Text message content",
-            "example": "Hello from OpenWA!",
+            "example": "Hello from Zaptura!",
             "maxLength": 4096
           },
           "mentions": {
@@ -13365,7 +13360,7 @@
           "header": {
             "type": "string",
             "description": "Optional header text, prepended to the rendered body",
-            "example": "OpenWA Store",
+            "example": "Zaptura Store",
             "maxLength": 1024
           },
           "footer": {
@@ -13619,11 +13614,11 @@
           "host": {
             "type": "string",
             "description": "Host the app is configured to reach.",
-            "example": "openwa-postgres"
+            "example": "zaptura-postgres"
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's own bundled container is actually running and backing this service, detected live from the labelled container rather than read from the saved intent. Falls back to the saved flag when Docker is unavailable.",
+            "description": "Whether Zaptura's own bundled container is actually running and backing this service, detected live from the labelled container rather than read from the saved intent. Falls back to the saved flag when Docker is unavailable.",
             "example": true
           }
         },
@@ -13649,7 +13644,7 @@
           },
           "host": {
             "type": "string",
-            "example": "openwa-redis"
+            "example": "zaptura-redis"
           },
           "port": {
             "type": "number",
@@ -13657,7 +13652,7 @@
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's bundled Redis container is backing this.",
+            "description": "Whether Zaptura's bundled Redis container is backing this.",
             "example": true
           }
         },
@@ -13735,11 +13730,11 @@
           "bucket": {
             "type": "string",
             "description": "Bucket name. Present only for `s3`.",
-            "example": "openwa-media"
+            "example": "zaptura-media"
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's bundled MinIO container is backing this.",
+            "description": "Whether Zaptura's bundled MinIO container is backing this.",
             "example": false
           },
           "s3Available": {
@@ -13937,7 +13932,7 @@
             "type": "string",
             "nullable": true,
             "description": "Release notes page for `latest`.",
-            "example": "https://github.com/rmyndharis/OpenWA/releases/tag/v0.23.6"
+            "example": "https://github.com/AsmSafone/Whatsapp-SaaS/releases/tag/v0.23.6"
           }
         },
         "required": [
@@ -13983,7 +13978,7 @@
           },
           "host": {
             "type": "string",
-            "example": "openwa-postgres"
+            "example": "zaptura-postgres"
           },
           "port": {
             "type": "string",
@@ -13992,12 +13987,12 @@
           },
           "username": {
             "type": "string",
-            "example": "openwa"
+            "example": "zaptura"
           },
           "database": {
             "type": "string",
             "description": "Database name, or the SQLite file path.",
-            "example": "openwa"
+            "example": "zaptura"
           },
           "schema": {
             "type": "string",
@@ -14048,7 +14043,7 @@
           },
           "host": {
             "type": "string",
-            "example": "openwa-redis"
+            "example": "zaptura-redis"
           },
           "port": {
             "type": "string",
@@ -17053,11 +17048,11 @@
               "type": "string"
             }
           },
-          "minOpenWAVersion": {
+          "minZapturaVersion": {
             "type": "string",
             "example": "0.18.0"
           },
-          "testedOpenWAVersion": {
+          "testedZapturaVersion": {
             "type": "string",
             "example": "0.18.0"
           },

@@ -18,6 +18,11 @@ export class RegisterDto {
   @MinLength(8)
   @MaxLength(128)
   password!: string;
+
+  @ApiPropertyOptional({ enum: ['starter', 'pro', 'plus', 'business'], default: 'starter' })
+  @IsOptional()
+  @IsIn(['starter', 'pro', 'plus', 'business'])
+  plan?: 'starter' | 'pro' | 'plus' | 'business';
 }
 
 export class LoginDto {

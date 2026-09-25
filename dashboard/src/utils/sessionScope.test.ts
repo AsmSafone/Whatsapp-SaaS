@@ -8,9 +8,8 @@ import {
   sessionScopeRows,
 } from './sessionScope.ts';
 
-test('only operator and viewer keys can be session-scoped in the dashboard', () => {
-  assert.equal(canScopeSessions('operator'), true);
-  assert.equal(canScopeSessions('viewer'), true);
+test('only user keys can be session-scoped in the dashboard', () => {
+  assert.equal(canScopeSessions('user'), true);
   assert.equal(canScopeSessions('admin'), false);
   assert.equal(canScopeSessions(''), false);
 });

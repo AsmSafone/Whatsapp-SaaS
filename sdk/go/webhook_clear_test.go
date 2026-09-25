@@ -1,4 +1,4 @@
-package openwa
+package zaptura
 
 import (
 	"encoding/json"

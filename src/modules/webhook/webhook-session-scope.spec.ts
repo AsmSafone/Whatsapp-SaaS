@@ -1,6 +1,6 @@
 // webhook by-id operations (findOne/update/delete/test) must be scoped to the URL
-// :sessionId, and GET /webhooks must be scoped to the key's allowedSessions. Without it, an
-// OPERATOR key for one session can read/edit/delete/redirect/fire another session's webhook,
+// :sessionId, and GET /webhooks must be scoped to the key's allowedSessions. Without it, a
+// USER key for one session can read/edit/delete/redirect/fire another session's webhook,
 // and enumerate every session's webhook URLs. These run against a real in-memory DB so the
 // scoping is exercised end-to-end, not asserted on a mock's WHERE clause.
 import { DataSource } from 'typeorm';

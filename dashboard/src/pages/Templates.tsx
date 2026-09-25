@@ -238,8 +238,8 @@ export function Templates() {
                 <Loader2 className="animate-spin" size={24} />
               </div>
             ) : templatesError && templates.length === 0 ? (
-              // A failed read is not an empty library: a viewer key always gets 403 here (the route is
-              // OPERATOR-only), and a gateway error would otherwise read as "no templates saved".
+              // A failed read is not an empty library: a 403 here
+              // and a gateway error would otherwise read as "no templates saved".
               <div className="templates-empty-list" role="alert">
                 <AlertCircle size={40} strokeWidth={1} />
                 {(templatesError as { status?: number }).status === 403 ? (

@@ -437,8 +437,8 @@ export function Webhooks() {
       <div className="webhooks-content">
         <div className="webhooks-list-container">
           {webhooksError && webhooks.length === 0 ? (
-            // A failed read is not an empty list: a viewer key always gets 403 here (the route is
-            // OPERATOR-only), and a gateway error would otherwise read as "no webhooks configured".
+            // A failed read is not an empty list: an unprivileged key gets 403 here,
+            // and a gateway error would otherwise read as "no webhooks configured".
             <div className="empty-table-state" role="alert">
               <AlertCircle size={48} strokeWidth={1} />
               {(webhooksError as { status?: number }).status === 403 ? (

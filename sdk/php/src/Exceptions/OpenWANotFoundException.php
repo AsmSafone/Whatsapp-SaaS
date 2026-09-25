@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Exceptions;
+namespace Zaptura\Exceptions;
 
 /** 404 Not Found. */
-class OpenWANotFoundException extends OpenWAApiException
+class ZapturaNotFoundException extends ZapturaApiException
 {
 }

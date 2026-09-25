@@ -210,7 +210,7 @@
     "connectionError": "Impossibile connettersi al server. Riprova.",
     "help": "Serve aiuto?",
     "viewDocs": "Visualizza la documentazione",
-    "footer": "Fatto con il ❤️ da Yudhi Armyndharis e dalla Community di Zaptura",
+    "footer": "Fatto con il ❤️ da Yudhi Aasmsafone e dalla Community di Zaptura",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -600,13 +600,11 @@
     "rolesTitle": "Riferimento Ruoli",
     "roles": {
       "admin": "Amministratore",
-      "operator": "Operatore",
-      "viewer": "Visualizzatore"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "Accesso completo a tutte le risorse",
-      "operator": "Gestione delle sessioni e dei messaggi",
-      "viewer": "Accesso in sola lettura"
+      "user": "User access"
     },
     "columns": {
       "name": "Nome",

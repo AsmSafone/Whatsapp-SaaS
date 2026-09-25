@@ -32,7 +32,7 @@ export function Login({ onLogin }: LoginProps) {
       throw new Error((errorData as { message?: string }).message || t('login.invalidAccount'));
     }
     const data: { role?: string } = await response.json().catch(() => ({}));
-    onLogin(token, data.role);
+    onLogin(token, data.role || 'user');
   };
 
   const handleSubmit = async (e: FormEvent) => {

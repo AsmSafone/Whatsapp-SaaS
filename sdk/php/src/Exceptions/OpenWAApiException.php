@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Exceptions;
+namespace Zaptura\Exceptions;
 
 /**
  * Raised when the API responds with a non-2xx status.
@@ -10,7 +10,7 @@ namespace OpenWA\Exceptions;
  * Carries the HTTP status code and the parsed error body. Use the named
  * subclass for common statuses, or branch on getStatus().
  */
-class OpenWAApiException extends OpenWAException
+class ZapturaApiException extends ZapturaException
 {
     private int $status;
     /** @var mixed */
@@ -45,21 +45,21 @@ class OpenWAApiException extends OpenWAException
     }
 
     /**
-     * Build the most specific OpenWAApiException subclass for a status code.
+     * Build the most specific ZapturaApiException subclass for a status code.
      *
      * @param mixed $body
      */
-    public static function classify(int $status, string $message, $body, ?string $errorKind): OpenWAApiException
+    public static function classify(int $status, string $message, $body, ?string $errorKind): ZapturaApiException
     {
         return match ($status) {
-            401 => new OpenWAAuthException($message, $status, $body, $errorKind),
-            403 => new OpenWAForbiddenException($message, $status, $body, $errorKind),
-            404 => new OpenWANotFoundException($message, $status, $body, $errorKind),
-            409 => new OpenWAConflictException($message, $status, $body, $errorKind),
-            429 => new OpenWARateLimitException($message, $status, $body, $errorKind),
-            501 => new OpenWANotImplementedException($message, $status, $body, $errorKind),
-            503 => new OpenWAServiceUnavailableException($message, $status, $body, $errorKind),
-            default => new OpenWAApiException($message, $status, $body, $errorKind),
+            401 => new ZapturaAuthException($message, $status, $body, $errorKind),
+            403 => new ZapturaForbiddenException($message, $status, $body, $errorKind),
+            404 => new ZapturaNotFoundException($message, $status, $body, $errorKind),
+            409 => new ZapturaConflictException($message, $status, $body, $errorKind),
+            429 => new ZapturaRateLimitException($message, $status, $body, $errorKind),
+            501 => new ZapturaNotImplementedException($message, $status, $body, $errorKind),
+            503 => new ZapturaServiceUnavailableException($message, $status, $body, $errorKind),
+            default => new ZapturaApiException($message, $status, $body, $errorKind),
         };
     }
 }

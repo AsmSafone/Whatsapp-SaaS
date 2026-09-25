@@ -1,14 +1,14 @@
 # 28 - Multitenancy
 
 > **Status:** Draft (design proposal — nothing here is implemented). This document defines the target
-> architecture for operating OpenWA as a multi-tenant platform: tenant identity, access control, 2FA,
+> architecture for operating Zaptura as a multi-tenant platform: tenant identity, access control, 2FA,
 > per-tenant branding, isolation, quotas, and the migration path from today's single-operator model.
 
 ## 28.1 Goals & non-goals
 
 **Goals**
 
-- One OpenWA deployment safely hosts many independent organizations (tenants), each with its own
+- One Zaptura deployment safely hosts many independent organizations (tenants), each with its own
   WhatsApp sessions, users, API keys, branding, plugins, and data — with no cross-tenant visibility.
 - Enterprise-grade identity: named users with per-tenant roles and optional/enforced two-factor
   authentication (TOTP), alongside the existing API-key model for programmatic access.
@@ -23,12 +23,12 @@
 
 ## 28.2 Current state assessment
 
-OpenWA today is **multi-session, not multi-tenant**. What already exists and is reused by this design:
+Zaptura today is **multi-session, not multi-tenant**. What already exists and is reused by this design:
 
 | Primitive                                                                                                         | Where                                                                           | Reuse                                                                                                                            |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | Many WhatsApp sessions per deployment, engine-isolated                                                            | `session.service.ts`                                                            | Sessions become tenant-owned resources                                                                                           |
-| API keys with roles (`ADMIN/OPERATOR/VIEWER`) and an `allowedSessions` scope; list + stats already scope-filtered | `api-key.entity.ts:37`, `api-key.guard.ts:64-77`, `session.controller.ts:68-70` | Evolves into tenant-scoped keys; the enforcement pattern (guard-level session resolution) is exactly where tenant checks plug in |
+| API keys with roles (`ADMIN/USER`) and an `allowedSessions` scope; list + stats already scope-filtered | `api-key.entity.ts:37`, `api-key.guard.ts:64-77`, `session.controller.ts:68-70` | Evolves into tenant-scoped keys; the enforcement pattern (guard-level session resolution) is exactly where tenant checks plug in |
 | Per-session plugin activation and per-session config overrides                                                    | `sessionConfig` in the plugin loader                                            | Per-tenant plugin policy on top                                                                                                  |
 | All business data keyed by `sessionId`                                                                            | messages, audit_log, webhooks, templates                                        | Adding `tenantId` alongside is mechanical                                                                                        |
 | Per-request ALS actor stamping (audit attribution)                                                                | `request-context.ts`                                                            | Audit gains `tenantId` at the same point                                                                                         |
@@ -45,7 +45,7 @@ boundary.
 - **Tenant** — an organization. Owns sessions, users, API keys, plugins-activation, branding,
   quotas, and a data partition. Identified by `tenantId` (uuid) + a stable `slug`.
 - **Membership** — a named **user**'s relationship to a tenant, with a **tenant role**
-  (`owner`, `admin`, `operator`, `viewer`). One user may belong to many tenants.
+  (`admin`, `user`). One user may belong to many tenants.
 - **Tenant role vs platform role** — today's global `ApiKeyRole` becomes the _platform_ role; the
   tenant role governs what a user/key may do _inside_ one tenant. The full matrix is in 28.5.3.
 
@@ -97,17 +97,17 @@ shared API keys already outgrew "one strong secret is enough".
 
 ### 28.5.3 Role matrix (target)
 
-| Capability                               | Platform admin   | Tenant owner | Tenant admin | Tenant operator | Tenant viewer |
-| ---------------------------------------- | ---------------- | ------------ | ------------ | --------------- | ------------- |
-| Provision/suspend tenants                | ✓                | –            | –            | –               | –             |
-| Manage tenant members & roles            | –                | ✓            | ✓            | –               | –             |
-| Manage tenant API keys                   | –                | ✓            | ✓            | –               | –             |
-| Create/delete sessions                   | –                | ✓            | ✓            | –               | –             |
-| Send messages, manage webhooks/templates | –                | ✓            | ✓            | ✓               | –             |
-| View sessions, messages, logs            | –                | ✓            | ✓            | ✓               | ✓             |
-| Configure tenant branding                | –                | ✓            | ✓            | –               | –             |
-| Manage own 2FA                           | every named user |              |              |                 |               |
-| Reset members' 2FA                       | ✓                | ✓            | –            | –               | –             |
+| Capability                               | Platform admin   | Tenant admin | Tenant user |
+| ---------------------------------------- | ---------------- | ------------ | ----------- |
+| Provision/suspend tenants                | ✓                | –            | –           |
+| Manage tenant members & roles            | –                | ✓            | –           |
+| Manage tenant API keys                   | –                | ✓            | –           |
+| Create/delete sessions                   | –                | ✓            | –           |
+| Send messages, manage webhooks/templates | –                | ✓            | ✓           |
+| View sessions, messages, logs            | –                | ✓            | ✓           |
+| Configure tenant branding                | –                | ✓            | –           |
+| Manage own 2FA                           | every named user |              |             |
+| Reset members' 2FA                       | ✓                | ✓            | –           |
 
 ### 28.5.4 SSO / SCIM (phase 3 markers)
 
@@ -119,7 +119,7 @@ without schema change.
 
 - **Linked-device identity**: the engine's browser display name (the `BAILEYS_BROWSER` tuple)
   resolves per session: `session.config.browserName` → `tenant.branding.deviceName` → global
-  `BAILEYS_BROWSER_NAME` env → `'OpenWA'`. This supersedes the global-only env approach for
+  `BAILEYS_BROWSER_NAME` env → `'Zaptura'`. This supersedes the global-only env approach for
   white-label tenants while keeping a global fallback.
 - **Dashboard**: `tenant.branding` (display name, logo URL, optional accent color within the
   existing token system) applied at login and in the shell; global defaults when absent.

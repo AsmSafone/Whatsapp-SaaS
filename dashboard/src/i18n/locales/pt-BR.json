@@ -210,7 +210,7 @@
     "connectionError": "Não foi possível conectar ao servidor. Por favor, tente novamente.",
     "help": "Precisa de ajuda?",
     "viewDocs": "Ver documentação",
-    "footer": "Feito com ❤️ por Yudhi Armyndharis e a comunidade Zaptura",
+    "footer": "Feito com ❤️ por Yudhi Aasmsafone e a comunidade Zaptura",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -551,13 +551,11 @@
     "rolesTitle": "Referência de funções",
     "roles": {
       "admin": "Administrador",
-      "operator": "Operador",
-      "viewer": "Visualizador"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "Acesso completo a todos os recursos",
-      "operator": "Gerenciamento de sessões e mensagens",
-      "viewer": "Acesso somente leitura"
+      "user": "User access"
     },
     "columns": {
       "name": "Nome",

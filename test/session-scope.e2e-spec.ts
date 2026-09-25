@@ -29,7 +29,7 @@ describe('Session-scoped query endpoints (e2e)', () => {
   let nameB: string;
   let scopedKey: string; // ADMIN, allowedSessions: [sessA]
   let adminKey: string; // ADMIN, unrestricted
-  let throwawayId: string; // a VIEWER key used as the :id target for key-management routes
+  let throwawayId: string; // a USER key used as the :id target for key-management routes
   let auditRepo: Repository<AuditLog>;
 
   beforeAll(async () => {
@@ -71,7 +71,7 @@ describe('Session-scoped query endpoints (e2e)', () => {
       await authService.createApiKey({ name: 'e2e-scoped', role: ApiKeyRole.ADMIN, allowedSessions: [sessA] })
     ).rawKey;
     adminKey = (await authService.createApiKey({ name: 'e2e-admin', role: ApiKeyRole.ADMIN })).rawKey;
-    throwawayId = (await authService.createApiKey({ name: 'e2e-throwaway', role: ApiKeyRole.VIEWER })).apiKey.id;
+    throwawayId = (await authService.createApiKey({ name: 'e2e-throwaway', role: ApiKeyRole.USER })).apiKey.id;
   });
 
   afterAll(async () => {
@@ -222,7 +222,7 @@ describe('Session-scoped query endpoints (e2e)', () => {
       const created = await request(app.getHttpServer())
         .post('/api/auth/api-keys')
         .set('X-API-Key', adminKey)
-        .send({ name: 'e2e-lifecycle', role: 'viewer' })
+        .send({ name: 'e2e-lifecycle', role: 'user' })
         .expect(201);
       const id = (created.body as { id: string }).id;
       await request(app.getHttpServer())
@@ -297,7 +297,7 @@ describe('Session-scoped query endpoints (e2e)', () => {
       await request(app.getHttpServer())
         .put(`/api/auth/api-keys/${soleAdminId}`)
         .set('X-API-Key', soleAdminKey)
-        .send({ role: 'operator' })
+        .send({ role: 'user' })
         .expect(409);
     });
 

@@ -16,7 +16,7 @@ function createMockApiKey(overrides: Partial<ApiKey> = {}): ApiKey {
     name: 'Test Key',
     keyHash: 'hash',
     keyPrefix: 'zap_k1_xxxx',
-    role: ApiKeyRole.OPERATOR,
+    role: ApiKeyRole.USER,
     allowedIps: null,
     allowedSessions: null,
     allowedChats: null,
@@ -193,7 +193,7 @@ describe('ApiKeyGuard', () => {
       .mockReturnValueOnce(false) // not public
       .mockReturnValueOnce(ApiKeyRole.ADMIN); // required role = ADMIN
 
-    const apiKey = createMockApiKey({ role: ApiKeyRole.VIEWER });
+    const apiKey = createMockApiKey({ role: ApiKeyRole.USER });
     (authService.validateApiKey as jest.Mock).mockResolvedValue(apiKey);
     (authService.hasPermission as jest.Mock).mockReturnValue(false);
 
@@ -241,7 +241,7 @@ describe('ApiKeyGuard', () => {
     };
 
     it('stamps the key on an insufficient-role denial', async () => {
-      const apiKey = createMockApiKey({ id: 'key-uuid-1', name: 'Reporting key', role: ApiKeyRole.VIEWER });
+      const apiKey = createMockApiKey({ id: 'key-uuid-1', name: 'Reporting key', role: ApiKeyRole.USER });
       (authService.hasPermission as jest.Mock).mockReturnValue(false);
 
       const actor = await actorAfterDenial(() => {

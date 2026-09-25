@@ -20,9 +20,9 @@ const PG_OPTIONS: DataSourceOptions = {
   type: 'postgres',
   host: 'db',
   port: 5432,
-  username: 'openwa',
+  username: 'zaptura',
   password: 'secret',
-  database: 'openwa',
+  database: 'zaptura',
   // The app config still carries this; the factory takes over execution and must neutralize it.
   migrationsRun: true,
   migrationsTransactionMode: 'all',
@@ -135,9 +135,9 @@ describe('createBootDataSource (postgres boot migrations)', () => {
       expect.objectContaining({
         host: 'db',
         port: 5432,
-        user: 'openwa',
+        user: 'zaptura',
         password: 'secret',
-        database: 'openwa',
+        database: 'zaptura',
         connectionTimeoutMillis: 10000,
         options: '-c statement_timeout=0',
       }),
@@ -177,7 +177,7 @@ describe('createBootDataSource (postgres boot migrations)', () => {
   });
 
   it('keeps the default @nestjs/typeorm path for non-postgres options (no lock, no initialize)', async () => {
-    const sqliteOptions: DataSourceOptions = { type: 'better-sqlite3', database: './data/openwa.sqlite' };
+    const sqliteOptions: DataSourceOptions = { type: 'better-sqlite3', database: './data/zaptura.sqlite' };
     const dataSource = {
       initialize: jest.fn(() => Promise.resolve()),
       runMigrations: jest.fn(() => Promise.resolve()),
@@ -318,8 +318,8 @@ describe('createBootDataSource (postgres boot migrations)', () => {
       expect(clientCtor).toHaveBeenCalledWith(
         expect.objectContaining({
           host: 'db',
-          user: 'openwa',
-          database: 'openwa',
+          user: 'zaptura',
+          database: 'zaptura',
           options: '-c statement_timeout=0',
         }),
       );

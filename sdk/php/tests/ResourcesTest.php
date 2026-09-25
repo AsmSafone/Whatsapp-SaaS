@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Tests;
+namespace Zaptura\Tests;
 
-use OpenWA\Exceptions\OpenWANotFoundException;
+use Zaptura\Exceptions\ZapturaNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class ResourcesTest extends TestCase
@@ -485,7 +485,7 @@ class ResourcesTest extends TestCase
             'message' => 'Status media not found or expired',
             'error' => 'Not Found',
         ]);
-        $this->expectException(OpenWANotFoundException::class);
+        $this->expectException(ZapturaNotFoundException::class);
         $backend->makeClient()->status->media('s', 'w1');
     }
 

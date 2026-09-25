@@ -517,6 +517,132 @@
 }
 
 /* ================= Interactive Simulator ================= */
+.zp-shell .zp-mobile-view-tabs {
+  display: none;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.35rem;
+  margin-bottom: 1.5rem;
+  gap: 0.35rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.zp-shell .zp-mobile-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zp-shell .zp-mobile-tab-btn.active {
+  background: #10b981;
+  color: #022c22;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.zp-shell .zp-scenario-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.65rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.zp-shell .zp-scenario-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.zp-shell .zp-scenario-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-scenario-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.zp-shell .zp-scenario-btn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-scenario-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.zp-shell .zp-scenario-btn.active {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+.zp-shell .zp-scenario-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.zp-shell .zp-demo-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #34d399;
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  animation: zpToastFade 0.25s ease-out;
+}
+
+@keyframes zpToastFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .zp-shell .zp-sim-layout {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
@@ -640,9 +766,41 @@
 
 .zp-shell .zp-sim-payload-box {
   background: #020617;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.zp-shell .zp-payload-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.zp-shell .zp-payload-tab {
+  flex: 1;
+  padding: 0.65rem 0.85rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #64748b;
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.zp-shell .zp-payload-tab:hover {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.zp-shell .zp-payload-tab.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.06);
 }
 
 .zp-shell .zp-payload-header {
@@ -664,12 +822,13 @@
 
 .zp-shell .zp-payload-code {
   margin: 0;
-  padding: 0.9rem;
+  padding: 1rem;
   color: #38bdf8;
   font-family: 'Fira Code', monospace;
   font-size: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-x: auto;
+  max-height: 280px;
 }
 
 /* ================= WhatsApp iPhone Mockup ================= */
@@ -684,15 +843,14 @@
   background: #0b141a;
   border: 11px solid #1a232f;
   outline: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 50px;
+  border-radius: 48px;
   box-shadow:
     0 0 0 1px #090d14,
     0 25px 65px -10px rgba(0, 0, 0, 0.9),
     0 0 45px rgba(16, 185, 129, 0.12);
-  width: 360px;
+  width: 375px;
   max-width: 100%;
-  height: 720px;
-  aspect-ratio: 9 / 19.2;
+  height: clamp(560px, 82vh, 720px);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -960,59 +1118,227 @@
   color: #53bdeb;
 }
 
+.zp-shell .zp-wa-avatar {
+  position: relative;
+}
+
+.zp-shell .zp-wa-avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border: 2px solid #111b21;
+  border-radius: 50%;
+}
+
+.zp-shell .zp-wa-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.zp-shell .zp-wa-icon-action {
+  background: transparent;
+  border: none;
+  color: #8696a0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.zp-shell .zp-wa-icon-action:hover {
+  color: #00a884;
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .zp-shell .zp-wa-media-preview {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 0.5rem;
-  border-radius: 8px;
-  margin-bottom: 0.35rem;
-  font-size: 0.8rem;
+  gap: 0.65rem;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.55rem;
+  border-radius: 10px;
+  margin-bottom: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.zp-shell .zp-media-icon {
   color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-wa-media-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.zp-shell .zp-wa-media-info strong {
+  font-size: 0.8rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.zp-shell .zp-wa-media-info small {
+  font-size: 0.68rem;
+  color: #8696a0;
 }
 
 .zp-shell .zp-wa-doc-preview {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.65rem;
   background: rgba(0, 0, 0, 0.25);
-  padding: 0.5rem;
-  border-radius: 8px;
-  margin-bottom: 0.35rem;
+  padding: 0.55rem;
+  border-radius: 10px;
+  margin-bottom: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .zp-shell .zp-doc-icon {
   color: #f87171;
+  flex-shrink: 0;
 }
 
-.zp-shell .zp-wa-doc-preview strong {
+.zp-shell .zp-wa-doc-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.zp-shell .zp-wa-doc-info strong {
   display: block;
   font-size: 0.8rem;
   color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.zp-shell .zp-wa-doc-preview small {
-  font-size: 0.7rem;
+.zp-shell .zp-wa-doc-info small {
+  font-size: 0.68rem;
   color: #8696a0;
 }
 
-.zp-shell .zp-wa-voice-preview {
+/* Voice message card with real audio simulation */
+.zp-shell .zp-wa-voice-card {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 0.4rem 0.6rem;
-  border-radius: 8px;
-  margin-bottom: 0.35rem;
-  font-size: 0.8rem;
+  gap: 0.65rem;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.5rem 0.7rem;
+  border-radius: 12px;
+  margin-bottom: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.zp-shell .zp-wave-bar {
-  flex: 1;
-  height: 4px;
+.zp-shell .zp-wa-voice-play-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   background: #00a884;
-  border-radius: 2px;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.35);
+}
+
+.zp-shell .zp-wa-voice-play-btn:hover {
+  transform: scale(1.08);
+  background: #008f6f;
+}
+
+.zp-shell .zp-play-icon {
+  margin-left: 2px;
+}
+
+.zp-shell .zp-wa-voice-waveform {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.zp-shell .zp-wa-wave-visual {
+  height: 12px;
+  background: linear-gradient(90deg, #00a884, #00a884) no-repeat;
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  position: relative;
+  transition: background-size 0.3s linear;
+}
+
+.zp-shell .zp-wa-wave-visual.playing {
+  animation: zpPulseWave 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes zpPulseWave {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+.zp-shell .zp-wa-voice-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #8696a0;
+}
+
+.zp-shell .zp-wa-voice-tag {
+  color: #00a884;
+  font-weight: 600;
+}
+
+/* Clickable Interactive WhatsApp Buttons inside message */
+.zp-shell .zp-wa-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.45rem;
+}
+
+.zp-shell .zp-wa-action-btn {
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #53bdeb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.zp-shell .zp-wa-action-btn:hover {
+  background: rgba(83, 189, 235, 0.16);
+  border-color: #53bdeb;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.zp-shell .zp-wa-action-btn:active {
+  transform: translateY(0);
 }
 
 .zp-shell .zp-wa-typing-bubble {
@@ -1055,12 +1381,19 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .zp-shell .zp-wa-attach-btn {
+  background: transparent;
+  border: none;
   color: #8696a0;
   cursor: pointer;
   flex-shrink: 0;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.2s;
 }
 
@@ -1068,27 +1401,60 @@
   color: #00a884;
 }
 
-.zp-shell .zp-wa-mock-input {
+.zp-shell .zp-wa-input-container {
   flex: 1;
   background: #2a3942;
-  border-radius: 20px;
-  padding: 0.45rem 0.85rem;
-  font-size: 0.8rem;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  gap: 0.4rem;
+}
+
+.zp-shell .zp-wa-emoji-icon {
   color: #8696a0;
-  user-select: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-wa-real-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e9edef;
+  font-size: 0.85rem;
+  font-family: inherit;
+  padding: 0.5rem 0;
+}
+
+.zp-shell .zp-wa-real-input::placeholder {
+  color: #8696a0;
 }
 
 .zp-shell .zp-wa-send-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: #00a884;
-  color: #ffffff;
+  background: #2a3942;
+  border: none;
+  color: #8696a0;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 168, 132, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zp-shell .zp-wa-send-btn.active {
+  background: #00a884;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 168, 132, 0.45);
+}
+
+.zp-shell .zp-wa-send-btn:hover {
+  transform: scale(1.06);
 }
 
 .zp-shell .zp-iphone-home-indicator {
@@ -1516,8 +1882,8 @@
 .zp-shell .zp-pricing-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  max-width: 1040px;
+  gap: 1.5rem;
+  max-width: 1260px;
   margin: 0 auto;
   align-items: stretch;
 }
@@ -1525,8 +1891,8 @@
 .zp-shell .zp-pricing-card {
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 1.75rem 1.25rem;
+  border-radius: 18px;
+  padding: 2.25rem 1.65rem;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -1980,6 +2346,15 @@
 
 /* ================= Responsive Breakpoints ================= */
 
+@media (max-width: 1180px) {
+  .zp-shell .zp-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 760px;
+    gap: 1.5rem;
+    margin: 0 auto;
+  }
+}
+
 /* ---- Tablet / narrow desktop (≤ 992px) ---- */
 @media (max-width: 992px) {
   /* Nav */
@@ -2340,38 +2715,43 @@
     font-size: 2.25rem;
   }
 
-  /* Phone mockup */
+  /* Phone mockup mobile responsiveness */
   .zp-shell .zp-phone-wrapper {
-    width: 310px;
-    height: 620px;
-    max-width: 100%;
-    border-radius: 44px;
-    border-width: 9px;
+    width: 100%;
+    max-width: 340px;
+    height: clamp(480px, 80vh, 620px);
+    border-radius: 40px;
+    border-width: 8px;
+    outline: none;
     box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.85);
   }
+  .zp-shell .zp-phone-wrapper::before,
+  .zp-shell .zp-phone-wrapper::after {
+    display: none;
+  }
   .zp-shell .zp-iphone-status-bar {
-    height: 38px;
+    height: 36px;
     padding: 0 0.85rem;
   }
   .zp-shell .zp-iphone-island {
-    width: 82px;
-    height: 20px;
+    width: 78px;
+    height: 18px;
   }
   .zp-shell .zp-iphone-island-cam {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
   }
   .zp-shell .zp-wa-header {
-    padding: 0.5rem 0.65rem;
-    gap: 0.4rem;
+    padding: 0.45rem 0.65rem;
+    gap: 0.35rem;
   }
   .zp-shell .zp-wa-avatar {
-    width: 30px;
-    height: 30px;
-    font-size: 0.725rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
   }
   .zp-shell .zp-wa-contact h4 {
-    font-size: 0.8rem;
+    font-size: 0.825rem;
   }
   .zp-shell .zp-wa-status {
     font-size: 0.65rem;
@@ -2385,9 +2765,21 @@
     gap: 0.5rem;
   }
   .zp-shell .zp-wa-bubble {
-    max-width: 92%;
-    padding: 0.45rem 0.65rem;
+    max-width: 90%;
+    padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
+  }
+  .zp-shell .zp-wa-action-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  .zp-shell .zp-wa-voice-card {
+    padding: 0.4rem 0.5rem;
+    gap: 0.5rem;
+  }
+  .zp-shell .zp-wa-voice-play-btn {
+    width: 28px;
+    height: 28px;
   }
   .zp-shell .zp-wa-security-alert {
     font-size: 0.6rem;
@@ -2395,22 +2787,25 @@
   }
   .zp-shell .zp-wa-footer {
     padding: 0.45rem 0.65rem;
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
-  .zp-shell .zp-wa-mock-input {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.6rem;
+  .zp-shell .zp-wa-input-container {
+    padding: 0 0.55rem;
+  }
+  .zp-shell .zp-wa-real-input {
+    font-size: 0.775rem;
+    padding: 0.4rem 0;
   }
   .zp-shell .zp-wa-send-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
   .zp-shell .zp-iphone-home-indicator {
-    padding-bottom: 6px;
+    padding-bottom: 5px;
     padding-top: 3px;
   }
   .zp-shell .zp-iphone-home-pill {
-    width: 90px;
+    width: 85px;
     height: 4px;
   }
 }

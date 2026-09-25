@@ -41,9 +41,9 @@ test('startup validation: 429/5xx keeps the cached role (transient failure, not 
 });
 
 test('startup validation: ok + role refreshes the cached role from the server', () => {
-  assert.deepEqual(resolveStartupValidation(200, { valid: true, role: 'viewer' }), {
+  assert.deepEqual(resolveStartupValidation(200, { valid: true, role: 'user' }), {
     action: 'role',
-    role: 'viewer',
+    role: 'user',
   });
 });
 
@@ -53,9 +53,9 @@ test('startup validation: ok without a usable role keeps the cached role', () =>
   assert.deepEqual(resolveStartupValidation(200, null), { action: 'keep' });
 });
 
-test('isUserRole accepts exactly the three known roles', () => {
-  assert.deepEqual(['admin', 'operator', 'viewer'].filter(isUserRole), ['admin', 'operator', 'viewer']);
-  for (const value of ['superuser', '', undefined, null, 42, 'ADMIN']) {
+test('isUserRole accepts exactly the known roles', () => {
+  assert.deepEqual(['admin', 'user'].filter(isUserRole), ['admin', 'user']);
+  for (const value of ['operator', 'viewer', 'superuser', '', undefined, null, 42, 'ADMIN']) {
     assert.equal(isUserRole(value), false, `expected ${String(value)} to be rejected`);
   }
 });
@@ -65,8 +65,8 @@ test('isUserRole accepts exactly the three known roles', () => {
 // saved key). Harness mirrors Infrastructure.test.ts: jsdom globals, a fetch stub recording every
 // call, i18n catalogues awaited before render. App brings its own providers, so no wrapper here.
 
-const LOGIN_KEY = 'openwa_api_key';
-const ROLE_KEY = 'openwa_user_role';
+const LOGIN_KEY = 'zaptura_api_key';
+const ROLE_KEY = 'zaptura_user_role';
 
 interface FetchCall {
   method: string;
@@ -78,7 +78,7 @@ const fetchCalls: FetchCall[] = [];
 // Per-test body for POST /auth/validate. The home page's stats endpoints need their object shapes
 // ([] would crash Dashboard's overview render); every other request gets an empty list, which the
 // post-login pages' React Query hooks tolerate.
-let validateBody: { valid?: boolean; role?: string } = { valid: true, role: 'operator' };
+let validateBody: { valid?: boolean; role?: string } = { valid: true, role: 'user' };
 
 function installFetchStub(): void {
   globalThis.fetch = (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
@@ -151,7 +151,7 @@ afterEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   fetchCalls.length = 0;
-  validateBody = { valid: true, role: 'operator' };
+  validateBody = { valid: true, role: 'user' };
   window.history.replaceState(null, '', '/login');
 });
 
@@ -176,23 +176,23 @@ test('a fresh sign-in makes exactly one /auth/validate request, feeding the role
   // The login page's own validate is the one request; the startup re-validation effect must not
   // re-fire on the null→key transition that storing the fresh key causes.
   assert.equal(validateCallCount(), 1);
-  assert.equal(localStorage.getItem(ROLE_KEY), 'operator');
+  assert.equal(localStorage.getItem(ROLE_KEY), 'user');
   assert.equal(sessionStorage.getItem(LOGIN_KEY), 'fresh-key');
 });
 
-test('a fresh sign-in with a role-less validate response still degrades to viewer', async () => {
+test('a fresh sign-in with a role-less validate response still degrades to user', async () => {
   validateBody = { valid: true };
   rtl.render(createElement(App));
 
   await signIn('fresh-key');
 
   assert.equal(validateCallCount(), 1);
-  assert.equal(localStorage.getItem(ROLE_KEY), 'viewer');
+  assert.equal(localStorage.getItem(ROLE_KEY), 'user');
 });
 
 test('a page reload with a saved key re-validates once at startup and refreshes the cached role', async () => {
   sessionStorage.setItem(LOGIN_KEY, 'saved-key');
-  localStorage.setItem(ROLE_KEY, 'viewer'); // stale cached role
+  localStorage.setItem(ROLE_KEY, 'user'); // stale cached role
   validateBody = { valid: true, role: 'admin' };
   rtl.render(createElement(App));
 

@@ -54,7 +54,7 @@ describe('App smoke (e2e)', () => {
 
   it('GET /api/health withholds the version without credentials, discloses it to a valid key', async () => {
     const authService = app.get(AuthService);
-    const { rawKey } = await authService.createApiKey({ name: 'e2e-health', role: ApiKeyRole.VIEWER });
+    const { rawKey } = await authService.createApiKey({ name: 'e2e-health', role: ApiKeyRole.USER });
 
     await request(app.getHttpServer())
       .get('/api/health')
@@ -132,7 +132,7 @@ describe('App RED metrics (e2e)', () => {
 
     const authService = app.get(AuthService);
     adminKey = (await authService.createApiKey({ name: 'e2e-red-admin', role: ApiKeyRole.ADMIN })).rawKey;
-    viewerKey = (await authService.createApiKey({ name: 'e2e-red-viewer', role: ApiKeyRole.VIEWER })).rawKey;
+    userKey = (await authService.createApiKey({ name: 'e2e-red-user', role: ApiKeyRole.USER })).rawKey;
 
     // The store is process-wide; count only this suite's requests from here on.
     resetHttpRequestMetrics();
@@ -159,9 +159,9 @@ describe('App RED metrics (e2e)', () => {
     expect(totalRequests()).toBe(2);
   });
 
-  it('records a role-denied request (403, viewer key on an admin route)', async () => {
-    await request(app.getHttpServer()).get('/api/auth/api-keys').set('X-API-Key', viewerKey).expect(403);
-    expect(counter('GET', '/api/auth/api-keys', '403')).toBe(1);
+  it('records a role-denied request (403, user key on an admin route)', async () => {
+    await request(app.getHttpServer()).get('/api/infra/config').set('X-API-Key', userKey).expect(403);
+    expect(counter('GET', '/api/infra/config', '403')).toBe(1);
     expect(totalRequests()).toBe(3);
   });
 

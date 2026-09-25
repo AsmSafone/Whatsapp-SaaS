@@ -1,6 +1,6 @@
-# OpenWA Java SDK
+# Zaptura Java SDK
 
-Official Java client for the [OpenWA](https://github.com/rmyndharis/OpenWA)
+Official Java client for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS)
 WhatsApp API Gateway.
 
 Hand-written against the exact API surface (paths, DTOs, response shapes) and
@@ -14,8 +14,8 @@ Java 17+, one runtime dependency ([Gson](https://github.com/google/gson)).
 
 ```xml
 <dependency>
-  <groupId>com.rmyndharis</groupId>
-  <artifactId>openwa</artifactId>
+  <groupId>com.asmsafone</groupId>
+  <artifactId>zaptura</artifactId>
   <version>0.5.0</version>
 </dependency>
 ```
@@ -23,24 +23,24 @@ Java 17+, one runtime dependency ([Gson](https://github.com/google/gson)).
 **Gradle**
 
 ```groovy
-implementation 'com.rmyndharis:openwa:0.5.0'
+implementation 'com.asmsafone:zaptura:0.5.0'
 ```
 
 ## Quickstart
 
 ```java
-import com.rmyndharis.openwa.OpenWAClient;
-import com.rmyndharis.openwa.model.MessageResponse;
-import com.rmyndharis.openwa.model.SendTextRequest;
+import com.asmsafone.zaptura.ZapturaClient;
+import com.asmsafone.zaptura.model.MessageResponse;
+import com.asmsafone.zaptura.model.SendTextRequest;
 
-OpenWAClient client = new OpenWAClient("http://localhost:2785", "zap_k1_…");
+ZapturaClient client = new ZapturaClient("http://localhost:2785", "zap_k1_…");
 
 client.sessions.start("my-session");
 
 MessageResponse result = client.messages.sendText("my-session",
     SendTextRequest.builder()
         .chatId("628123456789@c.us")
-        .text("Hello from the OpenWA Java SDK!")
+        .text("Hello from the Zaptura Java SDK!")
         .build());
 
 System.out.println(result.messageId());
@@ -50,10 +50,10 @@ For full control over configuration (timeout, default headers, a custom
 transport), build a `ClientConfig`:
 
 ```java
-import com.rmyndharis.openwa.ClientConfig;
+import com.asmsafone.zaptura.ClientConfig;
 import java.time.Duration;
 
-OpenWAClient client = new OpenWAClient(ClientConfig.builder()
+ZapturaClient client = new ZapturaClient(ClientConfig.builder()
     .baseUrl("https://wa.example.com")
     .apiKey("zap_k1_…")
     .timeout(Duration.ofSeconds(15))
@@ -70,7 +70,7 @@ and PHP SDKs:
 `profile` · `calls` · `media`,
 plus `client.auth()`.
 
-Operator-only modules (`docker`, `metrics`, `infra`, `plugins`, `mcp`) are
+Admin-only modules (`docker`, `metrics`, `infra`, `plugins`, `mcp`) are
 intentionally not exposed; all user-facing resources are.
 
 ## Error handling
@@ -79,31 +79,31 @@ Errors are a typed, unchecked hierarchy — branch with `instanceof` or on
 `.status()`:
 
 ```java
-import com.rmyndharis.openwa.errors.OpenWAConflictError;
-import com.rmyndharis.openwa.errors.OpenWANotFoundError;
+import com.asmsafone.zaptura.errors.ZapturaConflictError;
+import com.asmsafone.zaptura.errors.ZapturaNotFoundError;
 
 try {
     client.messages.sendText("my-session", body);
-} catch (OpenWAConflictError e) {
+} catch (ZapturaConflictError e) {
     // 409 — engine not ready
-} catch (OpenWANotFoundError e) {
+} catch (ZapturaNotFoundError e) {
     // 404 — session or chat not found
 }
 ```
 
 | Class                           | HTTP | Meaning                                                 |
 | ------------------------------- | ---- | ------------------------------------------------------- |
-| `OpenWAAuthError`               | 401  | Missing or invalid API key                              |
-| `OpenWAForbiddenError`          | 403  | API key role insufficient                               |
-| `OpenWANotFoundError`           | 404  | Resource not found                                      |
-| `OpenWAConflictError`           | 409  | Engine not ready                                        |
-| `OpenWARateLimitError`          | 429  | Rate limited                                            |
-| `OpenWANotImplementedError`     | 501  | Active engine does not support the call                 |
-| `OpenWAServiceUnavailableError` | 503  | Engine did not confirm in time — the only retryable one |
-| `OpenWAApiError`                | —    | Any other non-2xx (carries `.status()`)                 |
-| `OpenWATimeoutError`            | —    | Request exceeded the configured timeout                 |
+| `ZapturaAuthError`               | 401  | Missing or invalid API key                              |
+| `ZapturaForbiddenError`          | 403  | API key role insufficient                               |
+| `ZapturaNotFoundError`           | 404  | Resource not found                                      |
+| `ZapturaConflictError`           | 409  | Engine not ready                                        |
+| `ZapturaRateLimitError`          | 429  | Rate limited                                            |
+| `ZapturaNotImplementedError`     | 501  | Active engine does not support the call                 |
+| `ZapturaServiceUnavailableError` | 503  | Engine did not confirm in time — the only retryable one |
+| `ZapturaApiError`                | —    | Any other non-2xx (carries `.status()`)                 |
+| `ZapturaTimeoutError`            | —    | Request exceeded the configured timeout                 |
 
-All extend `OpenWAError` (a `RuntimeException`). In a routed deployment only 503 proves the request was never carried out: a forward that fails after the request reached the owner node answers 502 or 504.
+All extend `ZapturaError` (a `RuntimeException`). In a routed deployment only 503 proves the request was never carried out: a forward that fails after the request reached the owner node answers 502 or 504.
 
 ## Reliability & security
 
@@ -113,7 +113,7 @@ All extend `OpenWAError` (a `RuntimeException`). In a routed deployment only 503
 - **No automatic retries.** A failed request throws immediately; wrap calls in
   your own backoff if you need retries (especially for `429`). Inject a custom
   `HttpTransport` for retry or observability middleware.
-- **Redirects are never followed.** A `3xx` surfaces as an `OpenWAApiError`
+- **Redirects are never followed.** A `3xx` surfaces as an `ZapturaApiError`
   rather than being followed, so the API key is never re-sent to a redirect
   target.
 - **Default per-request timeout** is 30 s (configurable). Path segments (chat /
@@ -142,7 +142,7 @@ Sonatype Central Publishing plugin — a plain `mvn verify` never runs any of it
 One-time setup (repository secrets):
 
 - `MAVEN_CENTRAL_USERNAME` / `MAVEN_CENTRAL_PASSWORD` — the two halves of a
-  Sonatype Central Portal user token for the verified `com.rmyndharis`
+  Sonatype Central Portal user token for the verified `com.asmsafone`
   namespace.
 - `GPG_PRIVATE_KEY` — ASCII-armored signing key.
 - `GPG_PASSPHRASE` — passphrase for that key.

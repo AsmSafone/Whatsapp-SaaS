@@ -45,7 +45,7 @@ describe('BullBoardAuthMiddleware', () => {
   });
 
   it('forbids a valid non-admin key', async () => {
-    authService.validateApiKey.mockResolvedValue({ role: ApiKeyRole.OPERATOR });
+    authService.validateApiKey.mockResolvedValue({ role: ApiKeyRole.USER });
     authService.hasPermission.mockReturnValue(false);
     const next = jest.fn();
     await mw.use(reqWith({ 'x-api-key': 'op' }), res, next);
@@ -349,7 +349,7 @@ describe('BullBoardAuthMiddleware audit trail', () => {
   });
 
   it('audits a 403 (valid non-admin key)', async () => {
-    authService.validateApiKey.mockResolvedValue({ role: ApiKeyRole.OPERATOR });
+    authService.validateApiKey.mockResolvedValue({ role: ApiKeyRole.USER });
     authService.hasPermission.mockReturnValue(false);
     const next = jest.fn();
     await mw.use(reqFor('GET', { 'x-api-key': 'op' }, '/api/admin/queues/'), res, next);

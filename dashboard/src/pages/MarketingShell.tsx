@@ -27,7 +27,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
           <div className="zp-nav-links">
             <a href="/#features">Features</a>
-            <a href="/#simulator">Live Demo</a>
+            <a href="/#demo">Live Demo</a>
             <a href="/#how-it-works">How It Works</a>
             <NavLink to="/pricing">Pricing</NavLink>
             <NavLink to="/docs">Documentation</NavLink>
@@ -57,7 +57,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
             <a href="/#features" onClick={close}>
               Features
             </a>
-            <a href="/#simulator" onClick={close}>
+            <a href="/#demo" onClick={close}>
               Live Demo
             </a>
             <a href="/#how-it-works" onClick={close}>
@@ -104,12 +104,9 @@ export function MarketingShell({ children }: MarketingShellProps) {
           <div className="zp-footer-col">
             <h4>Platform</h4>
             <a href="/#features">Features</a>
-            <a href="/#simulator">Interactive Simulator</a>
+            <a href="/#demo">Live Demo</a>
             <a href="/#how-it-works">Architecture</a>
-            <Link to="/pricing">Pricing Plans</Link>
-            <a href="/api/docs" target="_blank" rel="noreferrer">
-              Interactive OpenAPI
-            </a>
+            <Link to="/#pricing">Pricing Plans</Link>
           </div>
 
           <div className="zp-footer-col">

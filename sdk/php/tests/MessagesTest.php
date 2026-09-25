@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Tests;
+namespace Zaptura\Tests;
 
-use OpenWA\Exceptions\OpenWANotFoundException;
+use Zaptura\Exceptions\ZapturaNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class MessagesTest extends TestCase
@@ -172,7 +172,7 @@ class MessagesTest extends TestCase
             'message' => 'Message not found',
             'error' => 'Not Found',
         ]);
-        $this->expectException(OpenWANotFoundException::class);
+        $this->expectException(ZapturaNotFoundException::class);
         $backend->makeClient()->messages->editMessage('s1', ['chatId' => 'a@c.us', 'messageId' => 'missing', 'body' => 'x']);
     }
 

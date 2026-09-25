@@ -64,7 +64,7 @@ export function Pricing() {
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
                     <strong>
-                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Numbers' : 'Number'}
+                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
                   {NX_PLAN_FEATURES.map((feat, idx) => (
@@ -76,7 +76,7 @@ export function Pricing() {
                 </ul>
 
                 <Link
-                  to="/register"
+                  to={`/register?plan=${plan.id}`}
                   className={`zp-btn ${plan.popular ? 'zp-btn-primary' : 'zp-btn-outline'} zp-btn-full`}
                 >
                   <span>{plan.popular ? 'Start Free Trial Now' : 'Select ' + plan.name}</span>

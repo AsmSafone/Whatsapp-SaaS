@@ -375,7 +375,9 @@
 .profile-page .plans-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  gap: 1.5rem;
+  max-width: 1260px;
+  margin: 0 auto;
 }
 
 @media (max-width: 1100px) {

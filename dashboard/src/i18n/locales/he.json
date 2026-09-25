@@ -217,7 +217,7 @@
     "connectionError": "לא ניתן להתחבר לשרת. יש לנסות שוב.",
     "help": "צריך עזרה?",
     "viewDocs": "לצפייה בתיעוד",
-    "footer": "נבנה באהבה על ידי Yudhi Armyndharis וקהילת Zaptura",
+    "footer": "נבנה באהבה על ידי Yudhi Aasmsafone וקהילת Zaptura",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -609,13 +609,11 @@
     "rolesTitle": "מדריך תפקידים",
     "roles": {
       "admin": "Admin",
-      "operator": "Operator",
-      "viewer": "Viewer"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "גישה מלאה לכל המשאבים",
-      "operator": "ניהול Sessions והודעות",
-      "viewer": "גישת קריאה בלבד"
+      "user": "User access"
     },
     "columns": {
       "name": "שם",

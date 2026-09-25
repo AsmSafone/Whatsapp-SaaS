@@ -15,7 +15,6 @@ import {
   Puzzle,
   Sun,
   Moon,
-  Monitor,
   Menu,
   X,
   ChevronLeft,
@@ -51,13 +50,11 @@ const allNavItems = [
   { to: '/profile', icon: User, key: 'profile' as const, adminOnly: false },
 ];
 
-const themeIcons = { light: Sun, dark: Moon, system: Monitor };
-
 export function Layout({ onLogout, userRole }: LayoutProps) {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const ThemeIcon = themeIcons[theme];
-  const themeLabel = t(`theme.${theme}`);
+  const { toggleTheme, resolvedTheme } = useTheme();
+  const ThemeIcon = resolvedTheme === 'dark' ? Moon : Sun;
+  const themeLabel = t(`theme.${resolvedTheme}`);
 
   const navItems = allNavItems.filter(item => !item.adminOnly || userRole === 'admin');
 
@@ -263,7 +260,7 @@ export function Layout({ onLogout, userRole }: LayoutProps) {
           <div className="appearance-menu">
             <button
               className="theme-toggle-btn"
-              onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               title={t('theme.toggleTo', { value: t(resolvedTheme === 'dark' ? 'theme.light' : 'theme.dark') })}
               aria-label={t('theme.toggleTo', { value: t(resolvedTheme === 'dark' ? 'theme.light' : 'theme.dark') })}
             >

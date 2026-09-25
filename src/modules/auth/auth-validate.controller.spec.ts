@@ -5,7 +5,7 @@ describe('AuthValidateController', () => {
   const controller = new AuthValidateController();
 
   const makeKey = (over: Partial<ApiKey> = {}): ApiKey =>
-    ({ id: 'k1', role: ApiKeyRole.OPERATOR, isActive: true, allowedIps: null, ...over }) as ApiKey;
+    ({ id: 'k1', role: ApiKeyRole.USER, isActive: true, allowedIps: null, ...over }) as ApiKey;
 
   it('reports the guard-validated key as valid, echoing its role', () => {
     expect(controller.validate(makeKey({ role: ApiKeyRole.ADMIN }))).toEqual({

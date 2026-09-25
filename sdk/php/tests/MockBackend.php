@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Tests;
+namespace Zaptura\Tests;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use OpenWA\Client as OpenWAClient;
+use Zaptura\Client as ZapturaClient;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -72,9 +72,9 @@ class MockBackend
         return new GuzzleClient(['handler' => HandlerStack::create($recorder)]);
     }
 
-    public function makeClient(string $baseUrl = 'http://localhost:2785', string $apiKey = 'zap_k1_test'): OpenWAClient
+    public function makeClient(string $baseUrl = 'http://localhost:2785', string $apiKey = 'zap_k1_test'): ZapturaClient
     {
-        return new OpenWAClient([
+        return new ZapturaClient([
             'baseUrl' => $baseUrl,
             'apiKey' => $apiKey,
             'httpClient' => $this->httpClient(),

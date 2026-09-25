@@ -21,7 +21,7 @@ function createMockApiKey(overrides: Partial<ApiKey> = {}): ApiKey {
     name: 'Test Key',
     keyHash: hashKey('test-key'),
     keyPrefix: 'test-key-pre',
-    role: ApiKeyRole.OPERATOR,
+    role: ApiKeyRole.USER,
     allowedIps: null,
     allowedSessions: null,
     allowedChats: null,
@@ -237,7 +237,7 @@ describe('AuthService', () => {
       expect(repository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'My Key',
-          role: ApiKeyRole.OPERATOR, // default
+          role: ApiKeyRole.USER, // default
         }),
       );
     });
@@ -303,7 +303,7 @@ describe('AuthService', () => {
       const result = await service.update('uuid-1', { name: 'Updated' });
 
       expect(result.name).toBe('Updated');
-      expect(result.role).toBe(ApiKeyRole.OPERATOR); // unchanged
+      expect(result.role).toBe(ApiKeyRole.USER); // unchanged
     });
 
     it('evicts active WebSocket sockets when allowedSessions narrows', async () => {
@@ -323,7 +323,7 @@ describe('AuthService', () => {
       jest
         .spyOn((service as unknown as { moduleRef: { get: (...a: unknown[]) => unknown } }).moduleRef, 'get')
         .mockReturnValue({ evictApiKey });
-      setupKeys([createMockApiKey({ id: 'uuid-1', role: ApiKeyRole.OPERATOR })]);
+      setupKeys([createMockApiKey({ id: 'uuid-1', role: ApiKeyRole.USER })]);
 
       await service.update('uuid-1', { role: ApiKeyRole.ADMIN });
 
@@ -345,7 +345,7 @@ describe('AuthService', () => {
     it('rejects demoting or expiring the last usable admin', async () => {
       setupKeys([createMockApiKey({ id: 'uuid-1', role: ApiKeyRole.ADMIN })]);
 
-      await expect(service.update('uuid-1', { role: ApiKeyRole.OPERATOR })).rejects.toThrow(/last active admin/i);
+      await expect(service.update('uuid-1', { role: ApiKeyRole.USER })).rejects.toThrow(/last active admin/i);
       await expect(
         service.update('uuid-1', { expiresAt: new Date(Date.now() + 60_000).toISOString() }),
       ).rejects.toThrow(/last active admin/i);
@@ -476,7 +476,7 @@ describe('AuthService', () => {
       setupLiveAdmins('admin-a', 'admin-b');
 
       const results = await Promise.allSettled([
-        service.update('admin-a', { role: ApiKeyRole.OPERATOR }),
+        service.update('admin-a', { role: ApiKeyRole.USER }),
         service.revoke('admin-b'),
       ]);
 
@@ -507,15 +507,15 @@ describe('AuthService', () => {
 
     it('runs non-admin mutations and benign admin updates on unguarded statements', async () => {
       setupKeys([
-        createMockApiKey({ id: 'op-del', role: ApiKeyRole.OPERATOR }),
-        createMockApiKey({ id: 'op-rev', role: ApiKeyRole.OPERATOR }),
-        createMockApiKey({ id: 'op-demote', role: ApiKeyRole.OPERATOR }),
+        createMockApiKey({ id: 'op-del', role: ApiKeyRole.USER }),
+        createMockApiKey({ id: 'op-rev', role: ApiKeyRole.USER }),
+        createMockApiKey({ id: 'op-demote', role: ApiKeyRole.USER }),
         createMockApiKey({ id: 'adm-1', role: ApiKeyRole.ADMIN }),
       ]);
 
       await service.delete('op-del'); // non-admin delete
       await service.revoke('op-rev'); // non-admin revoke
-      await service.update('op-demote', { role: ApiKeyRole.VIEWER }); // demote of a non-admin
+      await service.update('op-demote', { role: ApiKeyRole.USER }); // demote of a non-admin
       await service.update('adm-1', { name: 'renamed' }); // benign update of an admin
 
       // The last-admin guard is bound via andWhere; none of these statements carries it — the
@@ -536,9 +536,9 @@ describe('AuthService', () => {
     // write runs. The write must carry only its own patch — a full-entity save from the stale
     // snapshot would resurrect the concurrent commit.
     it('a rename does not resurrect a concurrent revoke: the write carries only name', async () => {
-      setupKeys([createMockApiKey({ id: 'op-1', role: ApiKeyRole.OPERATOR, isActive: false, name: 'original' })]);
+      setupKeys([createMockApiKey({ id: 'op-1', role: ApiKeyRole.USER, isActive: false, name: 'original' })]);
       (repository.findOne as jest.Mock).mockResolvedValueOnce(
-        createMockApiKey({ id: 'op-1', role: ApiKeyRole.OPERATOR, isActive: true, name: 'original' }), // stale pre-read
+        createMockApiKey({ id: 'op-1', role: ApiKeyRole.USER, isActive: true, name: 'original' }), // stale pre-read
       );
 
       const result = await service.update('op-1', { name: 'renamed' });
@@ -549,9 +549,9 @@ describe('AuthService', () => {
     });
 
     it('a revoke does not clobber a concurrent rename: isActive is the only column written', async () => {
-      setupKeys([createMockApiKey({ id: 'op-1', role: ApiKeyRole.OPERATOR, isActive: true, name: 'renamed-by-peer' })]);
+      setupKeys([createMockApiKey({ id: 'op-1', role: ApiKeyRole.USER, isActive: true, name: 'renamed-by-peer' })]);
       (repository.findOne as jest.Mock).mockResolvedValueOnce(
-        createMockApiKey({ id: 'op-1', role: ApiKeyRole.OPERATOR, isActive: true, name: 'original' }), // stale pre-read
+        createMockApiKey({ id: 'op-1', role: ApiKeyRole.USER, isActive: true, name: 'original' }), // stale pre-read
       );
 
       const result = await service.revoke('op-1');
@@ -592,7 +592,7 @@ describe('AuthService', () => {
     it('rejects demoting the last unscoped admin even while a session-scoped admin survives', async () => {
       setupKeys([unscopedAdmin('admin-a'), scopedAdmin('admin-scoped')]);
 
-      await expect(service.update('admin-a', { role: ApiKeyRole.OPERATOR })).rejects.toThrow(/last active admin/i);
+      await expect(service.update('admin-a', { role: ApiKeyRole.USER })).rejects.toThrow(/last active admin/i);
     });
 
     it('rejects scoping the last unscoped admin — the same capability-stripping as a demotion', async () => {
@@ -622,7 +622,7 @@ describe('AuthService', () => {
       // fails here rather than in production.
       setupKeys([unscopedAdmin('admin-a'), chatScopedAdmin('admin-chat')]);
 
-      await expect(service.update('admin-a', { role: ApiKeyRole.OPERATOR })).rejects.toThrow(/last active admin/i);
+      await expect(service.update('admin-a', { role: ApiKeyRole.USER })).rejects.toThrow(/last active admin/i);
       expect(lastAdminFragments.join(' ')).toContain('allowedChats');
     });
 
@@ -658,7 +658,7 @@ describe('AuthService', () => {
       // mutation has already demoted it. The guard reads the row's CURRENT state inside the
       // statement (the table double below), so there is no spurious conflict — the delete goes
       // through and the demoted key is gone.
-      setupKeys([createMockApiKey({ id: 'admin-a', role: ApiKeyRole.OPERATOR })]);
+      setupKeys([createMockApiKey({ id: 'admin-a', role: ApiKeyRole.USER })]);
       (repository.findOne as jest.Mock).mockResolvedValueOnce(
         createMockApiKey({ id: 'admin-a', role: ApiKeyRole.ADMIN }), // stale pre-read
       );
@@ -1026,21 +1026,21 @@ describe('AuthService', () => {
 
     it('should allow ADMIN to access OPERATOR routes', () => {
       const key = createMockApiKey({ role: ApiKeyRole.ADMIN });
-      expect(service.hasPermission(key, ApiKeyRole.OPERATOR)).toBe(true);
+      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(true);
     });
 
     it('should allow ADMIN to access VIEWER routes', () => {
       const key = createMockApiKey({ role: ApiKeyRole.ADMIN });
-      expect(service.hasPermission(key, ApiKeyRole.VIEWER)).toBe(true);
+      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(true);
     });
 
     it('should deny VIEWER access to OPERATOR routes', () => {
-      const key = createMockApiKey({ role: ApiKeyRole.VIEWER });
-      expect(service.hasPermission(key, ApiKeyRole.OPERATOR)).toBe(false);
+      const key = createMockApiKey({ role: ApiKeyRole.USER });
+      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(false);
     });
 
     it('should deny OPERATOR access to ADMIN routes', () => {
-      const key = createMockApiKey({ role: ApiKeyRole.OPERATOR });
+      const key = createMockApiKey({ role: ApiKeyRole.USER });
       expect(service.hasPermission(key, ApiKeyRole.ADMIN)).toBe(false);
     });
   });

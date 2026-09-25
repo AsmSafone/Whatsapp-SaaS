@@ -177,7 +177,7 @@ export interface ApiKey {
   id: string;
   name: string;
   keyPrefix: string;
-  role: 'admin' | 'operator' | 'viewer';
+  role: 'admin' | 'user';
   allowedIps?: string[];
   allowedSessions?: string[];
   allowedChats?: string[];
@@ -547,7 +547,7 @@ export interface UpdateCheck {
 }
 
 export interface InfraStatus {
-  // `builtIn` = OpenWA's own bundled container is actually running and backing this service (live),
+  // `builtIn` = Zaptura's own bundled container is actually running and backing this service (live),
   // not just the saved intent — falls back to the saved flag when Docker is unavailable. (#488)
   database: { connected: boolean; type: string; host: string; builtIn: boolean };
   redis: { enabled: boolean; connected: boolean; host: string; port: number; builtIn: boolean };
@@ -697,9 +697,17 @@ export interface SearchResults {
 // 401s every request; the never-settling promise halts this request's chain so callers neither flash
 // a generic error toast nor receive an undefined payload while the page navigates away. Otherwise
 // throw an Error carrying the HTTP status and, when the gateway supplied one, its machine code.
+function getStoredApiKey(): string | null {
+  return (
+    sessionStorage.getItem('zaptura_api_key') ||
+    localStorage.getItem('zaptura_api_key')
+  );
+}
+
 async function handleErrorResponse<T>(response: Response): Promise<T> {
   if (response.status === 401) {
-    sessionStorage.removeItem('openwa_api_key');
+    sessionStorage.removeItem('zaptura_api_key');
+    localStorage.removeItem('zaptura_api_key');
     if (typeof window !== 'undefined') {
       window.location.assign('/');
       return new Promise<T>(() => {});
@@ -728,8 +736,8 @@ async function handleErrorResponse<T>(response: Response): Promise<T> {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // Get API key from sessionStorage for authentication
-  const apiKey = sessionStorage.getItem('openwa_api_key');
+  // Get API key from storage for authentication
+  const apiKey = getStoredApiKey();
 
   // For FormData (file uploads) let the browser set multipart/form-data + boundary itself.
   const isFormData = options.body instanceof FormData;
@@ -754,7 +762,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 /** Like {@link request} but returns the raw response text — e.g. a plugin's HTML config-UI bundle. */
 async function requestText(endpoint: string): Promise<string> {
-  const apiKey = sessionStorage.getItem('openwa_api_key');
+  const apiKey = getStoredApiKey();
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: { ...(apiKey ? { 'X-API-Key': apiKey } : {}) },
   });
@@ -770,8 +778,8 @@ async function requestText(endpoint: string): Promise<string> {
 async function requestBlob(endpoint: string): Promise<Blob> {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // Get API key from sessionStorage for authentication
-  const apiKey = sessionStorage.getItem('openwa_api_key');
+  // Get API key from storage for authentication
+  const apiKey = getStoredApiKey();
 
   const headers: HeadersInit = {
     ...(apiKey ? { 'X-API-Key': apiKey } : {}),
@@ -1285,8 +1293,8 @@ export interface CatalogPlugin {
   author?: string;
   license?: string;
   keywords?: string[];
-  minOpenWAVersion?: string;
-  testedOpenWAVersion?: string;
+  minZapturaVersion?: string;
+  testedZapturaVersion?: string;
   homepage?: string;
   download?: string;
   installed: boolean;

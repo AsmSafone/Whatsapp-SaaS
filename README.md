@@ -5,7 +5,7 @@
 <h1 align="center">⚡ Zaptura</h1>
 <p align="center">
   <strong>Autonomous Multi-Tenant WhatsApp SaaS & Developer API Cloud</strong><br />
-  <em>Engineered on top of the high-performance OpenWA core gateway</em>
+  <em>Engineered on top of the high-performance Zaptura core gateway</em>
 </p>
 
 <p align="center">
@@ -20,9 +20,9 @@
 
 ## ⚡ What is Zaptura?
 
-**Zaptura** is a turnkey, multi-tenant WhatsApp SaaS platform and autonomous REST API cloud gateway built on top of OpenWA. It delivers high-throughput WhatsApp automation, multi-session virtualization, isolated per-user accounts, bi-directional webhooks, and AI agent connectors—**with zero per-message fees**.
+**Zaptura** is a turnkey, multi-tenant WhatsApp SaaS platform and autonomous REST API cloud gateway built on top of Zaptura. It delivers high-throughput WhatsApp automation, multi-session virtualization, isolated per-user accounts, bi-directional webhooks, and AI agent connectors—**with zero per-message fees**.
 
-Built on a **pluggable architecture**, OpenWA lets you select database engines (SQLite/PostgreSQL), backup/migration storage backends (Local/S3), and cache layers (disabled/Redis) through configuration rather than application-code changes. Message media itself is returned inline to API and webhook consumers; it is not automatically persisted to the storage backend.
+Built on a **pluggable architecture**, Zaptura lets you select database engines (SQLite/PostgreSQL), backup/migration storage backends (Local/S3), and cache layers (disabled/Redis) through configuration rather than application-code changes. Message media itself is returned inline to API and webhook consumers; it is not automatically persisted to the storage backend.
 
 |                               |                                                                                                                                          |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -31,27 +31,27 @@ Built on a **pluggable architecture**, OpenWA lets you select database engines (
 | 🖥️ **Full Dashboard**         | Modern React UI for session, webhook, and API key management                                                                             |
 | 🔹 **Multi-Session Ready**    | Run multiple WhatsApp sessions concurrently on one instance                                                                              |
 | 🐳 **Docker Native**          | Production-ready with zero configuration                                                                                                 |
-| 🧩 **Official Plugins**       | Chatwoot, Typebot & more as sandboxed plugins on the Integration Fabric — [OpenWA-plugins](https://github.com/rmyndharis/OpenWA-plugins) |
+| 🧩 **Official Plugins**       | Chatwoot, Typebot & more as sandboxed plugins on the Integration Fabric — [Zaptura-plugins](https://github.com/AsmSafone/Whatsapp-SaaS-plugins) |
 | 🔗 **n8n Integration**        | Community nodes for workflow automation                                                                                                  |
-| 🧩 **Community Adapters**     | Third-party integrations (e.g. ioBroker) — see [docs](./docs/23-community-integrations.md)                                               |
-| 🔐 **Session-scoped keys**    | Operator and viewer (reader) tokens can be limited to chosen sessions — or all sessions if none are selected                             |
+| 🧩 **Community Adapters**     | Third-party integrations (e.g. ioBroker)                                                                                                 |
+| 🔐 **Session-scoped keys**    | User tokens can be limited to chosen sessions — or all sessions if none are selected                                                     |
 | 🔒 **Chat-scoped keys**       | Those same tokens can also be limited to chosen chats — a few groups and contacts — so an agent on a shared account sees only its own    |
 
-### Session-scoped operator & viewer tokens
+### Session-scoped user tokens
 
-When you create or edit an **operator** or **viewer** API key in the dashboard, you can tick the WhatsApp sessions that key may use.
+When you create or edit a **user** API key in the dashboard, you can tick the WhatsApp sessions that key may use.
 
 - **No sessions selected** — the key can access every session, including ones created later.
-- **One or more sessions selected** — the key can only list, read, and (for operator) manage those sessions. A request naming any other session returns `401`; session-filtered lists (sessions, audit, webhook delivery failures) return that key's rows rather than an error; and the key-management routes and the queue dashboard, which name no session at all, return `403`.
+- **One or more sessions selected** — the key can only list, read, and manage those sessions. A request naming any other session returns `401`; session-filtered lists (sessions, audit, webhook delivery failures) return that key's rows rather than an error; and the key-management routes and the queue dashboard, which name no session at all, return `403`.
 
 Admin keys stay unscoped in the dashboard so they can keep managing other API keys. The HTTP API still accepts `allowedSessions` on any role if you need that from a client.
 
-### Chat-scoped operator & viewer tokens
+### Chat-scoped user tokens
 
 A session-scoped key still reaches every chat on the sessions it may use. A key can be narrowed further, to **chats** (a chosen set of groups and individual contacts), with `allowedChats` on `POST /auth/api-keys` or `PUT /auth/api-keys/{id}`. The dashboard does not set or show it yet, and editing a key there leaves its chats unchanged.
 
 - **No chats selected** — the key can reach every chat on its sessions.
-- **One or more selected** — the key reaches only those chats. Every authenticated REST route not explicitly marked as safe for a chat-scoped key refuses it with `403` (a request naming a session outside `allowedSessions` still answers `401` first), including routes added in later releases: the refusal is the default. Inside its chats an operator key can do what the marked routes allow, which is more than reading and sending: it can also delete or clear a chat, leave or rename a group, and block the contact. It cannot change who belongs to a group: adding, removing, promoting or demoting participants, answering join requests and reading or resetting the invite link all stay closed.
+- **One or more selected** — the key reaches only those chats. Every authenticated REST route not explicitly marked as safe for a chat-scoped key refuses it with `403` (a request naming a session outside `allowedSessions` still answers `401` first), including routes added in later releases: the refusal is the default. Inside its chats a user key can do what the marked routes allow, which is more than reading and sending: it can also delete or clear a chat, leave or rename a group, and block the contact. It cannot change who belongs to a group: adding, removing, promoting or demoting participants, answering join requests and reading or resetting the invite link all stay closed.
 - **The two scopes are independent** — a key may be limited to sessions, to chats, to both, or to neither.
 
 This lets you point an **AI agent or third-party integration at a shared account** without handing it every chat. Give the agent a key scoped to the few groups (or DMs) it is meant to handle: it can send and reply there, but it cannot list your other chats, read any other DM, message a contact outside its set, or reach the queue dashboard. It reads its chats through `GET /sessions/{sessionId}/messages/{chatId}/history`, which works on whatsapp-web.js only; on Baileys it sees just each chat's last-message preview. It receives no pushed events, so it has to poll. It can still read the session's own status (`GET /sessions/{sessionId}`) so an integration can tell whether it is connected.
@@ -68,7 +68,7 @@ None of this changes the ban-risk guidance below. It limits what a _key_ can rea
 
 ## ⚠️ Before you connect a number — please read
 
-OpenWA is an unofficial, community-maintained gateway. It connects to WhatsApp through **reverse-engineered clients** (the [`whatsapp-web.js`](https://github.com/pedroslopez/whatsapp-web.js) project and [`@whiskeysockets/baileys`](https://github.com/WhiskeySockets/Baileys)), **not** through Meta's official Cloud API. This has real consequences you should understand before you link a phone number.
+Zaptura is an unofficial, community-maintained gateway. It connects to WhatsApp through **reverse-engineered clients** (the [`whatsapp-web.js`](https://github.com/pedroslopez/whatsapp-web.js) project and [`@whiskeysockets/baileys`](https://github.com/WhiskeySockets/Baileys)), **not** through Meta's official Cloud API. This has real consequences you should understand before you link a phone number.
 
 ### What this means in practice
 
@@ -89,21 +89,21 @@ These are practical guardrails, not guarantees — but they materially reduce th
 
 1. **Warm up fresh numbers.** For the first several days, behave like a normal human user: scan the QR, exchange a handful of messages with saved contacts, join a group or two, set a profile photo. Don't blast on day one.
 2. **Don't cold-blast strangers.** Sending the first-ever message to a large batch of numbers that have never messaged you is the single most reliable way to get restricted — on either engine.
-3. **Rate-limit yourself.** OpenWA ships with a configurable rate limiter (`RATE_LIMIT_*` env vars). Use it. A few messages per minute per session is sustainable; "thousands in an hour" is not.
+3. **Rate-limit yourself.** Zaptura ships with a configurable rate limiter (`RATE_LIMIT_*` env vars). Use it. A few messages per minute per session is sustainable; "thousands in an hour" is not.
 4. **Use opted-in recipients.** The safest workloads are replies and alerts to people who already expect to hear from you (OTP to your own users, order updates, support replies).
 5. **Keep a fallback.** For anything auth-critical or revenue-critical, keep an SMS / email / official-Cloud-API path. Do not bet a login flow solely on an unofficial client.
 6. **Mind the hosting IP.** Cheap datacenter IPs are flagged more aggressively than residential ones. A residential proxy (supported per-session via the proxy settings) can help; it is not a license to spam.
 
 ### Known platform behaviour (not bugs)
 
-A few things that look like bugs but are actually server-side WhatsApp policy, not OpenWA defects — we track them separately so we can distinguish them from real bugs:
+A few things that look like bugs but are actually server-side WhatsApp policy, not Zaptura defects — we track them separately so we can distinguish them from real bugs:
 
-- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves OpenWA, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of OpenWA. We track it in [#830](https://github.com/rmyndharis/OpenWA/issues/830).
-- **Accounts that get restricted cannot be "unrestricted" by us.** If WhatsApp disables a number, you need to appeal through their channels — OpenWA has no lever to pull.
+- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves Zaptura, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of Zaptura. We track it in [#830](https://github.com/AsmSafone/Whatsapp-SaaS/issues/830).
+- **Accounts that get restricted cannot be "unrestricted" by us.** If WhatsApp disables a number, you need to appeal through their channels — Zaptura has no lever to pull.
 
 ### Compliance
 
-For any deployment where ethical, legal, or regulatory compliance matters (healthcare, finance, large-scale commercial messaging, anything touching end users in the EU/EEA under DMA/GDPR framings), treat OpenWA as **not approved** and use Meta's [official WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api). OpenWA is an excellent fit for personal projects, internal tooling, automation hobbyists, and learning — it is not a drop-in replacement for the official API in regulated environments.
+For any deployment where ethical, legal, or regulatory compliance matters (healthcare, finance, large-scale commercial messaging, anything touching end users in the EU/EEA under DMA/GDPR framings), treat Zaptura as **not approved** and use Meta's [official WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api). Zaptura is an excellent fit for personal projects, internal tooling, automation hobbyists, and learning — it is not a drop-in replacement for the official API in regulated environments.
 
 📖 For the deeper, maintainer-side risk analysis (protocol-change exposure, dependency strategy, security posture), see [Risk Management (`docs/16`)](./docs/16-risk-management.md).
 
@@ -168,8 +168,8 @@ For any deployment where ethical, legal, or regulatory compliance matters (healt
 
 ```bash
 # Clone and start
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+cd Zaptura
 docker compose -f docker-compose.dev.yml up -d
 
 # Access (the dashboard is bundled into the API image and served on the same port)
@@ -193,8 +193,8 @@ docker compose -f docker-compose.dev.yml up -d
 
 ```bash
 # Clone repository
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+cd Zaptura
 
 # Install the locked dependencies (includes dashboard)
 npm ci
@@ -208,7 +208,7 @@ npm run dev
 # Swagger: http://localhost:2785/api/docs
 ```
 
-Use `npm install` instead when intentionally changing dependencies. OpenWA's committed lockfile uses
+Use `npm install` instead when intentionally changing dependencies. Zaptura's committed lockfile uses
 registry artifacts only, so npm 12 works with its secure default that blocks Git dependencies; do not
 disable that policy globally.
 
@@ -221,7 +221,7 @@ disable that policy globally.
 The production stack never exposes `/var/run/docker.sock` directly to the application container. Instead, a dedicated `docker-proxy` sidecar (based on [`tecnativa/docker-socket-proxy`](https://github.com/Tecnativa/docker-socket-proxy)) acts as the sole gateway to the Docker daemon:
 
 ```
-openwa-api  ──TCP 2375──▶  docker-proxy  ──unix──▶  /var/run/docker.sock
+zaptura-api  ──TCP 2375──▶  docker-proxy  ──unix──▶  /var/run/docker.sock
 ```
 
 Only the operations needed for container orchestration are enabled (`CONTAINERS`, `IMAGES`, `VOLUMES`, `INFO`, `PING`, plus the `POST` method switch). The application connects via the `DOCKER_HOST=tcp://docker-proxy:2375` environment variable, which `DockerService` detects automatically. Note this is an operational gateway, not a fine-grained privilege boundary: with `POST` enabled the proxy admits every method to the enabled paths and cannot scope container-create payloads, so a compromised API container would be host-root-equivalent — see `SECURITY.md` for the full threat model, mitigations, and how to disable the proxy if you don't use the built-in datastore orchestration.
@@ -233,14 +233,14 @@ The production image never runs the Node.js process as root. On startup, the con
 ```
 dumb-init (PID 1)
   └─ docker-entrypoint.sh (root — fixes named-volume ownership via chown)
-       └─ gosu openwa node dist/main  (drops to the openwa user)
+       └─ gosu zaptura node dist/main  (drops to the zaptura user)
 ```
 
 - **dumb-init** is PID 1 and forwards signals (SIGTERM, etc.) for graceful shutdown.
-- **docker-entrypoint.sh** runs as root only long enough to `chown` the named-volume mount points so the `openwa` user can write to them.
+- **docker-entrypoint.sh** runs as root only long enough to `chown` the named-volume mount points so the `zaptura` user can write to them.
 - **gosu** performs a clean `exec`-based privilege drop — no `su` or `sudo` wrappers, so the node process is the direct child of dumb-init.
 
-Named volumes (e.g. `openwa-data`) get their ownership corrected automatically on every start, so no manual `chown` step is needed after volume creation.
+Named volumes (e.g. `zaptura-data`) get their ownership corrected automatically on every start, so no manual `chown` step is needed after volume creation.
 
 ---
 
@@ -267,7 +267,7 @@ docker compose --profile full up -d
 | `full`     | All services above    |
 
 > The dashboard is bundled into the API image and served by NestJS on the API port, so it
-> needs no profile — it is always available wherever `openwa-api` runs. For TLS/public exposure,
+> needs no profile — it is always available wherever `zaptura-api` runs. For TLS/public exposure,
 > put your own reverse proxy (nginx, Caddy, a cloud load balancer, or a k8s Ingress) in front;
 > see the nginx example in `docs/12-troubleshooting-faq.md`.
 
@@ -322,7 +322,7 @@ curl -X POST http://localhost:2785/api/sessions/{sessionId}/messages/send-text \
   -H "X-API-Key: YOUR_API_KEY" \
   -d '{
     "chatId": "628123456789@c.us",
-    "text": "Hello from OpenWA!"
+    "text": "Hello from Zaptura!"
   }'
 ```
 
@@ -348,7 +348,7 @@ curl -X POST http://localhost:2785/api/sessions/{sessionId}/webhooks \
 
 ## 🤖 MCP Server (AI Agents)
 
-OpenWA can expose a **curated set of tools over the [Model Context Protocol](https://modelcontextprotocol.io)** so AI agents (Claude, Cursor, …) can drive WhatsApp. It is **off by default** and **additive** — every REST route keeps working unchanged.
+Zaptura can expose a **curated set of tools over the [Model Context Protocol](https://modelcontextprotocol.io)** so AI agents (Claude, Cursor, …) can drive WhatsApp. It is **off by default** and **additive** — every REST route keeps working unchanged.
 
 Set `MCP_ENABLED=true` to mount a stateless Streamable-HTTP transport at **`POST /mcp`** on the existing server (same port, no extra process). It mounts **25 read-only tools** by default — session, message, contact, group, webhook, label and automation-rule _reads_ — because the surface is read-only unless you opt out. Add `MCP_READONLY=false` to mount all **51 tools**, adding the write tier (send, reply, group operations). Either way it is a focused surface rather than the full API, so agents aren't overwhelmed.
 
@@ -361,7 +361,7 @@ Point an MCP client at it (e.g. for Claude Code, a `.mcp.json` at your project r
 ```json
 {
   "mcpServers": {
-    "openwa": {
+    "zaptura": {
       "type": "http",
       "url": "http://localhost:2785/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_KEY" }
@@ -374,7 +374,7 @@ The key can be passed as `Authorization: Bearer …` or `X-API-Key: …`. Every 
 
 **Security guidance:**
 
-- **Mint a dedicated, least-privilege key** for the agent — a non-admin, **session-scoped** key (`OPERATOR` role at most). The plaintext key is shown only once on creation; to rotate, create a new key and delete the old one.
+- **Mint a dedicated, least-privilege key** for the agent — a non-admin, **session-scoped** key (`USER` role). The plaintext key is shown only once on creation; to rotate, create a new key and delete the old one.
 - The key **must not** carry an IP allow-list (`allowedIps`) — there is no genuine client IP over MCP, so such a key is rejected.
 - Set **`MCP_READONLY=true`** to mount only the read tools (no sends/writes).
 - Set **`MCP_RATE_LIMIT_MAX`** (default `60`) to limit tool calls per API key per window.
@@ -402,7 +402,7 @@ The key can be passed as `Authorization: Bearer …` or `X-API-Key: …`. Every 
 ## 📁 Project Structure
 
 ```
-openwa/
+zaptura/
 ├── src/
 │   ├── main.ts                 # Application entry point
 │   ├── app.module.ts           # Root module
@@ -473,12 +473,12 @@ See [LICENSE](./LICENSE) for details.
 
 <div align="center">
 
-**OpenWA** – Free, Open Source WhatsApp API Gateway
+**Zaptura** – Free, Open Source WhatsApp API Gateway
 
-[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🐛 Report Bug](https://github.com/rmyndharis/OpenWA/issues) · [💡 Request Feature](https://github.com/rmyndharis/OpenWA/issues)
+[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🐛 Report Bug](https://github.com/AsmSafone/Whatsapp-SaaS/issues) · [💡 Request Feature](https://github.com/AsmSafone/Whatsapp-SaaS/issues)
 
 <br/>
 
-<sub>Made with ❤️ by <a href="https://github.com/rmyndharis">Yudhi Armyndharis</a> and the OpenWA Community</sub>
+<sub>Made with ❤️ by <a href="https://github.com/asmsafone">Yudhi Aasmsafone</a> and the Zaptura Community</sub>
 
 </div>

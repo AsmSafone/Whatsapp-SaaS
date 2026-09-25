@@ -106,7 +106,7 @@ const MIN_PROD_MASTER_KEY_LENGTH = 32;
 
 /** Known weak/default/placeholder secret values that must never reach production. */
 const FORBIDDEN_PROD_SECRETS = new Set([
-  'openwa',
+  'zaptura',
   'minioadmin',
   'your-secure-password',
   'dev-master-key',
@@ -158,7 +158,7 @@ export interface SecretCheckEnv {
   nodeEnv?: string;
   databaseType?: string;
   databasePassword?: string;
-  /** POSTGRES_BUILTIN — when 'true', OpenWA runs the bundled Postgres on the internal-only network. */
+  /** POSTGRES_BUILTIN — when 'true', Zaptura runs the bundled Postgres on the internal-only network. */
   postgresBuiltIn?: string;
   /** DATABASE_HOST — used to confirm a built-in exemption really points at the internal `postgres`. */
   databaseHost?: string;
@@ -167,7 +167,7 @@ export interface SecretCheckEnv {
   s3SecretKey?: string;
   /** S3_ENDPOINT — used to confirm a built-in exemption really points at the internal `minio`. */
   s3Endpoint?: string;
-  /** MINIO_BUILTIN — when 'true', OpenWA runs the bundled MinIO on the internal-only network. */
+  /** MINIO_BUILTIN — when 'true', Zaptura runs the bundled MinIO on the internal-only network. */
   minioBuiltIn?: string;
   apiMasterKey?: string;
   /** ALLOW_DEV_API_KEY — when 'true' it seeds the well-known public `dev-admin-key` as an ADMIN credential. */
@@ -206,7 +206,7 @@ export function assertNoDefaultSecretsInProduction(env: SecretCheckEnv): void {
   const problems: string[] = [];
 
   // Built-in datastores run on the internal-only Docker network (not published), so their fixed
-  // 'openwa'/'minioadmin' credentials are not internet-reachable — exempt them so selecting the
+  // 'zaptura'/'minioadmin' credentials are not internet-reachable — exempt them so selecting the
   // built-in option doesn't crash-loop a production boot. The exemption requires BOTH the built-in
   // flag AND an internal host: a host-pinned EXTERNAL datastore (even with the built-in flag set) is
   // reachable, so its weak credential is still enforced.

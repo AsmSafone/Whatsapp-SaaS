@@ -2,37 +2,37 @@
 
 declare(strict_types=1);
 
-namespace OpenWA;
+namespace Zaptura;
 
 use GuzzleHttp\ClientInterface;
-use OpenWA\Exceptions\OpenWAException;
-use OpenWA\Http\HttpExecutor;
-use OpenWA\Resources\CatalogResource;
-use OpenWA\Resources\CallsResource;
-use OpenWA\Resources\MediaResource;
-use OpenWA\Resources\ChannelsResource;
-use OpenWA\Resources\ChatsResource;
-use OpenWA\Resources\ContactsResource;
-use OpenWA\Resources\GroupsResource;
-use OpenWA\Resources\HealthResource;
-use OpenWA\Resources\LabelsResource;
-use OpenWA\Resources\MessagesResource;
-use OpenWA\Resources\ProfileResource;
-use OpenWA\Resources\SearchResource;
-use OpenWA\Resources\SessionsResource;
-use OpenWA\Resources\StatusResource;
-use OpenWA\Resources\TemplatesResource;
-use OpenWA\Resources\WebhooksResource;
+use Zaptura\Exceptions\ZapturaException;
+use Zaptura\Http\HttpExecutor;
+use Zaptura\Resources\CatalogResource;
+use Zaptura\Resources\CallsResource;
+use Zaptura\Resources\MediaResource;
+use Zaptura\Resources\ChannelsResource;
+use Zaptura\Resources\ChatsResource;
+use Zaptura\Resources\ContactsResource;
+use Zaptura\Resources\GroupsResource;
+use Zaptura\Resources\HealthResource;
+use Zaptura\Resources\LabelsResource;
+use Zaptura\Resources\MessagesResource;
+use Zaptura\Resources\ProfileResource;
+use Zaptura\Resources\SearchResource;
+use Zaptura\Resources\SessionsResource;
+use Zaptura\Resources\StatusResource;
+use Zaptura\Resources\TemplatesResource;
+use Zaptura\Resources\WebhooksResource;
 
 /**
- * OpenWA PHP SDK — client core.
+ * Zaptura PHP SDK — client core.
  *
  * The single entry point. It owns an {@see HttpExecutor} (which wraps a Guzzle
  * client with an injectable handler) and exposes domain resources as
  * properties:
  *
  * ```php
- * use OpenWA\Client;
+ * use Zaptura\Client;
  *
  * $client = new Client([
  *     'baseUrl' => 'http://localhost:2785',
@@ -42,7 +42,7 @@ use OpenWA\Resources\WebhooksResource;
  * $client->sessions->start('my-session');
  * $result = $client->messages->sendText('my-session', [
  *     'chatId' => '628123456789@c.us',
- *     'text'   => 'Hello from the OpenWA PHP SDK!',
+ *     'text'   => 'Hello from the Zaptura PHP SDK!',
  * ]);
  * echo $result['messageId'];
  * ```
@@ -79,15 +79,15 @@ class Client
      *     defaultHeaders?:array<string,string>
      * } $config
      *
-     * @throws OpenWAException If baseUrl or apiKey is missing.
+     * @throws ZapturaException If baseUrl or apiKey is missing.
      */
     public function __construct(array $config)
     {
         if (empty($config['baseUrl'])) {
-            throw new OpenWAException('OpenWA Client: baseUrl is required');
+            throw new ZapturaException('Zaptura Client: baseUrl is required');
         }
         if (empty($config['apiKey'])) {
-            throw new OpenWAException('OpenWA Client: apiKey is required');
+            throw new ZapturaException('Zaptura Client: apiKey is required');
         }
 
         self::warnIfInsecureHttp($config['baseUrl']);
@@ -132,7 +132,7 @@ class Client
             $host = \trim($host, '[]');
             if (!\in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
                 \trigger_error(
-                    "OpenWA Client: baseUrl uses an insecure http:// URL (host: {$host}). "
+                    "Zaptura Client: baseUrl uses an insecure http:// URL (host: {$host}). "
                     . 'The API key will be sent in cleartext. Use https:// in production.',
                     \E_USER_WARNING
                 );

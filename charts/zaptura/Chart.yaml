@@ -1,0 +1,13 @@
+apiVersion: v2
+name: zaptura
+description: Zaptura — Autonomous WhatsApp API & SaaS Cloud Platform.
+type: application
+version: 0.1.20
+appVersion: '0.23.6'
+keywords:
+  - whatsapp
+  - zaptura
+  - api
+home: https://github.com/AsmSafone/Whatsapp-SaaS
+sources:
+  - https://github.com/AsmSafone/Whatsapp-SaaS

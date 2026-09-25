@@ -39,7 +39,7 @@ describe('CreateAuthAuditTables migration', () => {
       isActive: number;
       usageCount: number;
     }>;
-    expect(rows[0].role).toBe('operator');
+    expect(rows[0].role).toBe('user');
     expect(rows[0].usageCount).toBe(0);
 
     await qr.release();

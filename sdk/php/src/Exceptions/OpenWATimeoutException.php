@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenWA\Exceptions;
+namespace Zaptura\Exceptions;
 
 /** Raised when a request exceeds the configured timeout. */
-class OpenWATimeoutException extends OpenWAException
+class ZapturaTimeoutException extends ZapturaException
 {
     private float $timeout;
 

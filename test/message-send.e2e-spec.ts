@@ -33,7 +33,7 @@ import type { IWhatsAppEngine, MessageResult } from './../src/engine/interfaces/
 describe('Message send endpoints (e2e)', () => {
   let app: INestApplication<App>;
   let sessionId: string;
-  let operatorKey: string;
+  let userKey: string;
   let templateId: string;
   let templateNameFixture: string;
   const prevSimulateTyping = process.env.SIMULATE_TYPING;
@@ -56,11 +56,11 @@ describe('Message send endpoints (e2e)', () => {
   const post = (verb: string, body: object, session: string = sessionId) =>
     request(app.getHttpServer())
       .post(`/api/sessions/${session}/messages/${verb}`)
-      .set('X-API-Key', operatorKey)
+      .set('X-API-Key', userKey)
       .send(body);
 
   const get = (path: string, session: string = sessionId) =>
-    request(app.getHttpServer()).get(`/api/sessions/${session}/messages/${path}`).set('X-API-Key', operatorKey);
+    request(app.getHttpServer()).get(`/api/sessions/${session}/messages/${path}`).set('X-API-Key', userKey);
 
   /** GET batch/:id payload, in the settled shape the assertions read. */
   type BatchBody = {
@@ -94,14 +94,14 @@ describe('Message send endpoints (e2e)', () => {
     sessionId = (await sessionRepo.save(sessionRepo.create({ name: `e2e-send-${Date.now()}` }))).id;
 
     app.get(EngineRegistry).set(sessionId, engine as unknown as IWhatsAppEngine);
-    operatorKey = (await app.get(AuthService).createApiKey({ name: 'e2e-send', role: ApiKeyRole.OPERATOR })).rawKey;
+    userKey = (await app.get(AuthService).createApiKey({ name: 'e2e-send', role: ApiKeyRole.USER })).rawKey;
 
     // A real template row via the real route, so send-template exercises resolution and rendering
     // against persisted data rather than a seeded fixture.
     templateNameFixture = `e2e-greet-${Date.now()}`;
     const template = await request(app.getHttpServer())
       .post(`/api/sessions/${sessionId}/templates`)
-      .set('X-API-Key', operatorKey)
+      .set('X-API-Key', userKey)
       .send({
         name: templateNameFixture,
         header: 'Hi',

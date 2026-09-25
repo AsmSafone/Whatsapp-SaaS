@@ -56,7 +56,7 @@ export class AccountService {
         name: dto.name.trim(),
         email,
         passwordHash: hashPassword(dto.password),
-        plan: 'starter',
+        plan: dto.plan || 'starter',
       }),
     );
     return this.issue(user);
@@ -196,7 +196,7 @@ export class AccountService {
 
     const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
 
-    apiKey.role = ApiKeyRole.ADMIN;
+    apiKey.role = isOwner ? ApiKeyRole.ADMIN : ApiKeyRole.USER;
     apiKey.allowedIps = null;
     if (isOwner) {
       apiKey.allowedSessions = null;

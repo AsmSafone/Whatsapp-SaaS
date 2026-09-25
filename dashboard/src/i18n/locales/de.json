@@ -210,7 +210,7 @@
     "connectionError": "Verbindung zum Server nicht möglich. Bitte versuche es erneut.",
     "help": "Brauchst du Hilfe?",
     "viewDocs": "Dokumentation ansehen",
-    "footer": "Mit ❤️ erstellt von Yudhi Armyndharis und der Zaptura-Community",
+    "footer": "Mit ❤️ erstellt von Yudhi Aasmsafone und der Zaptura-Community",
     "version": "v{{version}} · {{date}}"
   },
   "dashboard": {
@@ -600,13 +600,11 @@
     "rolesTitle": "Rollenübersicht",
     "roles": {
       "admin": "Administrator",
-      "operator": "Operator",
-      "viewer": "Betrachter"
+      "user": "User"
     },
     "roleDescriptions": {
       "admin": "Vollzugriff auf alle Ressourcen",
-      "operator": "Verwaltung von Sitzungen und Nachrichten",
-      "viewer": "Nur Lesezugriff"
+      "user": "User access"
     },
     "columns": {
       "name": "Name",

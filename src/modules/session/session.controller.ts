@@ -95,7 +95,7 @@ export class SessionController {
   }
 
   @Post()
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   // Creating a session has no existing session id for the class-level @SessionScoped fence to check,
   // and the new session is outside the caller's allowlist by construction — so a key restricted to
   // specific sessions cannot create one. Different metadata key from @SessionScoped; they coexist.
@@ -128,7 +128,7 @@ export class SessionController {
       const minted = await this.authService.createApiKey(
         {
           name: `session:${session.name}`,
-          role: ApiKeyRole.OPERATOR,
+          role: ApiKeyRole.USER,
           allowedSessions: [session.id],
         },
         { userId: tenantUserId },
@@ -214,7 +214,7 @@ export class SessionController {
   }
 
   @Patch(':sessionId/config')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({
     summary: 'Update the tunable configuration for a session',
     description:
@@ -263,7 +263,7 @@ export class SessionController {
   }
 
   @Patch(':sessionId/proxy')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   // Routing a session's whole egress through an attacker-chosen host is an instance-level decision,
   // not a per-session one. Before this route existed, `proxyUrl` could only be set through POST
   // /sessions, which is unscoped by the fence above, so a key restricted to specific sessions could
@@ -296,7 +296,7 @@ export class SessionController {
   }
 
   @Delete(':sessionId')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a session' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -320,7 +320,7 @@ export class SessionController {
   }
 
   @Post(':sessionId/start')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Start a session and initialize WhatsApp connection',
@@ -353,7 +353,7 @@ export class SessionController {
   }
 
   @Post(':sessionId/stop')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Stop a session and disconnect WhatsApp' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -389,7 +389,7 @@ export class SessionController {
   }
 
   @Post(':sessionId/logout')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Log out of WhatsApp (unlinks this device) and stop the session',
@@ -455,7 +455,7 @@ export class SessionController {
   }
 
   @Post(':sessionId/force-kill')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Force-kill a stuck session (SIGKILL its wedged engine, then tear it down)' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -476,7 +476,7 @@ export class SessionController {
   }
 
   @Get(':sessionId/qr')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'Get QR code for session authentication' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
   @ApiResponse({
@@ -498,7 +498,7 @@ export class SessionController {
   }
 
   @Post(':sessionId/pairing-code')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'Request an 8-char pairing code to link via phone number (alternative to QR)' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
   @ApiResponse({ status: 201, description: 'Pairing code generated', type: PairingCodeResponseDto })
@@ -577,7 +577,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/read')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark a chat as read/seen' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -609,7 +609,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/presence/subscribe')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: "Subscribe to a chat's presence",
@@ -642,7 +642,7 @@ export class SessionController {
   }
 
   @Put(':sessionId/presence')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({
     summary: "Set the account's own global presence (appear online or offline)",
     description:
@@ -668,7 +668,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Get(':sessionId/presence/:chatId')
-  @RequireRole(ApiKeyRole.VIEWER)
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({
     summary: "Read a chat's last reported presence",
     description:
@@ -693,7 +693,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/unread')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark a chat as unread' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -717,7 +717,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Delete(':sessionId/chats/:chatId/messages')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete every message in a chat, keeping the chat itself' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -748,7 +748,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/archive')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Archive or unarchive a chat' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -778,7 +778,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/mute')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mute or unmute a chat' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -815,7 +815,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/pin')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Pin or unpin a chat at the top of the chat list' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -850,7 +850,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/delete')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a chat from the chat list (e.g. a group you have left)' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
@@ -874,7 +874,7 @@ export class SessionController {
 
   @ChatScoped('fenced')
   @Post(':sessionId/chats/typing')
-  @RequireRole(ApiKeyRole.OPERATOR)
+  @RequireRole(ApiKeyRole.USER)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Send a typing/recording presence indicator to a chat (or clear it with 'paused')" })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })

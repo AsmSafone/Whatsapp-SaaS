@@ -109,7 +109,7 @@ describe('EventsGateway API-key authorization sweep', () => {
   });
 
   it('evicts nobody when only the usage statistics moved', async () => {
-    const { apiKey, rawKey } = await service.createApiKey({ name: 'usage probe', role: ApiKeyRole.VIEWER });
+    const { apiKey, rawKey } = await service.createApiKey({ name: 'usage probe', role: ApiKeyRole.USER });
     const sock = await connect(rawKey);
 
     // What the authentication hot path writes on its own, for every key in use.
@@ -285,7 +285,7 @@ describe('EventsGateway API-key authorization sweep', () => {
     const { apiKey, rawKey } = await service.createApiKey({ name: 'demoted key' });
     const sock = await connect(rawKey);
 
-    await service.update(apiKey.id, { role: ApiKeyRole.VIEWER });
+    await service.update(apiKey.id, { role: ApiKeyRole.USER });
 
     expect(sock.disconnect).toHaveBeenCalledWith(true);
     expect(evictionMessage(sock)).toBe('API key authorization changed; please reconnect');

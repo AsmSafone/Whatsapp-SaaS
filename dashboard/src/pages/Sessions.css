@@ -867,7 +867,7 @@
   transform: translateX(22px);
 }
 
-/* A viewer-role key cannot write, and the control is also held during a save. The page copies this
+/* A read-only key cannot write, and the control is also held during a save. The page copies this
    rule came from have no disabled state because none of their toggles can be disabled; without it
    the switch looks live to someone who can never move it. */
 .sessions-page .toggle-switch input:disabled + .toggle-slider {
