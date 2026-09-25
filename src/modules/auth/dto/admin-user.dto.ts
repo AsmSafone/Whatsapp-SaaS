@@ -1,13 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
-import { UserPlan } from '../entities/user.entity';
+import type { UserPlan } from '../entities/user.entity';
 
 const VALID_PLANS: UserPlan[] = ['starter', 'pro', 'plus', 'business'];
 
 export class AdminUpdatePlanDto {
   @ApiProperty({ enum: VALID_PLANS, example: 'pro', description: 'User subscription plan' })
   @IsIn(VALID_PLANS, { message: 'Plan must be one of: starter, pro, plus, business' })
-  plan!: UserPlan;
+  plan!: 'starter' | 'pro' | 'plus' | 'business';
 }
 
 export class AdminUpdateUserDto {
@@ -24,7 +24,7 @@ export class AdminUpdateUserDto {
   @ApiPropertyOptional({ enum: VALID_PLANS, example: 'pro' })
   @IsOptional()
   @IsIn(VALID_PLANS, { message: 'Plan must be one of: starter, pro, plus, business' })
-  plan?: UserPlan;
+  plan?: 'starter' | 'pro' | 'plus' | 'business';
 }
 
 export class AdminResetPasswordDto {

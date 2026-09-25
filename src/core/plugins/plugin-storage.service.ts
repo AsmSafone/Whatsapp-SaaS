@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { DEFAULT_DATA_DIR } from '../../config/configuration';
 import { createLogger } from '../../common/services/logger.service';
+import { isPathWithin, isSafeStorageKey } from '../../common/utils/path-safety';
 import { PluginStatus, PluginStorage, PluginRegistryEntry, UserPluginConfig } from './plugin.interfaces';
 
 /** Unique-per-write counter so concurrent writes to the same key don't collide on the temp file. */
