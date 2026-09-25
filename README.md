@@ -31,7 +31,7 @@ Built on a **pluggable architecture**, Zaptura lets you select database engines 
 | 🖥️ **Full Dashboard**         | Modern React UI for session, webhook, and API key management                                                                             |
 | 🔹 **Multi-Session Ready**    | Run multiple WhatsApp sessions concurrently on one instance                                                                              |
 | 🐳 **Docker Native**          | Production-ready with zero configuration                                                                                                 |
-| 🧩 **Official Plugins**       | Chatwoot, Typebot & more as sandboxed plugins on the Integration Fabric — [Zaptura-plugins](https://github.com/AsmSafone/Whatsapp-SaaS-plugins) |
+| 🧩 **Official Plugins**       | Chatwoot, Typebot & more as sandboxed plugins on the Integration Fabric — [Zaptura-plugins](https://github.com/AsmSafone/ZapturaWA-plugins) |
 | 🔗 **n8n Integration**        | Community nodes for workflow automation                                                                                                  |
 | 🧩 **Community Adapters**     | Third-party integrations (e.g. ioBroker)                                                                                                 |
 | 🔐 **Session-scoped keys**    | User tokens can be limited to chosen sessions — or all sessions if none are selected                                                     |

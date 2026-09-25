@@ -1412,7 +1412,7 @@ The session-lifecycle security hardening release: lifecycle and logout operation
 - Join groups & group settings: `POST /api/sessions/:sessionId/groups/join` joins via invite code; `GET`/`PUT /api/sessions/:sessionId/groups/:groupId/settings` read and update `announce`/`locked` and `ephemeralSeconds` (Baileys only — `501` on whatsapp-web.js). Boolean and numeric fields are read strictly.
 - Own-profile management: `PUT /api/sessions/:sessionId/profile/{name,status,picture}` set the account's display name, about text, and profile picture on both engines.
 - Incoming-call handling: a `call.received` webhook + Socket.IO event fires once per ringing call (both engines); `POST /api/sessions/:sessionId/calls/:callId/reject` rejects a call, and per-session `config.autoRejectCalls: true` auto-rejects. Unknown/expired call ids return `404`.
-- Docs: the README feature table points to the first-party Integration Fabric plugins in the [Zaptura-plugins](https://github.com/AsmSafone/Whatsapp-SaaS-plugins) repo, and `docs/23-community-integrations.md` clarifies its community-only scope.
+- Docs: the README feature table points to the first-party Integration Fabric plugins in the [Zaptura-plugins](https://github.com/AsmSafone/ZapturaWA-plugins) repo, and `docs/23-community-integrations.md` clarifies its community-only scope.
 
 ### Changed
 

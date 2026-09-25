@@ -341,11 +341,11 @@ export default () => ({
     // there keeps loading them. Null once PLUGINS_DIR is set — an operator who named the directory
     // has said where plugins live, and nothing may second-guess that.
     legacyDir: process.env.PLUGINS_DIR ? null : LEGACY_PLUGINS_DIR,
-    // Remote catalog of installable plugins (JSON array; the Zaptura-plugins repo's plugins.json).
+    // Remote catalog of installable plugins (JSON array; the ZapturaWA-plugins repo's plugins.json).
     // Fetched through the SSRF guard — add its host to SSRF_ALLOWED_HOSTS if it is not publicly resolvable.
     catalogUrl:
       process.env.PLUGIN_CATALOG_URL ||
-      'https://raw.githubusercontent.com/AsmSafone/Whatsapp-SaaS-plugins/main/plugins.json',
+      'https://raw.githubusercontent.com/AsmSafone/ZapturaWA-plugins/main/plugins.json',
     // Cap on a plugin .zip downloaded by install-from-URL (matches the 5 MB upload limit). Fail-safe:
     // a non-numeric or non-positive value (parseInt → NaN/0/-n) falls back to the default rather than
     // silently disabling the cap (a downstream `??` would not catch NaN).

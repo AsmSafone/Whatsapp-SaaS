@@ -841,172 +841,185 @@ export default function Plugins() {
         </div>
       )}
 
-      <div className="plugins-layout">
-        <aside className="plugins-rail">
-          <div className="rail-stats">
-            <div className="rail-stat">
-              <span className="rail-stat-num">{enabledCount}</span>
-              <span className="rail-stat-label">{t('plugins.rail.enabled', 'enabled')}</span>
+      {visiblePlugins.length > 0 ? (
+        <div className="plugins-layout">
+          <aside className="plugins-rail">
+            <div className="rail-stats">
+              <div className="rail-stat">
+                <span className="rail-stat-num">{enabledCount}</span>
+                <span className="rail-stat-label">{t('plugins.rail.enabled', 'enabled')}</span>
+              </div>
+              <div className="rail-stat">
+                <span className="rail-stat-num">{visiblePlugins.length}</span>
+                <span className="rail-stat-label">{t('plugins.rail.installed', 'installed')}</span>
+              </div>
             </div>
-            <div className="rail-stat">
-              <span className="rail-stat-num">{visiblePlugins.length}</span>
-              <span className="rail-stat-label">{t('plugins.rail.installed', 'installed')}</span>
+
+            <div className="rail-section">
+              <p className="rail-label">{t('plugins.rail.active', 'Active plugins')}</p>
+              {activePlugins.length === 0 ? (
+                <p className="rail-empty">{t('plugins.rail.none', 'None enabled yet')}</p>
+              ) : (
+                <ul className="rail-active-list">
+                  {activePlugins.map(p => (
+                    <li key={p.id} className="rail-active-item">
+                      <span className="status-dot enabled" />
+                      <span className="rail-active-name">{localizePlugin(p, i18n.language).name}</span>
+                      <span className="rail-active-type">{p.type}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-          </div>
+          </aside>
 
-          <div className="rail-section">
-            <p className="rail-label">{t('plugins.rail.active', 'Active plugins')}</p>
-            {activePlugins.length === 0 ? (
-              <p className="rail-empty">{t('plugins.rail.none', 'None enabled yet')}</p>
-            ) : (
-              <ul className="rail-active-list">
-                {activePlugins.map(p => (
-                  <li key={p.id} className="rail-active-item">
-                    <span className="status-dot enabled" />
-                    <span className="rail-active-name">{localizePlugin(p, i18n.language).name}</span>
-                    <span className="rail-active-type">{p.type}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </aside>
+          <main className="plugins-main">
+            <div className="plugins-grid">
+              {visiblePlugins.map(plugin => {
+                const TypeIcon = pluginTypeIcons[plugin.type as PluginType] || Puzzle;
+                const isLoading = actionLoading === plugin.id;
+                const lz = localizePlugin(plugin, i18n.language);
 
-        <main className="plugins-main">
-          <div className="plugins-grid">
-            {visiblePlugins.map(plugin => {
-              const TypeIcon = pluginTypeIcons[plugin.type as PluginType] || Puzzle;
-              const isLoading = actionLoading === plugin.id;
-              const lz = localizePlugin(plugin, i18n.language);
-
-              return (
-                <div key={plugin.id} className="plugin-card">
-                  <div className={`plugin-card-header type-${plugin.type}`}>
-                    <div className="plugin-info">
-                      <div className="plugin-icon-wrapper">
-                        <TypeIcon size={20} />
+                return (
+                  <div key={plugin.id} className="plugin-card">
+                    <div className={`plugin-card-header type-${plugin.type}`}>
+                      <div className="plugin-info">
+                        <div className="plugin-icon-wrapper">
+                          <TypeIcon size={20} />
+                        </div>
+                        <div>
+                          <h3 className="plugin-name">{lz.name}</h3>
+                          <span className="plugin-version">v{plugin.version}</span>
+                          {updatesById.has(plugin.id) && (
+                            <button
+                              type="button"
+                              className="plugin-update-chip"
+                              title={`${t('plugins.catalog.updateAvailable', 'Update available')} (v${plugin.version} → v${updatesById.get(plugin.id)!.version})`}
+                              aria-label={t('plugins.catalog.updateAvailable', 'Update available')}
+                              onClick={() => {
+                                // Land the user directly on this plugin's catalog entry, where the
+                                // existing Update button (and its confirmation flow) lives.
+                                setInstallMode('catalog');
+                                setCatalogSearch(plugin.id);
+                                setShowInstallModal(true);
+                              }}
+                            >
+                              <ArrowUpCircle size={12} />v{updatesById.get(plugin.id)!.version}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="plugin-name">{lz.name}</h3>
-                        <span className="plugin-version">v{plugin.version}</span>
-                        {updatesById.has(plugin.id) && (
+                      {plugin.builtIn ? (
+                        <span className="plugin-builtin-badge">{t('plugins.builtIn', 'System Built-in')}</span>
+                      ) : (
+                        <span className="plugin-builtin-badge plugin-custom-badge">
+                          {plugin.ownerUserId
+                            ? t('plugins.myPlugin', 'My Plugin')
+                            : t('plugins.customPlugin', 'Custom Plugin')}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="plugin-card-body">
+                      <p className="plugin-description">{lz.description || t('plugins.noDescription')}</p>
+
+                      <div className="plugin-status-row">
+                        <div className="plugin-status">
+                          <span className={`status-dot ${plugin.status}`} />
+                          <span className="status-text">{plugin.status}</span>
+                        </div>
+                        <span className="plugin-type-label">{plugin.type}</span>
+                      </div>
+
+                      {plugin.error && (
+                        <div className="plugin-error">
+                          <p className="plugin-error-text">{plugin.error}</p>
+                        </div>
+                      )}
+
+                      {plugin.provides && plugin.provides.length > 0 && (
+                        <div className="plugin-provides">
+                          {plugin.provides.map(item => (
+                            <span key={item} className="provides-tag">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="plugin-actions">
+                        <button
+                          onClick={() => handleToggle(plugin)}
+                          disabled={isLoading}
+                          className={`btn-toggle ${plugin.status === 'enabled' ? 'disable' : 'enable'}`}
+                        >
+                          {isLoading ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : plugin.status === 'enabled' ? (
+                            <>
+                              <PowerOff size={16} />
+                              {t('plugins.disable')}
+                            </>
+                          ) : (
+                            <>
+                              <Power size={16} />
+                              {t('plugins.enable')}
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => handleHealthCheck(plugin.id)}
+                          disabled={isLoading}
+                          className="btn-action"
+                          title={t('plugins.healthCheck')}
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+
+                        <button
+                          className="btn-action"
+                          title={t('plugins.configure')}
+                          onClick={() => handleOpenConfig(plugin)}
+                        >
+                          <Settings size={16} />
+                        </button>
+
+                        {!plugin.builtIn && (
                           <button
-                            type="button"
-                            className="plugin-update-chip"
-                            title={`${t('plugins.catalog.updateAvailable', 'Update available')} (v${plugin.version} → v${updatesById.get(plugin.id)!.version})`}
-                            aria-label={t('plugins.catalog.updateAvailable', 'Update available')}
-                            onClick={() => {
-                              // Land the user directly on this plugin's catalog entry, where the
-                              // existing Update button (and its confirmation flow) lives.
-                              setInstallMode('catalog');
-                              setCatalogSearch(plugin.id);
-                              setShowInstallModal(true);
-                            }}
+                            className="btn-action btn-action-danger"
+                            title={t('plugins.uninstall', 'Uninstall')}
+                            onClick={() => void handleUninstall(plugin)}
+                            disabled={isLoading}
                           >
-                            <ArrowUpCircle size={12} />v{updatesById.get(plugin.id)!.version}
+                            <Trash2 size={16} />
                           </button>
                         )}
                       </div>
                     </div>
-                    {plugin.builtIn ? (
-                      <span className="plugin-builtin-badge">{t('plugins.builtIn', 'System Built-in')}</span>
-                    ) : (
-                      <span className="plugin-builtin-badge plugin-custom-badge">
-                        {plugin.ownerUserId ? t('plugins.myPlugin', 'My Plugin') : t('plugins.customPlugin', 'Custom Plugin')}
-                      </span>
-                    )}
                   </div>
-
-                  <div className="plugin-card-body">
-                    <p className="plugin-description">{lz.description || t('plugins.noDescription')}</p>
-
-                    <div className="plugin-status-row">
-                      <div className="plugin-status">
-                        <span className={`status-dot ${plugin.status}`} />
-                        <span className="status-text">{plugin.status}</span>
-                      </div>
-                      <span className="plugin-type-label">{plugin.type}</span>
-                    </div>
-
-                    {plugin.error && (
-                      <div className="plugin-error">
-                        <p className="plugin-error-text">{plugin.error}</p>
-                      </div>
-                    )}
-
-                    {plugin.provides && plugin.provides.length > 0 && (
-                      <div className="plugin-provides">
-                        {plugin.provides.map(item => (
-                          <span key={item} className="provides-tag">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="plugin-actions">
-                      <button
-                        onClick={() => handleToggle(plugin)}
-                        disabled={isLoading}
-                        className={`btn-toggle ${plugin.status === 'enabled' ? 'disable' : 'enable'}`}
-                      >
-                        {isLoading ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : plugin.status === 'enabled' ? (
-                          <>
-                            <PowerOff size={16} />
-                            {t('plugins.disable')}
-                          </>
-                        ) : (
-                          <>
-                            <Power size={16} />
-                            {t('plugins.enable')}
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleHealthCheck(plugin.id)}
-                        disabled={isLoading}
-                        className="btn-action"
-                        title={t('plugins.healthCheck')}
-                      >
-                        <CheckCircle size={16} />
-                      </button>
-
-                      <button
-                        className="btn-action"
-                        title={t('plugins.configure')}
-                        onClick={() => handleOpenConfig(plugin)}
-                      >
-                        <Settings size={16} />
-                      </button>
-
-                      {!plugin.builtIn && (
-                        <button
-                          className="btn-action btn-action-danger"
-                          title={t('plugins.uninstall', 'Uninstall')}
-                          onClick={() => void handleUninstall(plugin)}
-                          disabled={isLoading}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </main>
-      </div>
-
-      {visiblePlugins.length === 0 && !loading && (
-        <div className="empty-state">
-          <Puzzle size={64} />
-          <h3>{t('plugins.empty.title')}</h3>
-          <p>{t('plugins.empty.description')}</p>
+                );
+              })}
+            </div>
+          </main>
         </div>
+      ) : (
+        !loading && (
+          <div className="empty-state">
+            <Puzzle size={64} />
+            <h3>{t('plugins.empty.title')}</h3>
+            <p>{t('plugins.empty.description')}</p>
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ marginTop: '1rem' }}
+              onClick={() => setShowInstallModal(true)}
+            >
+              <Upload size={16} />
+              {t('plugins.install', 'Install plugin')}
+            </button>
+          </div>
+        )
       )}
 
       {showInstallModal && (
