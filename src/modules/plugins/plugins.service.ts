@@ -1,8 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginLoaderService, PluginStatus, PluginType, resolvePluginEntryPath } from '../../core/plugins';
+import { PluginLoaderService, PluginStatus, PluginType, resolvePluginEntryPath, PluginInstance } from '../../core/plugins';
 import { pluginUpdateBackupDirName, pluginUpdateStagingDirName } from '../../core/plugins';
 import type { PluginConfigSchema } from '../../core/plugins';
 import { PluginDto } from './dto/plugin.dto';
@@ -53,38 +60,38 @@ export class PluginsService {
     return next;
   }
 
-  findAll(): PluginDto[] {
-    const plugins = this.pluginLoader.getAllPlugins();
+  private toDto(plugin: PluginInstance, tenantUserId?: string | null): PluginDto {
+    const ownerUserId = this.pluginLoader.getPluginOwner(plugin.manifest.id) ?? plugin.ownerUserId ?? null;
+    if (tenantUserId) {
+      const userCfg = this.pluginLoader.getUserConfig(plugin.manifest.id, tenantUserId);
+      const isEnabled = userCfg?.enabled ?? (plugin.status === PluginStatus.ENABLED);
+      const effectiveConfig = userCfg?.config ?? plugin.config;
+      const effectiveActiveSessions = userCfg?.activeSessions ?? (plugin.activeSessions ?? ['*']);
+      const effectiveSessionConfig = userCfg?.sessionConfig ?? plugin.sessionConfig;
 
-    return plugins.map(plugin => ({
-      id: plugin.manifest.id,
-      name: plugin.manifest.name,
-      version: plugin.manifest.version,
-      type: plugin.manifest.type,
-      description: plugin.manifest.description,
-      author: plugin.manifest.author,
-      status: plugin.status,
-      config: redactSecretConfig(plugin.config, plugin.manifest.configSchema),
-      builtIn: this.pluginLoader.isBuiltIn(plugin.manifest.id),
-      provides: plugin.manifest.provides ?? [],
-      ingressCapable: isIngressCapable(plugin.manifest),
-      configSchema: plugin.manifest.configSchema,
-      configUi: plugin.manifest.configUi,
-      i18n: plugin.manifest.i18n,
-      sessionConfig: this.redactSessionConfig(plugin.sessionConfig, plugin.manifest.configSchema),
-      sessionScoped: plugin.manifest.sessionScoped !== false,
-      activeSessions: plugin.activeSessions ?? ['*'],
-      loadedAt: plugin.loadedAt?.toISOString(),
-      enabledAt: plugin.enabledAt?.toISOString(),
-      error: plugin.error,
-    }));
-  }
-
-  findOne(id: string): PluginDto {
-    const plugin = this.pluginLoader.getPlugin(id);
-
-    if (!plugin) {
-      throw new NotFoundException(`Plugin ${id} not found`);
+      return {
+        id: plugin.manifest.id,
+        name: plugin.manifest.name,
+        version: plugin.manifest.version,
+        type: plugin.manifest.type,
+        description: plugin.manifest.description,
+        author: plugin.manifest.author,
+        status: isEnabled ? PluginStatus.ENABLED : PluginStatus.INSTALLED,
+        config: redactSecretConfig(effectiveConfig, plugin.manifest.configSchema),
+        builtIn: this.pluginLoader.isBuiltIn(plugin.manifest.id),
+        provides: plugin.manifest.provides ?? [],
+        ingressCapable: isIngressCapable(plugin.manifest),
+        configSchema: plugin.manifest.configSchema,
+        configUi: plugin.manifest.configUi,
+        i18n: plugin.manifest.i18n,
+        sessionConfig: this.redactSessionConfig(effectiveSessionConfig, plugin.manifest.configSchema),
+        sessionScoped: plugin.manifest.sessionScoped !== false,
+        activeSessions: effectiveActiveSessions,
+        loadedAt: plugin.loadedAt?.toISOString(),
+        enabledAt: plugin.enabledAt?.toISOString(),
+        error: plugin.error,
+        ownerUserId,
+      };
     }
 
     return {
@@ -108,11 +115,65 @@ export class PluginsService {
       loadedAt: plugin.loadedAt?.toISOString(),
       enabledAt: plugin.enabledAt?.toISOString(),
       error: plugin.error,
+      ownerUserId,
     };
   }
 
-  enable(id: string): Promise<{ success: boolean; message: string }> {
-    return this.serialize(id, () => this.enableInner(id));
+  findAll(tenantUserId?: string | null): PluginDto[] {
+    const plugins = this.pluginLoader.getAllPlugins();
+
+    return plugins
+      .filter(plugin => {
+        if (!tenantUserId) return true;
+        const owner = this.pluginLoader.getPluginOwner(plugin.manifest.id) ?? plugin.ownerUserId;
+        return !owner || owner === tenantUserId;
+      })
+      .map(plugin => this.toDto(plugin, tenantUserId));
+  }
+
+  findOne(id: string, tenantUserId?: string | null): PluginDto {
+    const plugin = this.pluginLoader.getPlugin(id);
+
+    if (!plugin) {
+      throw new NotFoundException(`Plugin ${id} not found`);
+    }
+
+    if (tenantUserId) {
+      const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+      if (owner && owner !== tenantUserId) {
+        throw new NotFoundException(`Plugin ${id} not found`);
+      }
+    }
+
+    return this.toDto(plugin, tenantUserId);
+  }
+
+  enable(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+    return this.serialize(id, async () => {
+      const plugin = this.pluginLoader.getPlugin(id);
+      if (!plugin) {
+        throw new NotFoundException(`Plugin ${id} not found`);
+      }
+
+      if (tenantUserId) {
+        const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+        if (owner && owner !== tenantUserId) {
+          throw new NotFoundException(`Plugin ${id} not found`);
+        }
+        this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: true });
+        if (plugin.status !== PluginStatus.ENABLED) {
+          try {
+            await this.pluginLoader.enablePlugin(id);
+            this.pluginLoader.setOperatorEnabled(id, true);
+          } catch {
+            // best-effort runtime activation
+          }
+        }
+        return { success: true, message: `Plugin ${id} enabled successfully` };
+      }
+
+      return this.enableInner(id);
+    });
   }
 
   private async enableInner(id: string): Promise<{ success: boolean; message: string }> {
@@ -123,16 +184,12 @@ export class PluginsService {
     }
 
     if (plugin.status === PluginStatus.ENABLED) {
-      // Converge the persisted decision even on the no-op path, so a plugin left running by an older
-      // build (which had no such field) is still restored after the next restart.
       this.pluginLoader.setOperatorEnabled(id, true);
       return { success: true, message: `Plugin ${id} is already enabled` };
     }
 
     try {
       await this.pluginLoader.enablePlugin(id);
-      // Only after the lifecycle actually succeeded: a plugin that failed to enable must not be
-      // restored on every boot just to fail again.
       this.pluginLoader.setOperatorEnabled(id, true);
       return { success: true, message: `Plugin ${id} enabled successfully` };
     } catch (error) {
@@ -143,21 +200,43 @@ export class PluginsService {
     }
   }
 
-  disable(id: string): Promise<{ success: boolean; message: string }> {
-    return this.serialize(id, () => this.disableInner(id));
+  disable(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+    return this.serialize(id, async () => {
+      const plugin = this.pluginLoader.getPlugin(id);
+
+      if (!plugin) {
+        if (!this.pluginLoader.getRegistryEntry(id)) {
+          throw new NotFoundException(`Plugin ${id} not found`);
+        }
+        if (tenantUserId) {
+          const owner = this.pluginLoader.getPluginOwner(id);
+          if (owner && owner !== tenantUserId) {
+            throw new NotFoundException(`Plugin ${id} not found`);
+          }
+          this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: false });
+          return { success: true, message: `Plugin ${id} disabled successfully` };
+        }
+        this.pluginLoader.setOperatorEnabled(id, false);
+        return { success: true, message: `Plugin ${id} is not loaded; it will not be enabled on boot` };
+      }
+
+      if (tenantUserId) {
+        const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+        if (owner && owner !== tenantUserId) {
+          throw new NotFoundException(`Plugin ${id} not found`);
+        }
+        this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: false });
+        return { success: true, message: `Plugin ${id} disabled successfully` };
+      }
+
+      return this.disableInner(id);
+    });
   }
 
   private async disableInner(id: string): Promise<{ success: boolean; message: string }> {
     const plugin = this.pluginLoader.getPlugin(id);
 
     if (!plugin) {
-      // Not loaded, but the registry may still hold its entry — and with it `enabledByOperator`, the
-      // standing instruction to enable it on every boot. A plugin whose code went missing (an
-      // interrupted update, a package directory outside the data volume) is exactly that case: there is
-      // no runtime to tear down, so `disablePlugin` can never run, and until now the operator had no way
-      // to withdraw the decision at all. `disable` expresses intent rather than performing a runtime
-      // operation, so honour it against the registry; reinstalling the code must not silently resurrect
-      // a plugin the operator switched off. A 404 now means only what it should: an id nobody knows.
       if (!this.pluginLoader.getRegistryEntry(id)) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
@@ -169,11 +248,6 @@ export class PluginsService {
       plugin.manifest.type === PluginType.ENGINE &&
       id === (this.configService.get<string>('engine.type') ?? 'whatsapp-web.js')
     ) {
-      // The engine factory is pinned to engine.type and never reads plugin status, and boot re-enables
-      // that engine regardless: "disabling" it here reported success while sessions kept starting on
-      // it. Refuse it in the same shape enable uses for a non-active engine. Kept at this layer, not in
-      // the lifecycle, because shutdown and unload must still tear engines down. An engine that is not
-      // engine.type runs nothing, so it takes the ordinary path below.
       return {
         success: false,
         message: `Engine "${id}" cannot be disabled at runtime. Set engine.type and restart to switch engines.`,
@@ -181,8 +255,6 @@ export class PluginsService {
     }
 
     if (plugin.status !== PluginStatus.ENABLED) {
-      // Clear the decision here too: a plugin sitting in ERROR after a failed restore is not ENABLED,
-      // and disabling it must stop the gateway retrying it on every boot.
       this.pluginLoader.setOperatorEnabled(id, false);
       return { success: true, message: `Plugin ${id} is not enabled` };
     }
@@ -199,14 +271,21 @@ export class PluginsService {
     }
   }
 
-  updateSessions(id: string, sessions: string[]): PluginDto {
+  updateSessions(id: string, sessions: string[], tenantUserId?: string | null): PluginDto {
     const plugin = this.pluginLoader.getPlugin(id);
     if (!plugin) {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
-    // Full-replacement PUT: setPluginSessions overwrites the ENTIRE activeSessions array. The route
-    // is fenced with @RequireUnscopedKey, so only an unrestricted key can reach this — a scoped key
-    // must never be allowed to delete another tenant's activation by sending [] or its own session.
+
+    if (tenantUserId) {
+      const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+      if (owner && owner !== tenantUserId) {
+        throw new NotFoundException(`Plugin ${id} not found`);
+      }
+      this.pluginLoader.setUserConfig(id, tenantUserId, { activeSessions: sessions });
+      return this.findOne(id, tenantUserId);
+    }
+
     try {
       this.pluginLoader.setPluginSessions(id, sessions);
     } catch (error) {
@@ -215,16 +294,37 @@ export class PluginsService {
     return this.findOne(id);
   }
 
-  updateConfig(id: string, config: Record<string, unknown>): { success: boolean; message: string } {
+  updateConfig(
+    id: string,
+    config: Record<string, unknown>,
+    tenantUserId?: string | null,
+  ): { success: boolean; message: string } {
     const plugin = this.pluginLoader.getPlugin(id);
 
     if (!plugin) {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
 
+    if (tenantUserId) {
+      const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+      if (owner && owner !== tenantUserId) {
+        throw new NotFoundException(`Plugin ${id} not found`);
+      }
+      try {
+        const userCfg = this.pluginLoader.getUserConfig(id, tenantUserId);
+        const existing = userCfg?.config ?? plugin.config;
+        const merged = restoreSecretConfig(config, existing, plugin.manifest.configSchema);
+        this.pluginLoader.setUserConfig(id, tenantUserId, { config: merged });
+        return { success: true, message: `Plugin ${id} configuration updated` };
+      } catch (error) {
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }
+
     try {
-      // The dashboard PUTs the whole (redacted) config back, so a sentinel secret means "unchanged":
-      // restore the stored value instead of overwriting the real secret with the mask.
       const merged = restoreSecretConfig(config, plugin.config, plugin.manifest.configSchema);
       this.pluginLoader.updatePluginConfig(id, merged);
       return { success: true, message: `Plugin ${id} configuration updated` };
@@ -245,6 +345,7 @@ export class PluginsService {
     id: string,
     sessionId: string,
     config: Record<string, unknown>,
+    tenantUserId?: string | null,
   ): { success: boolean; message: string } {
     const plugin = this.pluginLoader.getPlugin(id);
 
@@ -252,8 +353,29 @@ export class PluginsService {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
     if (plugin.manifest.sessionScoped === false) {
-      // A global plugin has no per-session config — reject with 400 (mirrors PUT /:id/sessions).
       throw new BadRequestException(`Plugin ${id} is global (not session-scoped) and has no per-session config`);
+    }
+
+    if (tenantUserId) {
+      const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
+      if (owner && owner !== tenantUserId) {
+        throw new NotFoundException(`Plugin ${id} not found`);
+      }
+      try {
+        const userCfg = this.pluginLoader.getUserConfig(id, tenantUserId);
+        const existingMap = userCfg?.sessionConfig ?? {};
+        const existing = existingMap[sessionId] ?? plugin.sessionConfig?.[sessionId];
+        const merged = restoreSecretConfig(config, existing, plugin.manifest.configSchema);
+        this.pluginLoader.setUserConfig(id, tenantUserId, {
+          sessionConfig: { ...existingMap, [sessionId]: merged },
+        });
+        return { success: true, message: `Plugin ${id} configuration for session ${sessionId} updated` };
+      } catch (error) {
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
     }
 
     try {
@@ -320,7 +442,7 @@ export class PluginsService {
   }
 
   /** Install a plugin from an uploaded .zip: validate the package, write it to the plugins dir, and load it. */
-  install(file?: { buffer?: Buffer }): PluginDto {
+  install(file?: { buffer?: Buffer }, tenantUserId?: string | null): PluginDto {
     if (!file?.buffer?.length) {
       throw new BadRequestException('No plugin file uploaded');
     }
@@ -373,6 +495,9 @@ export class PluginsService {
         written.push(dest);
       }
       this.pluginLoader.loadPlugin(dir);
+      this.pluginLoader.setPluginOwner(manifest.id, tenantUserId ?? null);
+      const loaded = this.pluginLoader.getPlugin(manifest.id);
+      if (loaded) loaded.ownerUserId = tenantUserId ?? null;
     } catch (error) {
       if (dirExisted) {
         for (const dest of written) fs.rmSync(dest, { force: true });
@@ -385,7 +510,7 @@ export class PluginsService {
       );
     }
 
-    return this.findOne(manifest.id);
+    return this.findOne(manifest.id, tenantUserId);
   }
 
   /**
@@ -397,12 +522,12 @@ export class PluginsService {
    * params are deliberately ignored, see plugin-download.ts), the bytes MUST match it: a mismatch
    * means the package was substituted in transit and the install fails closed.
    */
-  async installFromUrl(url: string): Promise<PluginDto> {
+  async installFromUrl(url: string, tenantUserId?: string | null): Promise<PluginDto> {
     const buffer = await this.downloadPackage(url);
     // Peek the id (the SSRF download stays outside the lock) so the install — which writes the plugin
     // directory — is serialized against any concurrent uninstall/update of the same id.
     const { manifest } = parsePluginPackage(buffer);
-    return this.serialize(manifest.id, () => Promise.resolve(this.install({ buffer })));
+    return this.serialize(manifest.id, () => Promise.resolve(this.install({ buffer }, tenantUserId)));
   }
 
   /**
@@ -633,17 +758,27 @@ export class PluginsService {
   }
 
   /** Uninstall an installed user plugin: disable, unload, and delete its files. Built-ins are protected. */
-  uninstall(id: string): Promise<{ success: boolean; message: string }> {
-    return this.serialize(id, () => this.uninstallInner(id));
+  uninstall(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+    return this.serialize(id, () => this.uninstallInner(id, tenantUserId));
   }
 
-  private async uninstallInner(id: string): Promise<{ success: boolean; message: string }> {
+  private async uninstallInner(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
     // As in `disable`: not loaded is not unknown. A plugin whose code went missing still owns a
     // registry entry with its config and secrets, and `uninstallPlugin` already tolerates having no
     // runtime to tear down — so removing it is the one recovery left when the package cannot be
     // obtained again. A 404 means only what it should: an id nobody knows.
     if (!this.pluginLoader.getPlugin(id) && !this.pluginLoader.getRegistryEntry(id)) {
       throw new NotFoundException(`Plugin ${id} not found`);
+    }
+
+    if (tenantUserId) {
+      const owner = this.pluginLoader.getPluginOwner(id);
+      if (owner && owner !== tenantUserId) {
+        throw new ForbiddenException('Cannot uninstall a plugin you do not own');
+      }
+      if (!owner && this.pluginLoader.isBuiltIn(id)) {
+        throw new BadRequestException('Built-in plugins cannot be uninstalled');
+      }
     }
 
     try {

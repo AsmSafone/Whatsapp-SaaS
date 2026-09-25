@@ -282,7 +282,7 @@ describe('EventsGateway API-key authorization sweep', () => {
   });
 
   it('still evicts synchronously on an operator-driven change, before any sweep', async () => {
-    const { apiKey, rawKey } = await service.createApiKey({ name: 'demoted key' });
+    const { apiKey, rawKey } = await service.createApiKey({ name: 'demoted key', role: ApiKeyRole.ADMIN });
     const sock = await connect(rawKey);
 
     await service.update(apiKey.id, { role: ApiKeyRole.USER });

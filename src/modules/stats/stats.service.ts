@@ -121,13 +121,16 @@ export class StatsService {
     return value;
   }
 
-  async getOverview(): Promise<OverviewStats> {
-    return this.memoized('overview', () => this.loadOverview());
+  async getOverview(tenantUserId?: string | null): Promise<OverviewStats> {
+    const key = tenantUserId ? `overview:${tenantUserId}` : 'overview';
+    return this.memoized(key, () => this.loadOverview(tenantUserId));
   }
 
-  private async loadOverview(): Promise<OverviewStats> {
+  private async loadOverview(tenantUserId?: string | null): Promise<OverviewStats> {
     // Get session stats
-    const sessions = await this.sessionRepo.find();
+    const sessions = tenantUserId
+      ? await this.sessionRepo.find({ where: { ownerUserId: tenantUserId } })
+      : await this.sessionRepo.find();
     const byStatus: Record<string, number> = {};
     let active = 0;
 
@@ -140,18 +143,30 @@ export class StatsService {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
-    const messageStats = await this.messageRepo
+    const messageStatsQb = this.messageRepo
       .createQueryBuilder('m')
       .select('m.direction', 'direction')
-      .addSelect('COUNT(*)', 'count')
+      .addSelect('COUNT(*)', 'count');
+
+    if (tenantUserId) {
+      messageStatsQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const messageStats = await messageStatsQb
       .groupBy('m.direction')
       .getRawMany<{ direction: string; count: string }>();
 
-    const todayStats = await this.messageRepo
+    const todayStatsQb = this.messageRepo
       .createQueryBuilder('m')
       .select('m.direction', 'direction')
       .addSelect('COUNT(*)', 'count')
-      .where('m.createdAt >= :todayStart', { todayStart })
+      .where('m.createdAt >= :todayStart', { todayStart });
+
+    if (tenantUserId) {
+      todayStatsQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const todayStats = await todayStatsQb
       .groupBy('m.direction')
       .getRawMany<{ direction: string; count: string }>();
 
@@ -161,16 +176,24 @@ export class StatsService {
     const todayReceived = parseInt(todayStats.find(m => m.direction === 'incoming')?.count || '0');
 
     // Count failed messages
-    const failed = await this.messageRepo.count({
-      where: { status: MessageStatus.FAILED },
-    });
+    const failedQb = this.messageRepo
+      .createQueryBuilder('m')
+      .where('m.status = :failedStatus', { failedStatus: MessageStatus.FAILED });
 
-    // Cache session stats
-    await this.cacheService.setSessionsStats({
-      active,
-      total: sessions.length,
-      byStatus,
-    });
+    if (tenantUserId) {
+      failedQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const failed = await failedQb.getCount();
+
+    // Cache session stats only globally for admin
+    if (!tenantUserId) {
+      await this.cacheService.setSessionsStats({
+        active,
+        total: sessions.length,
+        byStatus,
+      });
+    }
 
     return {
       sessions: {
@@ -187,29 +210,34 @@ export class StatsService {
     };
   }
 
-  async getMessageStats(period: '24h' | '7d' | '30d'): Promise<MessageStats> {
-    return this.memoized(`messages:${period}`, () => this.loadMessageStats(period));
+  async getMessageStats(period: '24h' | '7d' | '30d', tenantUserId?: string | null): Promise<MessageStats> {
+    const key = tenantUserId ? `messages:${period}:${tenantUserId}` : `messages:${period}`;
+    return this.memoized(key, () => this.loadMessageStats(period, tenantUserId));
   }
 
-  private async loadMessageStats(period: '24h' | '7d' | '30d'): Promise<MessageStats> {
+  private async loadMessageStats(period: '24h' | '7d' | '30d', tenantUserId?: string | null): Promise<MessageStats> {
     const since = this.getPeriodStart(period);
     const interval = period === '24h' ? 'hour' : 'day';
 
     // Time series - using raw query for SQLite compatibility
-    const timeSeries = await this.getTimeSeries(since, interval);
+    const timeSeries = await this.getTimeSeries(since, interval, tenantUserId);
 
     // By type. Rows with no body AND no metadata are content-less system/event rows (e.g. @lid
     // privacy-user events the engine maps to `unknown`) — counting them would put a misleading
     // "unknown" slice in the by-type chart, so they're excluded from the aggregation.
-    const byTypeRaw = await this.messageRepo
+    const byTypeQb = this.messageRepo
       .createQueryBuilder('m')
       .select('m.type', 'type')
       .addSelect('COUNT(*)', 'count')
       .where('m.createdAt >= :since', { since })
       // Parenthesized: TypeORM does not wrap an andWhere, so a bare OR would escape the period bound.
-      .andWhere("((m.body IS NOT NULL AND m.body != '') OR m.metadata IS NOT NULL)")
-      .groupBy('m.type')
-      .getRawMany<{ type: string; count: string }>();
+      .andWhere("((m.body IS NOT NULL AND m.body != '') OR m.metadata IS NOT NULL)");
+
+    if (tenantUserId) {
+      byTypeQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const byTypeRaw = await byTypeQb.groupBy('m.type').getRawMany<{ type: string; count: string }>();
 
     const byType: Record<string, number> = {};
     for (const row of byTypeRaw) {
@@ -217,12 +245,18 @@ export class StatsService {
     }
 
     // By session
-    const bySessionRaw = await this.messageRepo
+    const bySessionQb = this.messageRepo
       .createQueryBuilder('m')
       .select('m.sessionId', 'sessionId')
       .addSelect('m.direction', 'direction')
       .addSelect('COUNT(*)', 'count')
-      .where('m.createdAt >= :since', { since })
+      .where('m.createdAt >= :since', { since });
+
+    if (tenantUserId) {
+      bySessionQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const bySessionRaw = await bySessionQb
       .groupBy('m.sessionId')
       .addGroupBy('m.direction')
       .getRawMany<{ sessionId: string; direction: string; count: string }>();
@@ -237,7 +271,9 @@ export class StatsService {
       else entry.received = parseInt(row.count);
     }
 
-    const sessions = await this.sessionRepo.find();
+    const sessions = tenantUserId
+      ? await this.sessionRepo.find({ where: { ownerUserId: tenantUserId } })
+      : await this.sessionRepo.find();
     const sessionNames = new Map(sessions.map(s => [s.id, s.name]));
 
     const bySession = Array.from(sessionMap.entries()).map(([sessionId, stats]) => ({
@@ -247,12 +283,18 @@ export class StatsService {
     }));
 
     // Top chats
-    const topChats = await this.messageRepo
+    const topChatsQb = this.messageRepo
       .createQueryBuilder('m')
       .select('m.chatId', 'chatId')
       .addSelect('COUNT(*)', 'messageCount')
       .addSelect('MAX(m.chatName)', 'chatName')
-      .where('m.createdAt >= :since', { since })
+      .where('m.createdAt >= :since', { since });
+
+    if (tenantUserId) {
+      topChatsQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const topChats = await topChatsQb
       .groupBy('m.chatId')
       // Order by the aggregate expression, not the "messageCount" alias: Postgres folds an unquoted
       // ORDER BY messageCount to lowercase and 42703s against the quoted alias (SQLite tolerated it).
@@ -272,16 +314,19 @@ export class StatsService {
     };
   }
 
-  async getSessionStats(sessionId: string): Promise<SessionStats> {
+  async getSessionStats(sessionId: string, tenantUserId?: string | null): Promise<SessionStats> {
     // The memo has no write-path hook, so a `session:<id>` entry can outlive its session row and
     // would keep serving a deleted session's stats until the TTL expires. Re-check existence on
     // every call — a cheap primary-key lookup next to the aggregate scans the memo exists to
     // avoid — and drop the stale entry instead of serving it.
     const key = `session:${sessionId}`;
-    if ((await this.sessionRepo.count({ where: { id: sessionId } })) === 0) {
+    const session = await this.sessionRepo.findOne({ where: { id: sessionId } });
+    if (!session || (tenantUserId && session.ownerUserId !== tenantUserId)) {
       this.memo.delete(key);
       throw new NotFoundException('Session not found');
     }
+    return this.memoized(key, () => this.loadSessionStats(sessionId));
+  }
     return this.memoized(key, () => this.loadSessionStats(sessionId));
   }
 
@@ -358,17 +403,27 @@ export class StatsService {
     }
   }
 
-  private async getTimeSeries(since: Date, interval: 'hour' | 'day'): Promise<TimeSeriesPoint[]> {
+  private async getTimeSeries(
+    since: Date,
+    interval: 'hour' | 'day',
+    tenantUserId?: string | null,
+  ): Promise<TimeSeriesPoint[]> {
     // Alias the bucket as `bucket`, not `timestamp`: `timestamp` is a reserved type keyword in
     // PostgreSQL, so `GROUP BY timestamp` is not read as the output alias and the query 500s
     // ("column m.createdAt must appear in the GROUP BY"). SQLite tolerates it, hence the dialect-only
     // bug. The API field stays `timestamp` (mapped below).
-    const raw = await this.messageRepo
+    const qb = this.messageRepo
       .createQueryBuilder('m')
       .select(timeSeriesTimestampSql(this.dataDbType, interval), 'bucket')
       .addSelect(`SUM(CASE WHEN m.direction = 'outgoing' THEN 1 ELSE 0 END)`, 'sent')
       .addSelect(`SUM(CASE WHEN m.direction = 'incoming' THEN 1 ELSE 0 END)`, 'received')
-      .where('m.createdAt >= :since', { since })
+      .where('m.createdAt >= :since', { since });
+
+    if (tenantUserId) {
+      qb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
+    }
+
+    const raw = await qb
       .groupBy('bucket')
       .orderBy('bucket', 'ASC')
       .getRawMany<{ bucket: string; sent: string; received: string }>();

@@ -85,6 +85,7 @@ export interface PluginInstanceRecord {
   enabled: boolean;
   config?: Record<string, unknown> | null;
   sessionScope?: string | null;
+  ownerUserId?: string | null;
 }
 
 /** Instance lookup verbs: the net-allowlist widening and the ingress per-instance config resolution. */

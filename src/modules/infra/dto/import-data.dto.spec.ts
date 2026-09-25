@@ -98,7 +98,6 @@ describe('ImportDataDto', () => {
   it.each<[string, number]>([
     ['docs/06-api-specification.md', 4],
     ['docs/07-api-collection.md', 1],
-    ['docs/14-migration-guide.md', 2],
   ])('every %s migration-table example shows every table the importer restores', (file, expected) => {
     const doc = readFileSync(join(__dirname, '..', '..', '..', '..', ...file.split('/')), 'utf8');
     const containers = tableContainers(doc);

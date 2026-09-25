@@ -698,10 +698,7 @@ export interface SearchResults {
 // a generic error toast nor receive an undefined payload while the page navigates away. Otherwise
 // throw an Error carrying the HTTP status and, when the gateway supplied one, its machine code.
 function getStoredApiKey(): string | null {
-  return (
-    sessionStorage.getItem('zaptura_api_key') ||
-    localStorage.getItem('zaptura_api_key')
-  );
+  return sessionStorage.getItem('zaptura_api_key') || localStorage.getItem('zaptura_api_key');
 }
 
 async function handleErrorResponse<T>(response: Response): Promise<T> {
@@ -1271,6 +1268,7 @@ export interface Plugin {
   enabledAt?: string;
   error?: string;
   i18n?: PluginI18n;
+  ownerUserId?: string | null;
 }
 
 export interface Engine {
@@ -1371,6 +1369,7 @@ export interface InstanceView {
   createdAt: string;
   updatedAt: string;
   ingressUrls: IngressUrl[];
+  ownerUserId?: string | null;
 }
 
 export type MintedInstance = InstanceView; // same shape; `secret` carries the plaintext once
@@ -1467,3 +1466,43 @@ export const accountApi = {
       body: JSON.stringify({ currentPassword, newPassword }),
     }),
 };
+
+// =============================================================================
+// Admin Users API (mirrors src/modules/auth/admin-users.controller.ts)
+// =============================================================================
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  plan: 'starter' | 'pro' | 'plus' | 'business';
+  role: 'admin' | 'user';
+  sessionCount: number;
+  sessionLimit: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const adminUsersApi = {
+  list: () => request<AdminUser[]>('/admin/users'),
+  updatePlan: (id: string, plan: string) =>
+    request<AdminUser>(`/admin/users/${id}/plan`, {
+      method: 'PATCH',
+      body: JSON.stringify({ plan }),
+    }),
+  updateUser: (id: string, data: { name?: string; email?: string; plan?: string }) =>
+    request<AdminUser>(`/admin/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  resetPassword: (id: string, newPassword: string) =>
+    request<{ ok: boolean; message: string }>(`/admin/users/${id}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword }),
+    }),
+  deleteUser: (id: string) =>
+    request<{ ok: boolean }>(`/admin/users/${id}`, {
+      method: 'DELETE',
+    }),
+};
+

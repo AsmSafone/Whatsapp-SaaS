@@ -11,13 +11,14 @@ import { ChatScopeService } from './chat-scope.service';
 import { AuthController } from './auth.controller';
 import { AuthValidateController } from './auth-validate.controller';
 import { AccountController } from './account.controller';
+import { AdminUsersController } from './admin-users.controller';
 import { ApiKeyGuard } from './guards/api-key.guard';
 import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-throttler.guard';
 
 @Global()
 @Module({
   imports: [TypeOrmModule.forFeature([ApiKey, User], 'main'), TypeOrmModule.forFeature([Session], 'data')],
-  controllers: [AuthController, AuthValidateController, AccountController],
+  controllers: [AuthController, AuthValidateController, AccountController, AdminUsersController],
   providers: [
     AuthService,
     AccountService,

@@ -102,6 +102,13 @@ export class InstanceView {
   })
   sessionScope!: string | null;
 
+  @ApiPropertyOptional({
+    description: 'Tenant user ID that owns this instance (null for system/admin instances).',
+    nullable: true,
+    type: String,
+  })
+  ownerUserId!: string | null;
+
   @ApiProperty({
     description:
       "Ingress HMAC secret. Masked ('***') on every read; plaintext returned only once on create/regenerate-secret.",

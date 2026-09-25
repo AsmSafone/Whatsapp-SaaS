@@ -886,7 +886,10 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
   /**
    * Get overall session statistics for multi-session monitoring
    */
-  async getStats(allowedSessions?: string[] | null): Promise<{
+  async getStats(
+    allowedSessions?: string[] | null,
+    ownerUserId?: string | null,
+  ): Promise<{
     total: number;
     active: number;
     ready: number;
@@ -908,6 +911,13 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
     if (scope) {
       qb.where('session.id IN (:...scope)', { scope });
     }
+    if (ownerUserId) {
+      if (scope) {
+        qb.andWhere('session.ownerUserId = :ownerUserId', { ownerUserId });
+      } else {
+        qb.where('session.ownerUserId = :ownerUserId', { ownerUserId });
+      }
+    }
     const rows = await qb.groupBy('session.status').getRawMany<{ status: string; count: string }>();
 
     const byStatus: Record<string, number> = {};
@@ -920,10 +930,18 @@ export class SessionService implements OnModuleDestroy, OnModuleInit, OnApplicat
 
     const memory = process.memoryUsage();
 
+    let active = this.engines.size;
+    if (scope) {
+      active = [...this.engines.keys()].filter(id => scope.includes(id)).length;
+    } else if (ownerUserId) {
+      const owned = await this.sessionRepository.find({ where: { ownerUserId }, select: { id: true } });
+      const ownedIds = new Set(owned.map(s => s.id));
+      active = [...this.engines.keys()].filter(id => ownedIds.has(id)).length;
+    }
+
     return {
       total,
-      // engines is keyed by session id; a scoped key sees only its own running engines, not the global count.
-      active: scope ? [...this.engines.keys()].filter(id => scope.includes(id)).length : this.engines.size,
+      active,
       ready: byStatus[SessionStatus.READY] || 0,
       disconnected: byStatus[SessionStatus.DISCONNECTED] || 0,
       byStatus,

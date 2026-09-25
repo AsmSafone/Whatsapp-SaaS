@@ -399,12 +399,13 @@ describe('SessionController — proxy() response contract', () => {
     hasCredentials: true,
   };
 
-  let sessionService: { getProxy: jest.Mock; updateProxy: jest.Mock };
+  let sessionService: { findOne: jest.Mock; getProxy: jest.Mock; updateProxy: jest.Mock };
   let auditService: { logInfo: jest.Mock };
   let controller: SessionController;
 
   beforeEach(() => {
     sessionService = {
+      findOne: jest.fn().mockResolvedValue({ id: 'sess-uuid-1' }),
       getProxy: jest.fn().mockResolvedValue(proxyProjection),
       updateProxy: jest.fn().mockResolvedValue(proxyProjection),
     };

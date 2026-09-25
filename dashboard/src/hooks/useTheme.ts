@@ -54,8 +54,7 @@ export function useTheme() {
     setThemeState(newTheme);
   }, []);
 
-  const resolvedTheme: 'light' | 'dark' =
-    theme === 'system' ? (systemIsDark ? 'dark' : 'light') : theme;
+  const resolvedTheme: 'light' | 'dark' = theme === 'system' ? (systemIsDark ? 'dark' : 'light') : theme;
 
   const toggleTheme = useCallback(() => {
     setThemeState(prev => {

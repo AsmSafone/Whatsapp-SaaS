@@ -10,6 +10,7 @@ import {
   pluginInstancesApi,
   statsApi,
   accountApi,
+  adminUsersApi,
   type Webhook,
   type WebhookFilters,
   type TemplatePayload,
@@ -37,6 +38,7 @@ export const queryKeys = {
   statsOverview: ['stats', 'overview'] as const,
   statsMessages: (period: string) => ['stats', 'messages', period] as const,
   accountMe: ['account', 'me'] as const,
+  adminUsers: ['admin', 'users'] as const,
 };
 
 // ── Session Queries ───────────────────────────────────────────────────
@@ -353,14 +355,13 @@ export function useCurrentEngineQuery() {
 }
 
 // ── Stats Queries ─────────────────────────────────────────────────────
-// /stats/* is ADMIN-only; a non-admin key gets 403 → don't retry, let the UI fall back gracefully.
+// /stats/* is scoped to tenant for USER keys, cross-instance for ADMIN keys.
 
 export function useStatsOverviewQuery() {
   return useQuery({
     queryKey: queryKeys.statsOverview,
     queryFn: statsApi.getOverview,
     staleTime: 30_000,
-    retry: false,
   });
 }
 
@@ -369,7 +370,6 @@ export function useStatsMessagesQuery(period: StatsPeriod) {
     queryKey: queryKeys.statsMessages(period),
     queryFn: () => statsApi.getMessages(period),
     staleTime: 30_000,
-    retry: false,
   });
 }
 
@@ -414,3 +414,55 @@ export function useChangePasswordMutation() {
       accountApi.changePassword(currentPassword, newPassword),
   });
 }
+
+// ── Admin Users Queries ───────────────────────────────────────────────
+
+export function useAdminUsersQuery() {
+  return useQuery({
+    queryKey: queryKeys.adminUsers,
+    queryFn: () => adminUsersApi.list(),
+  });
+}
+
+export function useAdminUpdatePlanMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, plan }: { id: string; plan: string }) => adminUsersApi.updatePlan(id, plan),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
+    },
+  });
+}
+
+export function useAdminUpdateUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name?: string; email?: string; plan?: string } }) =>
+      adminUsersApi.updateUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
+    },
+  });
+}
+
+export function useAdminResetPasswordMutation() {
+  return useMutation({
+    mutationFn: ({ id, newPassword }: { id: string; newPassword: string }) =>
+      adminUsersApi.resetPassword(id, newPassword),
+  });
+}
+
+export function useAdminDeleteUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminUsersApi.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessionStats });
+    },
+  });
+}
+

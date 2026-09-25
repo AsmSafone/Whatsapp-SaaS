@@ -1252,7 +1252,9 @@
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform 0.2s, background 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.2s;
   box-shadow: 0 2px 6px rgba(0, 168, 132, 0.35);
 }
 
@@ -1286,8 +1288,12 @@
 }
 
 @keyframes zpPulseWave {
-  0% { opacity: 0.8; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .zp-shell .zp-wa-voice-time {
@@ -1436,9 +1442,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #2a3942;
+  background: #3b4a54;
   border: none;
-  color: #8696a0;
+  color: #d1d7db;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1882,8 +1888,8 @@
 .zp-shell .zp-pricing-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  max-width: 1260px;
+  gap: 1.75rem;
+  max-width: 1400px;
   margin: 0 auto;
   align-items: stretch;
 }
@@ -1891,8 +1897,8 @@
 .zp-shell .zp-pricing-card {
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 2.25rem 1.65rem;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -1900,6 +1906,7 @@
     transform 0.25s,
     border-color 0.25s,
     box-shadow 0.25s;
+  min-width: 0;
 }
 
 .zp-shell .zp-pricing-card:hover {
@@ -1999,46 +2006,217 @@
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-/* Feature Matrix Table */
+/* ========== Feature Comparison Matrix ========== */
 .zp-shell .zp-matrix-section {
-  margin-top: 4.5rem;
+  margin-top: 5rem;
 }
 
 .zp-shell .zp-matrix-title {
   text-align: center;
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
   color: #f8fafc;
-  margin-bottom: 2rem;
+  margin: 0 0 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+.zp-shell .zp-matrix-title span {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.zp-shell .zp-matrix-subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 2.5rem;
 }
 
 .zp-shell .zp-matrix-table-wrap {
   overflow-x: auto;
-  background: rgba(15, 23, 42, 0.65);
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.35);
+  background: rgba(10, 18, 35, 0.9);
+  -webkit-overflow-scrolling: touch;
 }
 
 .zp-shell .zp-matrix-table {
   width: 100%;
+  min-width: 700px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
-.zp-shell .zp-matrix-table th,
-.zp-shell .zp-matrix-table td {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+/* ── Sticky header row ── */
+.zp-shell .zp-matrix-table thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(10, 18, 35, 0.98);
+  backdrop-filter: blur(8px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.zp-shell .zp-matrix-table th {
-  background: rgba(255, 255, 255, 0.02);
-  color: #f8fafc;
+.zp-shell .zp-matrix-feature-col {
+  width: 36%;
+  padding: 1.1rem 1.5rem;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.zp-shell .zp-matrix-plan-col {
+  width: 16%;
+  padding: 1rem 1rem;
+  text-align: center;
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Popular column highlight stripe */
+.zp-shell .zp-matrix-popular-col {
+  background: rgba(16, 185, 129, 0.06);
+  border-left: 2px solid rgba(16, 185, 129, 0.5) !important;
+  border-right: 2px solid rgba(16, 185, 129, 0.5);
+}
+
+.zp-shell .zp-matrix-plan-name {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.zp-shell .zp-matrix-popular-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Category group separator rows ── */
+.zp-shell .zp-matrix-group-row {
+  background: rgba(255, 255, 255, 0.025);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zp-shell .zp-matrix-group-label {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zp-shell .zp-matrix-group-icon {
+  font-size: 1rem;
+}
+
+/* ── Data rows ── */
+.zp-shell .zp-matrix-data-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+
+.zp-shell .zp-matrix-data-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.zp-shell .zp-matrix-data-row:last-child {
+  border-bottom: none;
+}
+
+/* Zebra stripe (every other data row) */
+.zp-shell .zp-matrix-data-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.zp-shell .zp-matrix-feature-name {
+  padding: 0.85rem 1.5rem;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zp-shell .zp-matrix-cell {
+  padding: 0.85rem 1rem;
+  text-align: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+.zp-shell .zp-matrix-popular-cell {
+  background: rgba(16, 185, 129, 0.04);
+  border-left-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Value indicators */
+.zp-shell .zp-matrix-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.zp-shell .zp-matrix-cross {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  font-size: 1rem;
   font-weight: 700;
 }
 
-.zp-shell .zp-matrix-table td {
-  color: #cbd5e1;
+.zp-shell .zp-matrix-value {
+  font-weight: 600;
+  color: #e2e8f0;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+/* Tooltip badge (? marker) */
+.zp-shell .zp-matrix-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(100, 116, 139, 0.25);
+  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  cursor: help;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.zp-shell .zp-matrix-tooltip:hover {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
 }
 
 /* ================= FAQ Accordion ================= */
@@ -2346,11 +2524,11 @@
 
 /* ================= Responsive Breakpoints ================= */
 
-@media (max-width: 1180px) {
+@media (max-width: 1280px) {
   .zp-shell .zp-pricing-grid {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 760px;
-    gap: 1.5rem;
+    max-width: 900px;
+    gap: 1.75rem;
     margin: 0 auto;
   }
 }
@@ -2384,8 +2562,12 @@
   /* Pricing grid — 2 columns on tablet */
   .zp-shell .zp-pricing-grid {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 640px;
+    max-width: 720px;
+    gap: 1.5rem;
     margin: 0 auto;
+  }
+  .zp-shell .zp-pricing-card {
+    padding: 2rem 1.75rem;
   }
 
   /* Type selector — 2 columns on tablet */
@@ -2552,10 +2734,12 @@
 
   /* Pricing */
   .zp-shell .zp-pricing-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 100%;
+    gap: 1rem;
   }
   .zp-shell .zp-pricing-card {
-    padding: 1.75rem 1.25rem;
+    padding: 1.75rem 1.5rem;
   }
 
   /* CTA */
@@ -2707,9 +2891,13 @@
   /* Pricing */
   .zp-shell .zp-pricing-grid {
     grid-template-columns: 1fr;
-    max-width: 360px;
+    max-width: 100%;
     margin: 0 auto;
-    gap: 1.25rem;
+    gap: 1rem;
+  }
+  .zp-shell .zp-pricing-card {
+    padding: 1.75rem 1.5rem;
+    border-radius: 16px;
   }
   .zp-shell .zp-plan-amount {
     font-size: 2.25rem;

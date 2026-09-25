@@ -1,4 +1,12 @@
-import { ConflictException, Injectable, Optional, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  Optional,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomBytes } from 'crypto';
@@ -214,4 +222,148 @@ export class AccountService {
     apiKey.updatedAt = user.updatedAt;
     return apiKey;
   }
+
+  async adminListUsers(): Promise<AdminUserView[]> {
+    const users = await this.users.find({ order: { createdAt: 'DESC' } });
+    const defaultAdmin = resolveDefaultAdminEmail().toLowerCase();
+
+    const sessionCountsRaw = await this.sessions
+      .createQueryBuilder('s')
+      .select('s.ownerUserId', 'ownerUserId')
+      .addSelect('COUNT(s.id)', 'count')
+      .where('s.ownerUserId IS NOT NULL')
+      .groupBy('s.ownerUserId')
+      .getRawMany<{ ownerUserId: string; count: string }>();
+
+    const countMap = new Map<string, number>();
+    for (const row of sessionCountsRaw) {
+      if (row.ownerUserId) {
+        countMap.set(row.ownerUserId, parseInt(row.count, 10) || 0);
+      }
+    }
+
+    return users.map(user => {
+      const isOwner = user.email.toLowerCase() === defaultAdmin;
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        plan: user.plan,
+        role: isOwner ? 'admin' : 'user',
+        sessionCount: countMap.get(user.id) || 0,
+        sessionLimit: PLAN_LIMITS[user.plan] ?? 1,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+    });
+  }
+
+  async adminSetPlan(userId: string, plan: UserPlan): Promise<AdminUserView> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    user.plan = plan;
+    const saved = await this.users.save(user);
+    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    const isOwner = saved.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    return {
+      id: saved.id,
+      name: saved.name,
+      email: saved.email,
+      plan: saved.plan,
+      role: isOwner ? 'admin' : 'user',
+      sessionCount,
+      sessionLimit: PLAN_LIMITS[saved.plan] ?? 1,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt,
+    };
+  }
+
+  async adminUpdateUser(
+    userId: string,
+    dto: { name?: string; email?: string; plan?: UserPlan },
+  ): Promise<AdminUserView> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const defaultAdmin = resolveDefaultAdminEmail().toLowerCase();
+    const isOwner = user.email.toLowerCase() === defaultAdmin;
+
+    if (dto.name !== undefined && dto.name.trim().length > 0) {
+      user.name = dto.name.trim();
+    }
+
+    if (dto.email !== undefined && dto.email.trim().length > 0) {
+      const nextEmail = dto.email.trim().toLowerCase();
+      if (nextEmail !== user.email.toLowerCase()) {
+        const existing = await this.users.findOne({ where: { email: nextEmail } });
+        if (existing && existing.id !== user.id) {
+          throw new ConflictException('An account with this email already exists');
+        }
+        user.email = nextEmail;
+      }
+    }
+
+    if (dto.plan !== undefined) {
+      user.plan = dto.plan;
+    }
+
+    const saved = await this.users.save(user);
+    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    return {
+      id: saved.id,
+      name: saved.name,
+      email: saved.email,
+      plan: saved.plan,
+      role: isOwner ? 'admin' : 'user',
+      sessionCount,
+      sessionLimit: PLAN_LIMITS[saved.plan] ?? 1,
+      createdAt: saved.createdAt,
+      updatedAt: saved.updatedAt,
+    };
+  }
+
+  async adminResetPassword(userId: string, newPassword: string): Promise<{ ok: boolean; message: string }> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    user.passwordHash = hashPassword(newPassword);
+    await this.users.save(user);
+
+    if (user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase()) {
+      try {
+        writeBootstrapAccount(user.email, newPassword);
+      } catch {
+        // file write non-fatal
+      }
+    }
+
+    return { ok: true, message: 'Password has been reset successfully' };
+  }
+
+  async adminDeleteUser(userId: string): Promise<{ ok: boolean }> {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    const defaultAdmin = resolveDefaultAdminEmail().toLowerCase();
+    if (user.email.toLowerCase() === defaultAdmin) {
+      throw new ForbiddenException('The primary owner/admin account cannot be deleted');
+    }
+
+    await this.sessions.delete({ ownerUserId: user.id });
+    await this.users.delete({ id: user.id });
+
+    return { ok: true };
+  }
+}
+
+export interface AdminUserView {
+  id: string;
+  name: string;
+  email: string;
+  plan: UserPlan;
+  role: 'admin' | 'user';
+  sessionCount: number;
+  sessionLimit: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -1024,22 +1024,17 @@ describe('AuthService', () => {
       expect(service.hasPermission(key, ApiKeyRole.ADMIN)).toBe(true);
     });
 
-    it('should allow ADMIN to access OPERATOR routes', () => {
+    it('should allow ADMIN to access USER routes', () => {
       const key = createMockApiKey({ role: ApiKeyRole.ADMIN });
       expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(true);
     });
 
-    it('should allow ADMIN to access VIEWER routes', () => {
-      const key = createMockApiKey({ role: ApiKeyRole.ADMIN });
-      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(true);
-    });
-
-    it('should deny VIEWER access to OPERATOR routes', () => {
+    it('should allow USER to access USER routes', () => {
       const key = createMockApiKey({ role: ApiKeyRole.USER });
-      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(false);
+      expect(service.hasPermission(key, ApiKeyRole.USER)).toBe(true);
     });
 
-    it('should deny OPERATOR access to ADMIN routes', () => {
+    it('should deny USER access to ADMIN routes', () => {
       const key = createMockApiKey({ role: ApiKeyRole.USER });
       expect(service.hasPermission(key, ApiKeyRole.ADMIN)).toBe(false);
     });

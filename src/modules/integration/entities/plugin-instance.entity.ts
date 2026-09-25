@@ -18,6 +18,9 @@ export class PluginInstance {
   @Column({ type: 'varchar', nullable: true })
   sessionScope!: string | null; // resolved session id this instance acts on; null = inherit manifest.sessions
 
+  @Column({ type: 'varchar', length: 36, nullable: true })
+  ownerUserId!: string | null; // tenant user ID that owns this instance (null for system/admin instances)
+
   @Column()
   secret!: string; // host-minted ingress HMAC secret; stored plaintext, masked to '***' on API reads
   // (via PluginInstanceService.maskedView + the provisioning controller's reveal flag), exposed

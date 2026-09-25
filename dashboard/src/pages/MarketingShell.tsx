@@ -112,7 +112,7 @@ export function MarketingShell({ children }: MarketingShellProps) {
           <div className="zp-footer-col">
             <h4>Developers</h4>
             <Link to="/docs">Quickstart Guide</Link>
-            <a href="/#code">SDKs & Code Samples</a>
+            <a href="/#code">Code Samples</a>
             <a href="/#faq">Technical FAQ</a>
             <a href="/api/docs" target="_blank" rel="noreferrer">
               Swagger UI

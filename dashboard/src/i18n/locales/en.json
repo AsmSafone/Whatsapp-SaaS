@@ -62,10 +62,12 @@
     "webhooks": "Webhooks",
     "templates": "Templates",
     "apiKeys": "API Keys",
-    "messageTester": "Message Tester",
+    "messageTester": "Playground",
+    "playground": "Playground",
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
-    "logs": "Logs",
+    "users": "Users",
+    "logs": "Audit Logs",
     "profile": "Profile"
   },
   "chats": {
@@ -677,8 +679,8 @@
     }
   },
   "messageTester": {
-    "title": "Message Tester",
-    "subtitle": "Send test messages through the API",
+    "title": "Playground",
+    "subtitle": "Test WhatsApp API messages and endpoints interactively",
     "compose": "Send Test Message",
     "responseTitle": "API Response",
     "session": "Session",
@@ -1082,5 +1084,73 @@
       "current": "This session"
     },
     "loading": "Searching…"
+  },
+  "playground": {
+    "title": "Playground",
+    "subtitle": "Test WhatsApp API messages and endpoints interactively"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage registered tenant accounts, subscriptions, and access",
+    "totalUsers": "Total Users",
+    "activeSessions": "Active Sessions",
+    "starterUsers": "Starter Plan",
+    "proUsers": "Pro Plan",
+    "plusUsers": "Plus Plan",
+    "businessUsers": "Business Plan",
+    "searchPlaceholder": "Search users by name or email...",
+    "filterPlan": "All Plans",
+    "noUsersFound": "No users found",
+    "noUsersMatch": "No users match your search",
+    "ownerBadge": "Owner / Admin",
+    "columns": {
+      "user": "User",
+      "role": "Role",
+      "plan": "Plan",
+      "sessions": "Sessions Usage",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "sessionsUsage": "{{count}} of {{limit}} sessions",
+    "actions": {
+      "changePlan": "Change Plan",
+      "resetPassword": "Reset Password",
+      "deleteUser": "Delete User"
+    },
+    "changePlanModal": {
+      "title": "Change Subscription Plan",
+      "subtitle": "Adjust plan tier and session limits for {{name}} ({{email}})",
+      "currentPlan": "Current Plan",
+      "selectPlan": "Select New Plan",
+      "confirm": "Update Plan",
+      "cancel": "Cancel",
+      "starterDesc": "1 WhatsApp Session included",
+      "proDesc": "3 WhatsApp Sessions included",
+      "plusDesc": "6 WhatsApp Sessions included",
+      "businessDesc": "10 WhatsApp Sessions included",
+      "updating": "Updating plan...",
+      "success": "Plan updated successfully"
+    },
+    "resetPasswordModal": {
+      "title": "Reset Password",
+      "subtitle": "Set a new password for {{name}} ({{email}})",
+      "newPassword": "New Password",
+      "placeholder": "Minimum 8 characters",
+      "confirm": "Reset Password",
+      "cancel": "Cancel",
+      "resetting": "Resetting password...",
+      "success": "Password reset successfully",
+      "lengthError": "Password must be at least 8 characters"
+    },
+    "deleteModal": {
+      "title": "Delete User Account",
+      "confirmMessage": "Are you sure you want to delete user <strong>{{name}}</strong> ({{email}})?",
+      "warning": "This will permanently delete the user account and any associated WhatsApp sessions. This action cannot be undone.",
+      "confirm": "Delete User",
+      "cancel": "Cancel",
+      "deleting": "Deleting user...",
+      "success": "User deleted successfully",
+      "cannotDeleteOwner": "Cannot delete the primary owner/admin account"
+    }
   }
 }

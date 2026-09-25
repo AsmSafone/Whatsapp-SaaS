@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { MarketingShell } from './MarketingShell';
-import { CODE_SAMPLES, FAQ_ITEMS, NX_PLAN_FEATURES, NX_PLANS } from './marketing-data';
+import { CODE_SAMPLES, FAQ_ITEMS, FEATURE_MATRIX, NX_PLANS } from './marketing-data';
 import './Marketing.css';
 
 const LANGS = ['JS', 'Python', 'cURL', 'Go', 'PHP'] as const;
@@ -62,7 +62,25 @@ interface DemoMessage {
   otpCode?: string;
 }
 
-const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
+interface DemoPayload {
+  endpoint: string;
+  method: string;
+  status: number;
+  latencyMs: number;
+  request: Record<string, unknown>;
+  webhook: Record<string, unknown>;
+}
+
+const SCENARIOS: Record<
+  string,
+  {
+    label: string;
+    messages: DemoMessage[];
+    composerType: MsgType;
+    composerText: string;
+    composerRecipient: string;
+  }
+> = {
   ecommerce: {
     label: '🛒 Order Tracking',
     messages: [
@@ -88,6 +106,9 @@ const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
         ],
       },
     ],
+    composerType: 'text',
+    composerText: 'Order #9482 confirmed! Your tracking link is ready.',
+    composerRecipient: '+1 (555) 382-9012',
   },
   otp: {
     label: '🔐 2FA Auth OTP',
@@ -112,6 +133,9 @@ const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
         buttons: [{ id: 'copy_otp', label: '📋 Copy Code: 849-204', action: 'copy_otp' }],
       },
     ],
+    composerType: 'text',
+    composerText: 'Send verification code for developer login',
+    composerRecipient: '+1 (555) 201-8834',
   },
   ai: {
     label: '🤖 AI Support Agent',
@@ -137,6 +161,9 @@ const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
         ],
       },
     ],
+    composerType: 'text',
+    composerText: 'What makes Zaptura faster than official Meta Cloud API?',
+    composerRecipient: '+1 (555) 498-1230',
   },
   voice: {
     label: '🎙 Audio Note',
@@ -159,6 +186,9 @@ const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
         status: 'read',
       },
     ],
+    composerType: 'voice',
+    composerText: '🎙 Voice message (0:14) dispatched via Baileys API',
+    composerRecipient: '+1 (555) 123-9087',
   },
   doc: {
     label: '📄 PDF Invoice',
@@ -182,8 +212,15 @@ const SCENARIOS: Record<string, { label: string; messages: DemoMessage[] }> = {
         status: 'read',
       },
     ],
+    composerType: 'doc',
+    composerText: '📄 Invoice_ZAP_9821.pdf generated and dispatched via API',
+    composerRecipient: '+1 (555) 765-4321',
   },
 };
+
+// Live iPhone clock helper
+const formatIPhoneClock = (d: Date) =>
+  d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
 
 export function Landing() {
   useDocumentTitle('Zaptura — Autonomous WhatsApp API & Automation Cloud');
@@ -192,6 +229,13 @@ export function Landing() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [yearly, setYearly] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Live iPhone clock
+  const [clockTime, setClockTime] = useState(() => formatIPhoneClock(new Date()));
+  useEffect(() => {
+    const id = setInterval(() => setClockTime(formatIPhoneClock(new Date())), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Live WhatsApp Simulator State (Mobile First & Interactive)
   const [mobileTab, setMobileTab] = useState<'phone' | 'api'>('phone');
@@ -208,7 +252,7 @@ export function Landing() {
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
   const [messagesList, setMessagesList] = useState<DemoMessage[]>(SCENARIOS.ecommerce.messages);
-  const [lastPayload, setLastPayload] = useState<any>({
+  const [lastPayload, setLastPayload] = useState<DemoPayload>({
     endpoint: '/api/sessions/zap_prod_01/messages/send-text',
     method: 'POST',
     status: 200,
@@ -269,6 +313,9 @@ export function Landing() {
     const scenario = SCENARIOS[key];
     if (!scenario) return;
     setMessagesList(scenario.messages);
+    setSimType(scenario.composerType);
+    setSimText(scenario.composerText);
+    setSimRecipient(scenario.composerRecipient);
 
     setLastPayload({
       endpoint: `/api/sessions/zap_prod_01/scenarios/${key}`,
@@ -491,7 +538,12 @@ export function Landing() {
         replyType = 'voice';
         replyText = '🎙 Voice note dispatched via Baileys audio stream (OPUS codec)';
         mediaDuration = '0:14';
-      } else if (lower.includes('doc') || lower.includes('pdf') || lower.includes('invoice') || lower.includes('file')) {
+      } else if (
+        lower.includes('doc') ||
+        lower.includes('pdf') ||
+        lower.includes('invoice') ||
+        lower.includes('file')
+      ) {
         replyType = 'doc';
         replyText = '📄 Generated Invoice_ZAP_9821.pdf dispatched via API';
         mediaName = 'Invoice_ZAP_9821.pdf';
@@ -696,18 +748,6 @@ export function Landing() {
                 {item.label}
               </button>
             ))}
-            <button
-              type="button"
-              className="zp-scenario-btn zp-scenario-reset"
-              onClick={() => {
-                loadScenario('ecommerce');
-                showToast('Chat history reset to default scenario');
-              }}
-              title="Reset conversation"
-            >
-              <RotateCcw size={13} />
-              <span>Reset</span>
-            </button>
           </div>
         </div>
 
@@ -827,7 +867,7 @@ export function Landing() {
             <div className="zp-phone-wrapper">
               {/* iPhone Dynamic Island & Status Bar */}
               <div className="zp-iphone-status-bar">
-                <span className="zp-iphone-time">9:41</span>
+                <span className="zp-iphone-time">{clockTime}</span>
                 <div className="zp-iphone-island">
                   <div className="zp-iphone-island-cam" />
                 </div>
@@ -918,7 +958,11 @@ export function Landing() {
                           }}
                           aria-label={playingVoiceId === msg.id ? 'Pause voice message' : 'Play voice message'}
                         >
-                          {playingVoiceId === msg.id ? <Pause size={14} /> : <Play size={14} className="zp-play-icon" />}
+                          {playingVoiceId === msg.id ? (
+                            <Pause size={14} />
+                          ) : (
+                            <Play size={14} className="zp-play-icon" />
+                          )}
                         </button>
                         <div className="zp-wa-voice-waveform">
                           <div
@@ -928,7 +972,11 @@ export function Landing() {
                             }}
                           />
                           <div className="zp-wa-voice-time">
-                            <span>{playingVoiceId === msg.id ? `0:0${Math.floor(voiceProgress / 8)}` : (msg.mediaDuration || '0:14')}</span>
+                            <span>
+                              {playingVoiceId === msg.id
+                                ? `0:0${Math.floor(voiceProgress / 8)}`
+                                : msg.mediaDuration || '0:14'}
+                            </span>
                             <span className="zp-wa-voice-tag">OPUS 48kHz</span>
                           </div>
                         </div>
@@ -1258,9 +1306,7 @@ export function Landing() {
           <h2 className="zp-section-title">
             Simple Plans. <span>Zero Hidden Costs.</span>
           </h2>
-          <p className="zp-section-desc">
-            Scale your WhatsApp operations with predictable flat pricing in Zaptura.
-          </p>
+          <p className="zp-section-desc">Scale your WhatsApp operations with predictable flat pricing in Zaptura.</p>
         </div>
 
         <div className="zp-billing-toggle-wrap">
@@ -1275,7 +1321,7 @@ export function Landing() {
         </div>
 
         <div className="zp-pricing-grid">
-          {NX_PLANS.map(plan => {
+          {NX_PLANS.map((plan, planIdx) => {
             const price = yearly ? Math.round(plan.monthly * 12 * 0.85) : plan.monthly;
             return (
               <div key={plan.id} className={`zp-pricing-card ${plan.popular ? 'popular' : ''}`}>
@@ -1306,12 +1352,15 @@ export function Landing() {
                       {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
-                  {NX_PLAN_FEATURES.map((feat, idx) => (
-                    <li key={idx}>
-                      <Check size={14} className="zp-text-emerald" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                  {FEATURE_MATRIX.flatMap(g => g.rows)
+                    .filter(row => row.values[planIdx] === true)
+                    .slice(0, 7)
+                    .map(row => (
+                      <li key={row.feature}>
+                        <Check size={14} className="zp-text-emerald" />
+                        <span>{row.feature}</span>
+                      </li>
+                    ))}
                 </ul>
 
                 <Link

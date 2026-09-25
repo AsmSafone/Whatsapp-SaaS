@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Star, ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, Star } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { MarketingShell } from './MarketingShell';
-import { NX_PLAN_FEATURES, NX_PLANS } from './marketing-data';
+import { FEATURE_MATRIX, NX_PLANS } from './marketing-data';
 import './Marketing.css';
 
 export function Pricing() {
@@ -67,12 +67,30 @@ export function Pricing() {
                       {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
-                  {NX_PLAN_FEATURES.map((feat, idx) => (
-                    <li key={idx}>
-                      <Check size={14} className="zp-text-emerald" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>Zero per-message fees</span>
+                  </li>
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>Full REST + WebSocket API</span>
+                  </li>
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>OpenAPI 3.0 / Swagger UI</span>
+                  </li>
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>HMAC-signed webhooks</span>
+                  </li>
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>AES-256 session encryption</span>
+                  </li>
+                  <li>
+                    <Check size={14} className="zp-text-emerald" />
+                    <span>Auto-reconnect watchdog</span>
+                  </li>
                 </ul>
 
                 <Link
@@ -87,78 +105,67 @@ export function Pricing() {
           })}
         </div>
 
-        {/* Feature Comparison Matrix */}
+        {/* ─── Detailed Feature Comparison Matrix ─── */}
         <div className="zp-matrix-section">
-          <h3 className="zp-matrix-title">Detailed Feature Matrix</h3>
+          <h3 className="zp-matrix-title">
+            Full Feature <span>Comparison</span>
+          </h3>
+          <p className="zp-matrix-subtitle">Every capability, every plan — no asterisks hidden in fine print.</p>
+
           <div className="zp-matrix-table-wrap">
-            <table className="zp-matrix-table">
+            <table className="zp-matrix-table" role="table">
               <thead>
                 <tr>
-                  <th>Capability</th>
-                  <th>Starter</th>
-                  <th>Pro</th>
-                  <th>Plus</th>
-                  <th>Business</th>
+                  <th className="zp-matrix-feature-col">Feature</th>
+                  {NX_PLANS.map(p => (
+                    <th key={p.id} className={`zp-matrix-plan-col ${p.popular ? 'zp-matrix-popular-col' : ''}`}>
+                      <span className="zp-matrix-plan-name">{p.name}</span>
+                      {p.popular && <span className="zp-matrix-popular-tag">Popular</span>}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Concurrent WhatsApp Sessions</td>
-                  <td>1 Number</td>
-                  <td>3 Numbers</td>
-                  <td>6 Numbers</td>
-                  <td>10 Numbers</td>
-                </tr>
-                <tr>
-                  <td>Monthly Outbound Messages</td>
-                  <td>
-                    <span className="zp-text-emerald">Unlimited</span>
-                  </td>
-                  <td>
-                    <span className="zp-text-emerald">Unlimited</span>
-                  </td>
-                  <td>
-                    <span className="zp-text-emerald">Unlimited</span>
-                  </td>
-                  <td>
-                    <span className="zp-text-emerald">Unlimited</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Inbound Webhooks & Events</td>
-                  <td>Instant</td>
-                  <td>Instant</td>
-                  <td>Instant</td>
-                  <td>Instant</td>
-                </tr>
-                <tr>
-                  <td>Multi-Device QR Pairing</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                </tr>
-                <tr>
-                  <td>AI Copilot / LLM Hooks</td>
-                  <td>Standard</td>
-                  <td>Priority</td>
-                  <td>Priority</td>
-                  <td>Dedicated</td>
-                </tr>
-                <tr>
-                  <td>API Key Scoping & Isolation</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                </tr>
-                <tr>
-                  <td>Auto-Healing Session Watchdog</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                  <td>✓</td>
-                </tr>
+                {FEATURE_MATRIX.map(group => (
+                  <Fragment key={group.category}>
+                    <tr className="zp-matrix-group-row">
+                      <td colSpan={5} className="zp-matrix-group-label">
+                        <span className="zp-matrix-group-icon">{group.icon}</span>
+                        {group.category}
+                      </td>
+                    </tr>
+                    {group.rows.map(row => (
+                      <tr key={row.feature} className="zp-matrix-data-row">
+                        <td className="zp-matrix-feature-name">
+                          {row.feature}
+                          {row.tooltip && (
+                            <span className="zp-matrix-tooltip" title={row.tooltip}>
+                              ?
+                            </span>
+                          )}
+                        </td>
+                        {row.values.map((val, i) => (
+                          <td
+                            key={i}
+                            className={`zp-matrix-cell ${NX_PLANS[i]?.popular ? 'zp-matrix-popular-cell' : ''}`}
+                          >
+                            {val === true ? (
+                              <span className="zp-matrix-check" aria-label="Included">
+                                ✓
+                              </span>
+                            ) : val === false ? (
+                              <span className="zp-matrix-cross" aria-label="Not included">
+                                —
+                              </span>
+                            ) : (
+                              <span className="zp-matrix-value">{val}</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </Fragment>
+                ))}
               </tbody>
             </table>
           </div>

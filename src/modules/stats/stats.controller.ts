@@ -3,41 +3,44 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MessageStatsResponseDto, OverviewStatsResponseDto, SessionStatsResponseDto } from './dto/stats-response.dto';
 import { StatsService } from './stats.service';
 import { StatsQueryDto } from './dto/stats-query.dto';
-import { RequireRole, RequireUnscopedKey } from '../auth/decorators/auth.decorators';
-import { ApiKeyRole } from '../auth/entities/api-key.entity';
+import { CurrentApiKey, RequireRole, RequireUnscopedKey } from '../auth/decorators/auth.decorators';
+import { type ApiKey, ApiKeyRole } from '../auth/entities/api-key.entity';
 
 @ApiTags('statistics')
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  // Global, cross-session aggregates with no scope param. The ADMIN role gate alone does not keep a
-  // session-restricted key out — role and session scope are independent — so these also require an
-  // unrestricted key. (Per-session stats below stays scope-gated by its :sessionId route param.)
+  private resolveTenantUserId(apiKey?: ApiKey): string | null {
+    if (!apiKey || apiKey.role === ApiKeyRole.ADMIN) return null;
+    return apiKey.userId ?? (apiKey.id?.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
+  }
+
+  // Cross-session aggregates scoped to requesting tenant (or global for admin).
   @Get('overview')
-  @RequireRole(ApiKeyRole.ADMIN)
+  @RequireRole(ApiKeyRole.USER)
   @RequireUnscopedKey()
   @ApiOperation({ summary: 'Get overall statistics' })
   @ApiResponse({
     status: 200,
-    description: 'Cross-session aggregate statistics (sessions, messages, etc.).',
+    description: 'Session and message statistics (scoped to tenant for users, cross-instance for admin).',
     type: OverviewStatsResponseDto,
   })
-  async getOverview() {
-    return this.statsService.getOverview();
+  async getOverview(@CurrentApiKey() actor?: ApiKey) {
+    return this.statsService.getOverview(this.resolveTenantUserId(actor));
   }
 
   @Get('messages')
-  @RequireRole(ApiKeyRole.ADMIN)
+  @RequireRole(ApiKeyRole.USER)
   @RequireUnscopedKey()
   @ApiOperation({ summary: 'Get message statistics with time series' })
   @ApiResponse({
     status: 200,
-    description: 'Message statistics with a time series for the requested period.',
+    description: 'Message statistics with a time series for the requested period (scoped to tenant for users).',
     type: MessageStatsResponseDto,
   })
-  async getMessageStats(@Query() query: StatsQueryDto) {
-    return this.statsService.getMessageStats(query.period || '24h');
+  async getMessageStats(@Query() query: StatsQueryDto, @CurrentApiKey() actor?: ApiKey) {
+    return this.statsService.getMessageStats(query.period || '24h', this.resolveTenantUserId(actor));
   }
 
   @Get('sessions/:sessionId')
@@ -47,7 +50,7 @@ export class StatsController {
     description: 'Per-session statistics for the requested session.',
     type: SessionStatsResponseDto,
   })
-  async getSessionStats(@Param('sessionId') sessionId: string) {
-    return this.statsService.getSessionStats(sessionId);
+  async getSessionStats(@Param('sessionId') sessionId: string, @CurrentApiKey() actor?: ApiKey) {
+    return this.statsService.getSessionStats(sessionId, this.resolveTenantUserId(actor));
   }
 }

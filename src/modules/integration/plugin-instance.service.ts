@@ -34,7 +34,13 @@ export class PluginInstanceService implements PluginInstancePort {
   async mint(
     pluginId: string,
     instanceId: string,
-    opts: { sessionScope?: string; verifyToken?: string; secret?: string; config?: Record<string, unknown> },
+    opts: {
+      sessionScope?: string;
+      verifyToken?: string;
+      secret?: string;
+      config?: Record<string, unknown>;
+      ownerUserId?: string | null;
+    },
   ): Promise<PluginInstance> {
     const id = `${pluginId}:${instanceId}`;
     const existing = await this.repo.findOne({ where: { id } });
@@ -44,6 +50,7 @@ export class PluginInstanceService implements PluginInstancePort {
       pluginId,
       instanceId,
       sessionScope: opts.sessionScope || null,
+      ownerUserId: opts.ownerUserId ?? null,
       secret: normalizeSecret(opts.secret),
       verifyToken: opts.verifyToken ?? null,
       config: opts.config ?? null,
@@ -70,7 +77,13 @@ export class PluginInstanceService implements PluginInstancePort {
   async create(
     pluginId: string,
     instanceId: string,
-    opts: { sessionScope?: string; verifyToken?: string; secret?: string; config?: Record<string, unknown> },
+    opts: {
+      sessionScope?: string;
+      verifyToken?: string;
+      secret?: string;
+      config?: Record<string, unknown>;
+      ownerUserId?: string | null;
+    },
   ): Promise<PluginInstance> {
     const id = `${pluginId}:${instanceId}`;
     if (await this.repo.findOne({ where: { id } })) throw new InstanceExistsError(pluginId, instanceId);
@@ -79,6 +92,7 @@ export class PluginInstanceService implements PluginInstancePort {
       pluginId,
       instanceId,
       sessionScope: opts.sessionScope || null,
+      ownerUserId: opts.ownerUserId ?? null,
       secret: normalizeSecret(opts.secret),
       verifyToken: opts.verifyToken ?? null,
       config: opts.config ?? null,
@@ -87,7 +101,10 @@ export class PluginInstanceService implements PluginInstancePort {
     return this.repo.save(inst);
   }
 
-  list(pluginId: string): Promise<PluginInstance[]> {
+  list(pluginId: string, ownerUserId?: string | null): Promise<PluginInstance[]> {
+    if (ownerUserId) {
+      return this.repo.find({ where: { pluginId, ownerUserId } });
+    }
     return this.repo.find({ where: { pluginId } });
   }
 

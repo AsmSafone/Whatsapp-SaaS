@@ -908,7 +908,13 @@ export default function Plugins() {
                         )}
                       </div>
                     </div>
-                    {plugin.builtIn && <span className="plugin-builtin-badge">{t('plugins.builtIn')}</span>}
+                    {plugin.builtIn ? (
+                      <span className="plugin-builtin-badge">{t('plugins.builtIn', 'System Built-in')}</span>
+                    ) : (
+                      <span className="plugin-builtin-badge plugin-custom-badge">
+                        {plugin.ownerUserId ? t('plugins.myPlugin', 'My Plugin') : t('plugins.customPlugin', 'Custom Plugin')}
+                      </span>
+                    )}
                   </div>
 
                   <div className="plugin-card-body">

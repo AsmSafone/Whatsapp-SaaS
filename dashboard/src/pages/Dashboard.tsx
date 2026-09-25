@@ -29,19 +29,15 @@ export function Dashboard() {
   const { data: sessions = [], isLoading: loadingSessions, error: sessionsError } = useSessionsQuery();
   const { data: stats } = useSessionStatsQuery();
   const { data: webhooks, isError: webhooksFailed } = useWebhooksQuery();
-  // /stats/overview is ADMIN-only; for a non-admin key it 403s → overview stays undefined and the
-  // message cards fall back to '—' without breaking the (un-gated) session cards.
-  const { data: overview } = useStatsOverviewQuery();
+  // /stats/overview is scoped to the tenant for users, and cross-instance for admins.
+  const { data: overview, isLoading: loadingOverview } = useStatsOverviewQuery();
   const stopMutation = useStopSessionMutation();
-  const unavailable = '—';
-  const messagesToday = overview ? overview.messages.today.sent + overview.messages.today.received : unavailable;
-  const totalMessages = overview ? overview.messages.sent + overview.messages.received : unavailable;
+  const messagesToday = overview ? overview.messages.today.sent + overview.messages.today.received : loadingOverview ? '...' : 0;
+  const totalMessages = overview ? overview.messages.sent + overview.messages.received : loadingOverview ? '...' : 0;
   const loading = loadingSessions;
   const error =
     sessionsError instanceof Error ? sessionsError.message : sessionsError ? t('dashboard.loadError') : null;
-  // A failed read is not zero webhooks.
-  // A failed background refetch keeps the cached list, which still counts.
-  const webhookCount = webhooksFailed && !webhooks ? unavailable : (webhooks ?? []).length;
+  const webhookCount = webhooksFailed && !webhooks ? 0 : (webhooks ?? []).length;
 
   const handleDisconnect = async (id: string) => {
     try {

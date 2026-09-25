@@ -210,7 +210,7 @@ describe('AccountService', () => {
       expect(actor.userId).toBe('admin-id');
     });
 
-    it('returns ApiKeyRole.ADMIN and scoped allowedSessions for regular tenants', async () => {
+    it('returns ApiKeyRole.USER and scoped allowedSessions for regular tenants', async () => {
       const tenantToken = signUserToken(
         { sub: 'tenant-id', email: 'tenant@example.com', name: 'Tenant', plan: 'starter' },
         service.jwtSecret(),
@@ -228,7 +228,7 @@ describe('AccountService', () => {
       const actor = await service.actorFromToken(tenantToken);
 
       expect(actor.id).toBe('user:tenant-id');
-      expect(actor.role).toBe(ApiKeyRole.ADMIN);
+      expect(actor.role).toBe(ApiKeyRole.USER);
       expect(actor.allowedSessions).toEqual(['sess-1']);
       expect(actor.userId).toBe('tenant-id');
     });

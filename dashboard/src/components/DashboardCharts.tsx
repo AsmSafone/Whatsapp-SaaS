@@ -59,13 +59,9 @@ function shortChat(chatId: string): string {
 export function DashboardCharts() {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<StatsPeriod>('24h');
-  const { data, isLoading, isError, error } = useStatsMessagesQuery(period);
+  const { data, isLoading, isError } = useStatsMessagesQuery(period);
 
-  // Non-admin keys 403 on /stats/messages → hide the section entirely. Any OTHER error (e.g. a
-  // server 500) is a real fault: surface a small notice below instead of silently vanishing, which
-  // is what masked the #488 stats crash and made the whole chart "disappear" with no explanation.
-  const forbidden = (error as (Error & { status?: number }) | null)?.status === 403;
-  if (isError && forbidden) return null;
+  if (isError && !data) return null;
 
   const timeSeries = (data?.timeSeries ?? []).map(p => ({ ...p, label: formatTick(p.timestamp, period) }));
   const byType = Object.entries(data?.byType ?? {})

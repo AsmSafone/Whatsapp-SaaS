@@ -88,10 +88,11 @@ export class SessionController {
 
   /**
    * Returns the userId of the calling tenant, or null for platform-level admin API keys.
-   * Used to scope per-session reads so a tenant cannot access another tenant's sessions by id.
+   * Used to scope per-session reads and actions so a tenant cannot access another tenant's sessions by id.
    */
   private resolveTenantUserId(apiKey?: ApiKey): string | null {
-    return apiKey?.id?.startsWith('user:') ? (apiKey.userId ?? null) : null;
+    if (!apiKey || apiKey.role === ApiKeyRole.ADMIN) return null;
+    return apiKey.userId ?? (apiKey.id?.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
   }
 
   @Post()
@@ -109,7 +110,7 @@ export class SessionController {
   })
   @ApiResponse({ status: 409, description: 'Session name already exists' })
   async create(@Body() dto: CreateSessionDto, @CurrentApiKey() actor?: ApiKey): Promise<SessionResponseDto> {
-    const tenantUserId = actor?.id?.startsWith('user:') ? actor.userId : null;
+    const tenantUserId = this.resolveTenantUserId(actor);
     if (tenantUserId && actor?.role !== ApiKeyRole.ADMIN) {
       const plan = (actor?.plan as UserPlan | undefined) ?? 'starter';
       const limit = PLAN_LIMITS[plan] ?? 1;
@@ -168,7 +169,7 @@ export class SessionController {
     }
     // Tenant users only see their own sessions; admins (no userId) see all.
     // A session-restricted key is further clamped to its allowedSessions allowlist.
-    const tenantUserId = apiKey?.id?.startsWith('user:') ? apiKey.userId : null;
+    const tenantUserId = this.resolveTenantUserId(apiKey);
     const sessions = await this.sessionService.findAll(apiKey?.allowedSessions, {
       limit: limit ? parseInt(limit, 10) : undefined,
       offset: offset ? parseInt(offset, 10) : undefined,
@@ -234,7 +235,9 @@ export class SessionController {
   async updateConfig(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: UpdateSessionConfigDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<SessionConfigResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const config = await this.sessionService.updateConfig(id, dto);
     await this.auditService.logInfo(AuditAction.SESSION_CONFIG_UPDATED, {
       sessionId: id,
@@ -286,7 +289,9 @@ export class SessionController {
   async updateProxy(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: UpdateSessionProxyDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<SessionProxyResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const proxy = await this.sessionService.updateProxy(id, dto);
     await this.auditService.logInfo(AuditAction.SESSION_CONFIG_UPDATED, {
       sessionId: id,
@@ -310,8 +315,11 @@ export class SessionController {
       "another node currently holds this session's live engine and deleting it here would strip a " +
       'session the owner is running. No destructive side effect runs before either refusal.',
   })
-  async delete(@Param('sessionId', ParseUUIDPipe) id: string): Promise<void> {
-    const session = await this.sessionService.findOne(id);
+  async delete(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<void> {
+    const session = await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey));
     await this.sessionService.delete(id);
     await this.auditService.logInfo(AuditAction.SESSION_DELETED, {
       sessionId: id,
@@ -343,7 +351,11 @@ export class SessionController {
       "session's engine: only the owner may start it, and the claim is refused before any engine " +
       'is launched, so no second connection to the account is opened.',
   })
-  async start(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionResponseDto> {
+  async start(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const session = await this.sessionService.start(id);
     await this.auditService.logInfo(AuditAction.SESSION_STARTED, {
       sessionId: session.id,
@@ -379,7 +391,11 @@ export class SessionController {
       'is settled to `disconnected` and no success audit is written. Retry the stop; restart the ' +
       'node to reap a leaked process.',
   })
-  async stop(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionResponseDto> {
+  async stop(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const session = await this.sessionService.stop(id);
     await this.auditService.logInfo(AuditAction.SESSION_STOPPED, {
       sessionId: session.id,
@@ -445,7 +461,11 @@ export class SessionController {
       "body carries `code: 'SESSION_LOGOUT_INCOMPLETE'`; `phone` is cleared and no success audit " +
       'is written. Start the session again and retry the logout.',
   })
-  async logout(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionResponseDto> {
+  async logout(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const session = await this.sessionService.logout(id);
     await this.auditService.logInfo(AuditAction.SESSION_LOGGED_OUT, {
       sessionId: session.id,
@@ -466,7 +486,11 @@ export class SessionController {
   })
   @ApiResponse({ status: 400, description: 'Session is not started' })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async forceKill(@Param('sessionId', ParseUUIDPipe) id: string): Promise<SessionResponseDto> {
+  async forceKill(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<SessionResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const session = await this.sessionService.forceKill(id);
     await this.auditService.logInfo(AuditAction.SESSION_FORCE_KILLED, {
       sessionId: session.id,
@@ -489,7 +513,11 @@ export class SessionController {
     description: 'QR code not ready or session already authenticated',
   })
   @ApiResponse({ status: 404, description: 'Session not found' })
-  async getQRCode(@Param('sessionId', ParseUUIDPipe) id: string): Promise<QRCodeResponseDto> {
+  async getQRCode(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<QRCodeResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const qrCode = await this.sessionService.getQRCode(id);
     await this.auditService.logInfo(AuditAction.SESSION_QR_GENERATED, {
       sessionId: id,
@@ -509,7 +537,9 @@ export class SessionController {
   async requestPairingCode(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: RequestPairingCodeDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<PairingCodeResponseDto> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     return this.sessionService.requestPairingCode(id, dto.phoneNumber);
   }
 
@@ -537,9 +567,11 @@ export class SessionController {
   @ApiQuery({ name: 'offset', required: false, description: 'Number of groups to skip (for paging)' })
   async getGroups(
     @Param('sessionId', ParseUUIDPipe) id: string,
+    @CurrentApiKey() apiKey?: ApiKey,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ): Promise<{ id: string; name: string; linkedParentJID?: string | null }[]> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     return this.sessionService.getGroups(id, {
       limit: limit ? parseInt(limit, 10) : undefined,
       offset: offset ? parseInt(offset, 10) : undefined,
@@ -568,6 +600,7 @@ export class SessionController {
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ): Promise<ChatSummary[]> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     // This route is admitted to a chat-restricted key because it FILTERS to the key's chats rather
     // than naming one in the path. Filter BEFORE paginating: filtering the page instead would give a
     // restricted key a short or empty window while an allowed chat sat just past it.
@@ -602,7 +635,9 @@ export class SessionController {
   async markChatRead(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: MarkChatReadDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.sendSeen(id, dto.chatId, dto.messageIds);
     return { success };
   }
@@ -636,7 +671,9 @@ export class SessionController {
   async subscribeToPresence(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: SubscribePresenceDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     await this.sessionService.subscribeToPresence(id, dto.chatId);
     return { success: true };
   }
@@ -661,7 +698,9 @@ export class SessionController {
   async setOnlinePresence(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: SetOwnPresenceDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     await this.sessionService.setOnlinePresence(id, dto.available);
     return { success: true };
   }
@@ -686,7 +725,9 @@ export class SessionController {
   async getPresence(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Param('chatId') chatId: string,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<ChatPresenceResponseDto | null> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const presence = await this.sessionService.getPresence(id, chatId);
     return presence ? { ...presence, observedAt: new Date(presence.observedAt) } : null;
   }
@@ -710,7 +751,9 @@ export class SessionController {
   async markChatUnread(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: MarkChatUnreadDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.markUnread(id, dto.chatId);
     return { success };
   }
@@ -741,7 +784,9 @@ export class SessionController {
   async clearChatMessages(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Param('chatId') chatId: string,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.clearChatMessages(id, chatId);
     return { success };
   }
@@ -771,7 +816,9 @@ export class SessionController {
   async archiveChat(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: ArchiveChatDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.archiveChat(id, dto.chatId, dto.archive);
     return { success };
   }
@@ -808,7 +855,9 @@ export class SessionController {
   async muteChat(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: MuteChatDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     await this.sessionService.muteChat(id, dto.chatId, dto.muteUntil);
     return { success: true };
   }
@@ -843,7 +892,12 @@ export class SessionController {
       'the gateway stopped waiting for a confirmation that never came.',
   })
   @ApiResponse({ status: 409, description: ENGINE_NOT_READY_409 })
-  async pinChat(@Param('sessionId', ParseUUIDPipe) id: string, @Body() dto: PinChatDto): Promise<{ success: boolean }> {
+  async pinChat(
+    @Param('sessionId', ParseUUIDPipe) id: string,
+    @Body() dto: PinChatDto,
+    @CurrentApiKey() apiKey?: ApiKey,
+  ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.pinChat(id, dto.chatId, dto.pin);
     return { success };
   }
@@ -867,7 +921,9 @@ export class SessionController {
   async deleteChat(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: DeleteChatDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     const success = await this.sessionService.deleteChat(id, dto.chatId);
     return { success };
   }
@@ -884,7 +940,9 @@ export class SessionController {
   async sendChatState(
     @Param('sessionId', ParseUUIDPipe) id: string,
     @Body() dto: SendChatStateDto,
+    @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<{ success: boolean }> {
+    await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey)); // ownership check
     await this.sessionService.sendChatState(id, dto.chatId, dto.state);
     return { success: true };
   }
@@ -908,6 +966,6 @@ export class SessionController {
   }> {
     // Scope aggregate stats to the key's allowedSessions so a session-restricted key cannot enumerate
     // global session counts/status (the route carries no :sessionId for the guard to scope against).
-    return this.sessionService.getStats(apiKey?.allowedSessions);
+    return this.sessionService.getStats(apiKey?.allowedSessions, this.resolveTenantUserId(apiKey));
   }
 }

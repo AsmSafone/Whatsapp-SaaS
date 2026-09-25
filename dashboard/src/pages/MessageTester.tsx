@@ -115,7 +115,7 @@ const TERMINAL_BATCH_STATUSES: readonly BatchStatus[] = ['completed', 'cancelled
 
 export function MessageTester() {
   const { t } = useTranslation();
-  useDocumentTitle(t('messageTester.title'));
+  useDocumentTitle(t('playground.title', t('messageTester.title', 'Playground')));
   const { canWrite } = useRole();
   const { data: allSessions = [], isLoading: loadingSessions } = useSessionsQuery();
   const sessions = allSessions.filter(s => s.status === 'ready');
@@ -633,7 +633,10 @@ export function MessageTester() {
 
   return (
     <div className="message-tester">
-      <PageHeader title={t('messageTester.title')} subtitle={t('messageTester.subtitle')} />
+      <PageHeader
+        title={t('playground.title', t('messageTester.title', 'Playground'))}
+        subtitle={t('playground.subtitle', t('messageTester.subtitle'))}
+      />
 
       <div className="tester-panels">
         <div className="compose-panel">

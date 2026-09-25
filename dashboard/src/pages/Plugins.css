@@ -151,6 +151,12 @@
   flex-shrink: 0;
 }
 
+.plugins-page .plugin-custom-badge {
+  background: color-mix(in srgb, #6366f1 15%, transparent);
+  color: #818cf8;
+  border-color: color-mix(in srgb, #6366f1 35%, transparent);
+}
+
 .plugins-page .plugin-card-body {
   padding: 1.25rem;
 }

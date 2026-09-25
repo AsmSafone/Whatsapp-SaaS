@@ -27,6 +27,7 @@ const ApiKeys = lazy(() => import('./pages/ApiKeys').then(m => ({ default: m.Api
 const MessageTester = lazy(() => import('./pages/MessageTester').then(m => ({ default: m.MessageTester })));
 const Infrastructure = lazy(() => import('./pages/Infrastructure').then(m => ({ default: m.Infrastructure })));
 const Plugins = lazy(() => import('./pages/Plugins'));
+const Users = lazy(() => import('./pages/Users').then(m => ({ default: m.Users })));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 
 const queryClient = new QueryClient({
@@ -44,9 +45,7 @@ function AppContent() {
   // handleLogin stores a fresh key would re-fire the startup re-validation effect below and
   // double the /auth/validate request on every sign-in — the effect is for genuine page
   // refreshes with a saved key only.
-  const [savedKey] = useState(
-    () => localStorage.getItem('zaptura_api_key') || localStorage.getItem('zaptura_api_key'),
-  );
+  const [savedKey] = useState(() => localStorage.getItem('zaptura_api_key') || localStorage.getItem('zaptura_api_key'));
   const [isAuthenticated, setIsAuthenticated] = useState(!!savedKey);
   const [, setApiKey] = useState(savedKey || '');
   const { setRole, role } = useRole();
@@ -122,8 +121,10 @@ function AppContent() {
                 <Route path="templates" element={<Templates />} />
                 <Route path="api-keys" element={<ApiKeys />} />
                 {role === 'admin' && <Route path="logs" element={<Logs />} />}
-                <Route path="message-tester" element={<MessageTester />} />
+                <Route path="playground" element={<MessageTester />} />
+                <Route path="message-tester" element={<Navigate to="/playground" replace />} />
                 {role === 'admin' && <Route path="infrastructure" element={<Infrastructure />} />}
+                {role === 'admin' && <Route path="users" element={<Users />} />}
                 <Route path="plugins" element={<Plugins />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

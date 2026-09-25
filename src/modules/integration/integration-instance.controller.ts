@@ -12,6 +12,8 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CurrentApiKey, RequireRole } from '../auth/decorators/auth.decorators';
 import { type ApiKey, ApiKeyRole } from '../auth/entities/api-key.entity';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -20,24 +22,35 @@ import { PluginLoaderService } from '../../core/plugins/plugin-loader.service';
 import { InstanceExistsError, PluginInstanceService } from './plugin-instance.service';
 import { ScopeBindingService } from './scope-binding.service';
 import { PluginInstance } from './entities/plugin-instance.entity';
+import { Session } from '../session/entities/session.entity';
 import { buildIngressUrls } from './ingress-url';
 import { CreateInstanceDto, InstanceView, UpdateInstanceDto } from './dto/instance.dto';
 import { sessionScopeVisible } from '../../common/security/session-scope';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
-// ADMIN-only provisioning surface for per-plugin instances (e.g. one Chatwoot account). Only plugins
+// Provisioning surface for per-plugin instances (e.g. one Chatwoot account). Only plugins
 // that declare an ingress route AND the webhook:ingress permission can have instances; everything
 // else is rejected before touching persistence.
 @ApiTags('integration')
 @Controller('integration/plugins/:pluginId/instances')
-@RequireRole(ApiKeyRole.ADMIN)
+@RequireRole(ApiKeyRole.USER)
 export class IntegrationInstanceController {
   constructor(
     private readonly instances: PluginInstanceService,
     private readonly loader: PluginLoaderService,
     private readonly audit: AuditService,
     private readonly scopeBinding: ScopeBindingService,
+    @InjectRepository(Session, 'data')
+    private readonly sessionRepo: Repository<Session>,
   ) {}
+
+  private resolveTenantUserId(apiKey?: ApiKey): string | null {
+    if (!apiKey) return null;
+    if (apiKey.role === ApiKeyRole.ADMIN) {
+      return null;
+    }
+    return apiKey.userId ?? (apiKey.id.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
+  }
 
   @Post()
   @HttpCode(201)
@@ -53,14 +66,16 @@ export class IntegrationInstanceController {
     @Body() dto: CreateInstanceDto,
     @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<InstanceView> {
+    const tenantUserId = this.resolveTenantUserId(apiKey);
     const routes = this.assertIngressCapable(pluginId);
-    this.assertScopeWritable(apiKey, dto.sessionScope);
+    await this.assertScopeWritable(apiKey, dto.sessionScope);
     try {
       const inst = await this.instances.create(pluginId, dto.instanceId, {
         sessionScope: dto.sessionScope,
         verifyToken: dto.verifyToken,
         secret: dto.secret,
         config: dto.config,
+        ownerUserId: tenantUserId,
       });
       void this.audit.logInfo(AuditAction.INTEGRATION_INSTANCE_CREATED, {
         metadata: { pluginId, instanceId: dto.instanceId },
@@ -76,8 +91,9 @@ export class IntegrationInstanceController {
   @Get()
   @ApiResponse({ status: 200, description: 'Instances for the plugin (secrets masked).', type: [InstanceView] })
   async list(@Param('pluginId') pluginId: string, @CurrentApiKey() apiKey?: ApiKey): Promise<InstanceView[]> {
+    const tenantUserId = this.resolveTenantUserId(apiKey);
     const routes = this.pluginRoutes(pluginId);
-    const rows = await this.instances.list(pluginId);
+    const rows = await this.instances.list(pluginId, tenantUserId);
     return rows
       .filter(r => sessionScopeVisible(apiKey?.allowedSessions, r.sessionScope))
       .map(r => this.view(r, routes, false));
@@ -124,7 +140,7 @@ export class IntegrationInstanceController {
     @CurrentApiKey() apiKey?: ApiKey,
   ): Promise<InstanceView> {
     let inst: PluginInstance | null = await this.resolveVisible(pluginId, instanceId, apiKey);
-    if (dto.sessionScope !== undefined) this.assertScopeWritable(apiKey, dto.sessionScope);
+    if (dto.sessionScope !== undefined) await this.assertScopeWritable(apiKey, dto.sessionScope);
     const previousScope = inst.sessionScope;
     if (dto.enabled !== undefined) inst = await this.instances.setEnabled(pluginId, instanceId, dto.enabled);
     if (dto.sessionScope !== undefined || dto.config !== undefined) {
@@ -174,7 +190,14 @@ export class IntegrationInstanceController {
   // the endpoint cannot be used to probe which instances exist on other sessions.
   private async resolveVisible(pluginId: string, instanceId: string, apiKey?: ApiKey): Promise<PluginInstance> {
     const inst = await this.instances.resolve(pluginId, instanceId);
-    if (!inst || !sessionScopeVisible(apiKey?.allowedSessions, inst.sessionScope)) {
+    const tenantUserId = this.resolveTenantUserId(apiKey);
+    if (!inst) {
+      throw new NotFoundException('instance not found');
+    }
+    if (tenantUserId && inst.ownerUserId !== tenantUserId) {
+      throw new NotFoundException('instance not found');
+    }
+    if (!sessionScopeVisible(apiKey?.allowedSessions, inst.sessionScope)) {
       throw new NotFoundException('instance not found');
     }
     return inst;
@@ -182,7 +205,17 @@ export class IntegrationInstanceController {
 
   // A scoped key may only bind an instance to a session inside its own fence — never to another
   // session, and never to the all-sessions (omitted/'*') scope.
-  private assertScopeWritable(apiKey: ApiKey | undefined, sessionScope: string | null | undefined): void {
+  private async assertScopeWritable(apiKey: ApiKey | undefined, sessionScope: string | null | undefined): Promise<void> {
+    const tenantUserId = this.resolveTenantUserId(apiKey);
+    if (tenantUserId) {
+      if (!sessionScope || sessionScope === '*') {
+        throw new ForbiddenException('Non-admin tenants must bind integration instances to a specific session they own');
+      }
+      const session = await this.sessionRepo.findOne({ where: { id: sessionScope } });
+      if (!session || session.ownerUserId !== tenantUserId) {
+        throw new ForbiddenException(`Session ${sessionScope} is outside your account's allowed sessions`);
+      }
+    }
     if (!sessionScopeVisible(apiKey?.allowedSessions, sessionScope)) {
       throw new ForbiddenException("sessionScope is outside the API key's allowed sessions");
     }
@@ -223,6 +256,7 @@ export class IntegrationInstanceController {
       pluginId: masked.pluginId,
       instanceId: masked.instanceId,
       sessionScope: masked.sessionScope,
+      ownerUserId: inst.ownerUserId ?? null,
       secret: reveal ? inst.secret : masked.secret,
       verifyToken: reveal ? inst.verifyToken : inst.verifyToken ? '***' : null,
       config: masked.config,

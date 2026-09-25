@@ -687,11 +687,20 @@ export interface PluginInstance {
   // code actually came from rather than assume the configured one. Absent for built-ins, which are
   // registered programmatically and have no on-disk package.
   packageDir?: string;
+  // User ID that installed this custom plugin, or null for system / built-in plugins.
+  ownerUserId?: string | null;
 }
 
 // ============================================================================
 // Plugin Registry Entry (for storage)
 // ============================================================================
+
+export interface UserPluginConfig {
+  enabled?: boolean;
+  config?: Record<string, unknown>;
+  activeSessions?: string[];
+  sessionConfig?: Record<string, Record<string, unknown>>;
+}
 
 export interface PluginRegistryEntry {
   id: string;
@@ -703,6 +712,10 @@ export interface PluginRegistryEntry {
   builtIn: boolean; // True for bundled plugins
   installedAt: Date;
   updatedAt: Date;
+  // User ID of the plugin installer/owner (null for system plugins)
+  ownerUserId?: string | null;
+  // Per-user overrides for multi-tenant isolation
+  userConfigs?: Record<string, UserPluginConfig>;
   // Sessions a session-scoped plugin is activated for; ['*'] = all. Absent = not yet set (treated
   // as ['*'] on enable).
   activeSessions?: string[];

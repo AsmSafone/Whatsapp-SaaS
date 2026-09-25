@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -25,30 +26,38 @@ import {
   PluginCatalogEntryDto,
 } from './dto/plugin.dto';
 import type { CatalogPlugin } from './catalog';
-import { RequireRole, RequireUnscopedKey } from '../auth/decorators/auth.decorators';
-import { ApiKeyRole } from '../auth/entities/api-key.entity';
+import { RequireRole, RequireUnscopedKey, CurrentApiKey } from '../auth/decorators/auth.decorators';
+import { type ApiKey, ApiKeyRole } from '../auth/entities/api-key.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Session } from '../session/entities/session.entity';
 
 /** Max accepted upload size for a plugin package (compressed). */
 const MAX_PLUGIN_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 @ApiTags('plugins')
 @Controller('plugins')
-// Plugin installation and lifecycle are deployment-global and execute plugin code as the Zaptura
-// process user, so session-restricted keys are fenced off route by route below. The fence is NOT
-// applied at class level because @RequireUnscopedKey takes no argument and cannot be opted out of:
-// `updateSessions` is fenced too (it overwrites the ENTIRE active set, so a scoped key could delete
-// another tenant's activation by sending its own session or []), and `updateSessionConfig` is
-// already covered by the guard through its own :sessionId route param.
 export class PluginsController {
-  constructor(private readonly pluginsService: PluginsService) {}
+  constructor(
+    private readonly pluginsService: PluginsService,
+    @InjectRepository(Session, 'data')
+    private readonly sessionRepo: Repository<Session>,
+  ) {}
+
+  private resolveTenantUserId(apiKey?: ApiKey): string | null {
+    if (!apiKey) return null;
+    if (apiKey.role === ApiKeyRole.ADMIN) {
+      return null;
+    }
+    return apiKey.userId ?? (apiKey.id.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
+  }
 
   @Get()
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @ApiOperation({ summary: 'List all plugins' })
   @ApiResponse({ status: 200, description: 'List of all plugins', type: PluginDto, isArray: true })
-  findAll(): PluginDto[] {
-    return this.pluginsService.findAll();
+  findAll(@CurrentApiKey() actor?: ApiKey): PluginDto[] {
+    return this.pluginsService.findAll(this.resolveTenantUserId(actor));
   }
 
   @Post('install')
@@ -56,8 +65,6 @@ export class PluginsController {
   @RequireUnscopedKey()
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_PLUGIN_UPLOAD_BYTES } }))
   @ApiConsumes('multipart/form-data')
-  // @ApiConsumes only names the media type; without a body schema the upload this route exists for is
-  // invisible in the contract, and a generated client has no parameter to attach the file to.
   @ApiBody({
     required: true,
     schema: {
@@ -70,8 +77,8 @@ export class PluginsController {
   @ApiResponse({ status: 201, description: 'Plugin installed', type: PluginDto })
   @ApiResponse({ status: 400, description: 'Invalid package' })
   @ApiResponse({ status: 409, description: 'Plugin already installed' })
-  install(@UploadedFile() file: { buffer?: Buffer }): PluginDto {
-    return this.pluginsService.install(file);
+  install(@UploadedFile() file: { buffer?: Buffer }, @CurrentApiKey() actor?: ApiKey): PluginDto {
+    return this.pluginsService.install(file, this.resolveTenantUserId(actor));
   }
 
   @Post('install-url')
@@ -81,8 +88,8 @@ export class PluginsController {
   @ApiResponse({ status: 201, description: 'Plugin installed', type: PluginDto })
   @ApiResponse({ status: 400, description: 'Invalid URL, download failed, or invalid package' })
   @ApiResponse({ status: 409, description: 'Plugin already installed' })
-  async installFromUrl(@Body() dto: InstallFromUrlDto): Promise<PluginDto> {
-    return await this.pluginsService.installFromUrl(dto.url);
+  async installFromUrl(@Body() dto: InstallFromUrlDto, @CurrentApiKey() actor?: ApiKey): Promise<PluginDto> {
+    return await this.pluginsService.installFromUrl(dto.url, this.resolveTenantUserId(actor));
   }
 
   // Declared before `:id` so `GET /plugins/catalog` is not captured by the `:id` route.
@@ -98,62 +105,60 @@ export class PluginsController {
 
   @Get(':id')
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @ApiOperation({ summary: 'Get plugin by ID' })
   @ApiResponse({ status: 200, description: 'Plugin details', type: PluginDto })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  findOne(@Param('id') id: string): PluginDto {
-    return this.pluginsService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): PluginDto {
+    return this.pluginsService.findOne(id, this.resolveTenantUserId(actor));
   }
 
   @Post(':id/enable')
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Enable a plugin' })
   @ApiResponse({ status: 200, description: 'Plugin enabled successfully', type: PluginActionResponseDto })
-  async enable(@Param('id') id: string): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.enable(id);
+  async enable(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+    return await this.pluginsService.enable(id, this.resolveTenantUserId(actor));
   }
 
   @Post(':id/disable')
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Disable a plugin' })
   @ApiResponse({ status: 200, description: 'Plugin disabled successfully', type: PluginActionResponseDto })
-  async disable(@Param('id') id: string): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.disable(id);
+  async disable(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+    return await this.pluginsService.disable(id, this.resolveTenantUserId(actor));
   }
 
   @Put(':id/config')
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @ApiOperation({ summary: 'Update plugin configuration' })
   @ApiResponse({ status: 200, description: 'Plugin configuration updated', type: PluginActionResponseDto })
-  updateConfig(@Param('id') id: string, @Body() configDto: PluginConfigDto): { success: boolean; message: string } {
-    return this.pluginsService.updateConfig(id, configDto.config);
+  updateConfig(
+    @Param('id') id: string,
+    @Body() configDto: PluginConfigDto,
+    @CurrentApiKey() actor?: ApiKey,
+  ): { success: boolean; message: string } {
+    return this.pluginsService.updateConfig(id, configDto.config, this.resolveTenantUserId(actor));
   }
 
-  // The dashboard fetches this WITH the API key and injects the body as an opaque-origin sandboxed
-  // iframe srcdoc. It attaches that document's response-specific nonce to inline scripts so the
-  // inherited CSP allows only the isolated editor bootstrap, without enabling parent unsafe-inline.
   @Get(':id/config-ui')
   @RequireRole(ApiKeyRole.USER)
-  @RequireUnscopedKey()
   @Header('Content-Type', 'text/html; charset=utf-8')
   @Header('Content-Security-Policy', 'sandbox')
   @Header('X-Content-Type-Options', 'nosniff')
   @ApiOperation({ summary: "Serve a plugin's sandboxed config-UI entry HTML (for an iframe srcdoc)" })
-  // The handler pins the media type with @Header, which the document cannot see — declare it, or the
-  // only HTML route in the API publishes a 200 a client would decode as JSON.
   @ApiResponse({
     status: 200,
     description: 'Config UI HTML',
     content: { 'text/html': { schema: { type: 'string' } } },
   })
   @ApiResponse({ status: 404, description: 'Plugin not found or has no config UI' })
-  getConfigUi(@Param('id') id: string): string {
+  getConfigUi(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): string {
+    const tenantUserId = this.resolveTenantUserId(actor);
+    if (tenantUserId) {
+      this.pluginsService.findOne(id, tenantUserId);
+    }
     return this.pluginsService.getConfigUiHtml(id);
   }
 
@@ -163,12 +168,23 @@ export class PluginsController {
   @ApiResponse({ status: 200, description: 'Per-session plugin configuration updated', type: PluginActionResponseDto })
   @ApiResponse({ status: 400, description: 'Plugin is global (not session-scoped)' })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  updateSessionConfig(
+  async updateSessionConfig(
     @Param('id') id: string,
     @Param('sessionId') sessionId: string,
     @Body() configDto: PluginConfigDto,
-  ): { success: boolean; message: string } {
-    return this.pluginsService.updateSessionConfig(id, sessionId, configDto.config);
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<{ success: boolean; message: string }> {
+    const tenantUserId = this.resolveTenantUserId(actor);
+    if (tenantUserId) {
+      if (actor?.allowedSessions && !actor.allowedSessions.includes(sessionId)) {
+        throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
+      }
+      const session = await this.sessionRepo.findOne({ where: { id: sessionId } });
+      if (!session || session.ownerUserId !== tenantUserId) {
+        throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
+      }
+    }
+    return this.pluginsService.updateSessionConfig(id, sessionId, configDto.config, tenantUserId);
   }
 
   @Put(':id/sessions')
@@ -183,11 +199,26 @@ export class PluginsController {
       'A session-restricted key may not replace the full active set — full activation replacement requires an unrestricted key',
   })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  updateSessions(@Param('id') id: string, @Body() dto: PluginSessionsDto): PluginDto {
-    // This is a full-replacement PUT (setPluginSessions overwrites the entire activeSessions array),
-    // so a scoped key must never reach it: sending [] or its own session would delete every other
-    // tenant's activation. The @RequireUnscopedKey fence above enforces that before the handler runs.
-    return this.pluginsService.updateSessions(id, dto.sessions);
+  async updateSessions(
+    @Param('id') id: string,
+    @Body() dto: PluginSessionsDto,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<PluginDto> {
+    const tenantUserId = this.resolveTenantUserId(actor);
+    if (tenantUserId) {
+      for (const s of dto.sessions) {
+        if (s !== '*') {
+          if (actor?.allowedSessions && !actor.allowedSessions.includes(s)) {
+            throw new ForbiddenException(`Session ${s} is outside your account's allowed sessions`);
+          }
+          const session = await this.sessionRepo.findOne({ where: { id: s } });
+          if (!session || session.ownerUserId !== tenantUserId) {
+            throw new ForbiddenException(`Session ${s} is outside your account's allowed sessions`);
+          }
+        }
+      }
+    }
+    return this.pluginsService.updateSessions(id, dto.sessions, tenantUserId);
   }
 
   @Post(':id/update')
@@ -197,7 +228,9 @@ export class PluginsController {
   @ApiResponse({ status: 201, description: 'Plugin updated', type: PluginDto })
   @ApiResponse({ status: 400, description: 'Invalid URL/package, id mismatch, or built-in' })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  async update(@Param('id') id: string, @Body() dto: InstallFromUrlDto): Promise<PluginDto> {
+  async update(@Param('id') id: string, @Body() dto: InstallFromUrlDto, @CurrentApiKey() actor?: ApiKey): Promise<PluginDto> {
+    const tenantUserId = this.resolveTenantUserId(actor);
+    this.pluginsService.findOne(id, tenantUserId);
     return await this.pluginsService.updateFromUrl(id, dto.url);
   }
 
@@ -208,8 +241,8 @@ export class PluginsController {
   @ApiResponse({ status: 200, description: 'Plugin uninstalled', type: PluginActionResponseDto })
   @ApiResponse({ status: 400, description: 'Cannot uninstall (e.g. built-in)' })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  async uninstall(@Param('id') id: string): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.uninstall(id);
+  async uninstall(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+    return await this.pluginsService.uninstall(id, this.resolveTenantUserId(actor));
   }
 
   @Get(':id/health')
@@ -217,7 +250,9 @@ export class PluginsController {
   @RequireUnscopedKey()
   @ApiOperation({ summary: 'Check plugin health' })
   @ApiResponse({ status: 200, description: 'Plugin health status', type: PluginHealthResponseDto })
-  async healthCheck(@Param('id') id: string): Promise<{ healthy: boolean; message?: string }> {
+  async healthCheck(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ healthy: boolean; message?: string }> {
+    const tenantUserId = this.resolveTenantUserId(actor);
+    this.pluginsService.findOne(id, tenantUserId);
     return await this.pluginsService.healthCheck(id);
   }
 }

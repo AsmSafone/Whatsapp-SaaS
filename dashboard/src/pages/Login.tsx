@@ -73,7 +73,7 @@ export function Login({ onLogin }: LoginProps) {
           <span>Back to Home</span>
         </Link>
         <span className="register-trial-badge">
-          <Sparkles size={14} /> WhatsApp API
+          <Sparkles size={14} /> 99.9% Uptime
         </span>
       </div>
 

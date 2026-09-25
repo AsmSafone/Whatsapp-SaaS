@@ -13,6 +13,7 @@ import {
   PluginRegistryEntry,
   PluginStatus,
   PluginType,
+  UserPluginConfig,
 } from './plugin.interfaces';
 import { PluginStorageService } from './plugin-storage.service';
 import { PluginHostServices } from './plugin-host-services';
@@ -343,6 +344,22 @@ export class PluginLoaderService implements OnModuleInit, OnApplicationBootstrap
 
   setPluginSessionConfig(pluginId: string, sessionId: string, config: Record<string, unknown>): PluginInstance {
     return this.lifecycle.setPluginSessionConfig(pluginId, sessionId, config);
+  }
+
+  getPluginOwner(pluginId: string): string | null {
+    return this.pluginStorage.getPluginOwner(pluginId);
+  }
+
+  setPluginOwner(pluginId: string, ownerUserId: string | null): void {
+    this.pluginStorage.setPluginOwner(pluginId, ownerUserId);
+  }
+
+  getUserConfig(pluginId: string, userId: string): UserPluginConfig | null {
+    return this.pluginStorage.getUserConfig(pluginId, userId);
+  }
+
+  setUserConfig(pluginId: string, userId: string, patch: Partial<UserPluginConfig>): void {
+    this.pluginStorage.setUserConfig(pluginId, userId, patch);
   }
 
   /** Health across both tiers; the sandbox-routing implementation lives in PluginSandboxBridge. */

@@ -4,8 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { DEFAULT_DATA_DIR } from '../../config/configuration';
 import { createLogger } from '../../common/services/logger.service';
-import { isPathWithin, isSafeStorageKey } from '../../common/utils/path-safety';
-import { PluginStatus, PluginStorage, PluginRegistryEntry } from './plugin.interfaces';
+import { PluginStatus, PluginStorage, PluginRegistryEntry, UserPluginConfig } from './plugin.interfaces';
 
 /** Unique-per-write counter so concurrent writes to the same key don't collide on the temp file. */
 let tmpWriteSeq = 0;
@@ -216,6 +215,43 @@ export class PluginStorageService {
     const entry = this.registry.get(pluginId);
     if (entry) {
       entry.sessionConfig = sessionConfig;
+      entry.updatedAt = new Date();
+      this.saveRegistry();
+    }
+  }
+
+  // ============================================================================
+  // Multi-Tenant User-Scoped Config Management
+  // ============================================================================
+
+  getPluginOwner(pluginId: string): string | null {
+    return this.registry.get(pluginId)?.ownerUserId ?? null;
+  }
+
+  setPluginOwner(pluginId: string, ownerUserId: string | null): void {
+    const entry = this.registry.get(pluginId);
+    if (entry) {
+      entry.ownerUserId = ownerUserId;
+      entry.updatedAt = new Date();
+      this.saveRegistry();
+    }
+  }
+
+  getUserConfig(pluginId: string, userId: string): UserPluginConfig | null {
+    const entry = this.registry.get(pluginId);
+    return entry?.userConfigs?.[userId] ?? null;
+  }
+
+  setUserConfig(pluginId: string, userId: string, patch: Partial<UserPluginConfig>): void {
+    const entry = this.registry.get(pluginId);
+    if (entry) {
+      if (!entry.userConfigs) {
+        entry.userConfigs = {};
+      }
+      entry.userConfigs[userId] = {
+        ...entry.userConfigs[userId],
+        ...patch,
+      };
       entry.updatedAt = new Date();
       this.saveRegistry();
     }

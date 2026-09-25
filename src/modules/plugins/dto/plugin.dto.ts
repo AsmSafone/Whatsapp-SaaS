@@ -63,6 +63,9 @@ export class PluginDto {
 
   @ApiPropertyOptional({ description: 'Error message if plugin is in error state' })
   error?: string;
+
+  @ApiPropertyOptional({ description: 'User ID of the plugin installer/owner (null for system plugins)' })
+  ownerUserId?: string | null;
 }
 
 export class PluginConfigDto {
