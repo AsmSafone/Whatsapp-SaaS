@@ -15,7 +15,7 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
   box-sizing: border-box;
 }
@@ -104,9 +104,12 @@
 
 /* ================= Navigation Header ================= */
 .zp-shell .zp-nav-wrap {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 40;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
   background: transparent;
   border-bottom: 1px solid transparent;
   transition:
@@ -293,7 +296,7 @@
 /* ================= Hero Section ================= */
 .zp-shell .zp-hero {
   position: relative;
-  padding: 5.5rem 1.5rem 4rem;
+  padding: 7rem 1.5rem 4rem;
   display: flex;
   justify-content: center;
   text-align: center;
@@ -514,6 +517,11 @@
   margin: 0 auto;
   position: relative;
   z-index: 10;
+}
+
+.zp-shell .zp-pricing-page-hero,
+.zp-shell .zp-docs-page {
+  padding-top: 7rem;
 }
 
 .zp-shell .zp-section-alt {
@@ -2602,7 +2610,7 @@
 
   /* Hero */
   .zp-shell .zp-hero {
-    padding: 3.5rem 1.25rem 3rem;
+    padding: 6.5rem 1.25rem 3rem;
   }
   .zp-shell .zp-hero-title {
     font-size: clamp(2rem, 6vw, 3rem);
@@ -2678,7 +2686,7 @@
 
   /* Hero */
   .zp-shell .zp-hero {
-    padding: 3rem 1rem 2.5rem;
+    padding: 6rem 1rem 2.5rem;
   }
   .zp-shell .zp-hero-title {
     font-size: clamp(1.9rem, 7vw, 2.75rem);
@@ -2867,7 +2875,7 @@
 
   /* Hero */
   .zp-shell .zp-hero {
-    padding: 2.25rem 1rem 2rem;
+    padding: 5.5rem 1rem 2rem;
   }
   .zp-shell .zp-hero-title {
     font-size: clamp(1.65rem, 8vw, 2.25rem);

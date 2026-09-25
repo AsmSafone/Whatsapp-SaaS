@@ -16,7 +16,8 @@ export function MarketingShell({ children }: MarketingShellProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const offset = window.scrollY || document.documentElement.scrollTop || 0;
+      setScrolled(offset > 15);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
