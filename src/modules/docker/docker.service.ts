@@ -170,7 +170,9 @@ export class DockerService implements OnModuleInit {
     const isRunning = (svc: string): boolean =>
       containers.some(
         c =>
-          c.labels['com.zaptura.service'] === svc && c.labels['com.zaptura.builtin'] === 'true' && c.state === 'running',
+          c.labels['com.zaptura.service'] === svc &&
+          c.labels['com.zaptura.builtin'] === 'true' &&
+          c.state === 'running',
       );
     return { database: isRunning('database'), cache: isRunning('cache'), storage: isRunning('storage') };
   }

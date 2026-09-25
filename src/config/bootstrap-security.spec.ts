@@ -377,7 +377,11 @@ describe('assertNoDefaultSecretsInProduction', () => {
   it('does not check the DB password when using sqlite', () => {
     // DATABASE_PASSWORD is irrelevant for sqlite, so a leftover default must not block boot.
     expect(() =>
-      assertNoDefaultSecretsInProduction({ nodeEnv: 'production', databaseType: 'sqlite', databasePassword: 'zaptura' }),
+      assertNoDefaultSecretsInProduction({
+        nodeEnv: 'production',
+        databaseType: 'sqlite',
+        databasePassword: 'zaptura',
+      }),
     ).not.toThrow();
   });
 
