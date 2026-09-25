@@ -117,7 +117,10 @@ export class PluginsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Enable a plugin' })
   @ApiResponse({ status: 200, description: 'Plugin enabled successfully', type: PluginActionResponseDto })
-  async enable(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+  async enable(
+    @Param('id') id: string,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<{ success: boolean; message: string }> {
     return await this.pluginsService.enable(id, this.resolveTenantUserId(actor));
   }
 
@@ -126,7 +129,10 @@ export class PluginsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Disable a plugin' })
   @ApiResponse({ status: 200, description: 'Plugin disabled successfully', type: PluginActionResponseDto })
-  async disable(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+  async disable(
+    @Param('id') id: string,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<{ success: boolean; message: string }> {
     return await this.pluginsService.disable(id, this.resolveTenantUserId(actor));
   }
 
@@ -228,7 +234,11 @@ export class PluginsController {
   @ApiResponse({ status: 201, description: 'Plugin updated', type: PluginDto })
   @ApiResponse({ status: 400, description: 'Invalid URL/package, id mismatch, or built-in' })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  async update(@Param('id') id: string, @Body() dto: InstallFromUrlDto, @CurrentApiKey() actor?: ApiKey): Promise<PluginDto> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: InstallFromUrlDto,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<PluginDto> {
     const tenantUserId = this.resolveTenantUserId(actor);
     this.pluginsService.findOne(id, tenantUserId);
     return await this.pluginsService.updateFromUrl(id, dto.url);
@@ -241,7 +251,10 @@ export class PluginsController {
   @ApiResponse({ status: 200, description: 'Plugin uninstalled', type: PluginActionResponseDto })
   @ApiResponse({ status: 400, description: 'Cannot uninstall (e.g. built-in)' })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
-  async uninstall(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ success: boolean; message: string }> {
+  async uninstall(
+    @Param('id') id: string,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<{ success: boolean; message: string }> {
     return await this.pluginsService.uninstall(id, this.resolveTenantUserId(actor));
   }
 
@@ -250,7 +263,10 @@ export class PluginsController {
   @RequireUnscopedKey()
   @ApiOperation({ summary: 'Check plugin health' })
   @ApiResponse({ status: 200, description: 'Plugin health status', type: PluginHealthResponseDto })
-  async healthCheck(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<{ healthy: boolean; message?: string }> {
+  async healthCheck(
+    @Param('id') id: string,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<{ healthy: boolean; message?: string }> {
     const tenantUserId = this.resolveTenantUserId(actor);
     this.pluginsService.findOne(id, tenantUserId);
     return await this.pluginsService.healthCheck(id);

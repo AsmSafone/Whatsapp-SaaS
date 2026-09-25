@@ -152,9 +152,7 @@ export class StatsService {
       messageStatsQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
     }
 
-    const messageStats = await messageStatsQb
-      .groupBy('m.direction')
-      .getRawMany<{ direction: string; count: string }>();
+    const messageStats = await messageStatsQb.groupBy('m.direction').getRawMany<{ direction: string; count: string }>();
 
     const todayStatsQb = this.messageRepo
       .createQueryBuilder('m')
@@ -166,9 +164,7 @@ export class StatsService {
       todayStatsQb.innerJoin(Session, 's', 's.id = m.sessionId AND s.ownerUserId = :tenantUserId', { tenantUserId });
     }
 
-    const todayStats = await todayStatsQb
-      .groupBy('m.direction')
-      .getRawMany<{ direction: string; count: string }>();
+    const todayStats = await todayStatsQb.groupBy('m.direction').getRawMany<{ direction: string; count: string }>();
 
     const sent = parseInt(messageStats.find(m => m.direction === 'outgoing')?.count || '0');
     const received = parseInt(messageStats.find(m => m.direction === 'incoming')?.count || '0');
@@ -325,8 +321,6 @@ export class StatsService {
       this.memo.delete(key);
       throw new NotFoundException('Session not found');
     }
-    return this.memoized(key, () => this.loadSessionStats(sessionId));
-  }
     return this.memoized(key, () => this.loadSessionStats(sessionId));
   }
 

@@ -9,7 +9,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginLoaderService, PluginStatus, PluginType, resolvePluginEntryPath, PluginInstance } from '../../core/plugins';
+import {
+  PluginLoaderService,
+  PluginStatus,
+  PluginType,
+  resolvePluginEntryPath,
+  PluginInstance,
+} from '../../core/plugins';
 import { pluginUpdateBackupDirName, pluginUpdateStagingDirName } from '../../core/plugins';
 import type { PluginConfigSchema } from '../../core/plugins';
 import { PluginDto } from './dto/plugin.dto';
@@ -64,9 +70,9 @@ export class PluginsService {
     const ownerUserId = this.pluginLoader.getPluginOwner(plugin.manifest.id) ?? plugin.ownerUserId ?? null;
     if (tenantUserId) {
       const userCfg = this.pluginLoader.getUserConfig(plugin.manifest.id, tenantUserId);
-      const isEnabled = userCfg?.enabled ?? (plugin.status === PluginStatus.ENABLED);
+      const isEnabled = userCfg?.enabled ?? plugin.status === PluginStatus.ENABLED;
       const effectiveConfig = userCfg?.config ?? plugin.config;
-      const effectiveActiveSessions = userCfg?.activeSessions ?? (plugin.activeSessions ?? ['*']);
+      const effectiveActiveSessions = userCfg?.activeSessions ?? plugin.activeSessions ?? ['*'];
       const effectiveSessionConfig = userCfg?.sessionConfig ?? plugin.sessionConfig;
 
       return {
@@ -762,7 +768,10 @@ export class PluginsService {
     return this.serialize(id, () => this.uninstallInner(id, tenantUserId));
   }
 
-  private async uninstallInner(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+  private async uninstallInner(
+    id: string,
+    tenantUserId?: string | null,
+  ): Promise<{ success: boolean; message: string }> {
     // As in `disable`: not loaded is not unknown. A plugin whose code went missing still owns a
     // registry entry with its config and secrets, and `uninstallPlugin` already tolerates having no
     // runtime to tear down — so removing it is the one recovery left when the package cannot be

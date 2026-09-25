@@ -11,4 +11,3 @@ import { PluginsService } from './plugins.service';
   exports: [PluginsService],
 })
 export class PluginsApiModule {}
-

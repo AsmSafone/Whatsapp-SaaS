@@ -315,10 +315,7 @@ export class SessionController {
       "another node currently holds this session's live engine and deleting it here would strip a " +
       'session the owner is running. No destructive side effect runs before either refusal.',
   })
-  async delete(
-    @Param('sessionId', ParseUUIDPipe) id: string,
-    @CurrentApiKey() apiKey?: ApiKey,
-  ): Promise<void> {
+  async delete(@Param('sessionId', ParseUUIDPipe) id: string, @CurrentApiKey() apiKey?: ApiKey): Promise<void> {
     const session = await this.sessionService.findOne(id, this.resolveTenantUserId(apiKey));
     await this.sessionService.delete(id);
     await this.auditService.logInfo(AuditAction.SESSION_DELETED, {

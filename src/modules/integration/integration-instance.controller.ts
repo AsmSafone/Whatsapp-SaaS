@@ -205,11 +205,16 @@ export class IntegrationInstanceController {
 
   // A scoped key may only bind an instance to a session inside its own fence — never to another
   // session, and never to the all-sessions (omitted/'*') scope.
-  private async assertScopeWritable(apiKey: ApiKey | undefined, sessionScope: string | null | undefined): Promise<void> {
+  private async assertScopeWritable(
+    apiKey: ApiKey | undefined,
+    sessionScope: string | null | undefined,
+  ): Promise<void> {
     const tenantUserId = this.resolveTenantUserId(apiKey);
     if (tenantUserId) {
       if (!sessionScope || sessionScope === '*') {
-        throw new ForbiddenException('Non-admin tenants must bind integration instances to a specific session they own');
+        throw new ForbiddenException(
+          'Non-admin tenants must bind integration instances to a specific session they own',
+        );
       }
       const session = await this.sessionRepo.findOne({ where: { id: sessionScope } });
       if (!session || session.ownerUserId !== tenantUserId) {
