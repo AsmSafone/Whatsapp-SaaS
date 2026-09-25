@@ -595,6 +595,7 @@
     "title": "API Keys",
     "subtitle": "Manage API keys for authentication and access control",
     "createBtn": "Create API Key",
+    "documentation": "Documentation",
     "modalTitle": "Create API Key",
     "createdTitle": "API Key Created",
     "createdHint": "Copy this key now. You won't be able to see it again.",

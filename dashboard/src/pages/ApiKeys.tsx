@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   AlertCircle,
   Pencil,
+  BookOpen,
 } from 'lucide-react';
 import type { ApiKey } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -282,10 +283,16 @@ export function ApiKeys() {
         title={t('apiKeys.title')}
         subtitle={t('apiKeys.subtitle')}
         actions={
-          <button className="btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={18} />
-            {t('apiKeys.createBtn')}
-          </button>
+          <>
+            <a href="/api/docs" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+              <BookOpen size={16} />
+              {t('apiKeys.documentation', 'Documentation')}
+            </a>
+            <button className="btn-primary" onClick={() => setShowModal(true)}>
+              <Plus size={18} />
+              {t('apiKeys.createBtn')}
+            </button>
+          </>
         }
       />
 

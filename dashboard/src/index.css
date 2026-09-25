@@ -326,12 +326,14 @@ select:disabled {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 .btn-secondary:hover:not(:disabled) {
   background: var(--bg-white, #fff);
   border-color: var(--text-muted, #94a3b8);
   color: var(--text-primary, #1e293b);
+  text-decoration: none;
 }
 
 .btn-secondary:disabled {
