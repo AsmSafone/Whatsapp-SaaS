@@ -83,7 +83,6 @@ export interface Session {
    * dashboard can be served by a gateway that predates the field.
    */
   restriction?: AccountRestriction | null;
-  apiKey?: string;
 }
 
 /** One participant's presence within a chat. */
@@ -1505,4 +1504,3 @@ export const adminUsersApi = {
       method: 'DELETE',
     }),
 };
-

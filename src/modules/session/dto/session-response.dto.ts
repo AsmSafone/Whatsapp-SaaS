@@ -98,12 +98,6 @@ export class SessionResponseDto {
   })
   engineLoaded!: boolean;
 
-  @ApiPropertyOptional({
-    description: 'Session-scoped operator API key, returned once at create for a Zaptura account.',
-    example: 'zap_k1_...',
-  })
-  apiKey?: string;
-
   /**
    * Map a Session entity to the public response shape, stripping sensitive
    * engine config fields (`config`, `proxyUrl`, `proxyType`) that must not

@@ -19,7 +19,6 @@ export interface SessionCreateForm {
   proxyUrl: string;
   setProxyUrl: (url: string) => void;
   creating: boolean;
-  createdApiKey: string | null;
   handleCreate: () => Promise<void>;
 }
 
@@ -38,7 +37,6 @@ export function useSessionCreateForm({ onCreated, onFailed }: UseSessionCreateFo
   const [useProxy, setUseProxy] = useState(false);
   const [proxyUrl, setProxyUrl] = useState('');
   const [creating, setCreating] = useState(false);
-  const [createdApiKey, setCreatedApiKey] = useState<string | null>(null);
 
   const resetProxyFields = () => {
     setUseProxy(false);
@@ -51,7 +49,6 @@ export function useSessionCreateForm({ onCreated, onFailed }: UseSessionCreateFo
   useEffect(() => {
     if (!showCreateModal) {
       resetProxyFields();
-      setCreatedApiKey(null);
     }
   }, [showCreateModal]);
 
@@ -68,13 +65,9 @@ export function useSessionCreateForm({ onCreated, onFailed }: UseSessionCreateFo
       );
       setNewSessionName('');
       resetProxyFields();
-      if (newSession.apiKey) {
-        setCreatedApiKey(newSession.apiKey);
-      } else {
-        setShowCreateModal(false);
-      }
+      setShowCreateModal(false);
       toast.success(t('sessions.create.successTitle'), t('sessions.create.successDesc', { name: newSession.name }));
-      onCreated({ ...newSession, apiKey: undefined });
+      onCreated(newSession);
     } catch (err) {
       const msg = err instanceof Error ? err.message : t('sessions.create.errorDefault');
       toast.error(t('sessions.create.errorTitle'), msg);
@@ -94,7 +87,6 @@ export function useSessionCreateForm({ onCreated, onFailed }: UseSessionCreateFo
     proxyUrl,
     setProxyUrl,
     creating,
-    createdApiKey,
     handleCreate,
   };
 }

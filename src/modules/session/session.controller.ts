@@ -13,7 +13,6 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   ForbiddenException,
-  Optional,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { SessionService } from './session.service';
@@ -57,7 +56,6 @@ import {
 } from '../auth/decorators/auth.decorators';
 import { ChatScopeService } from '../auth/chat-scope.service';
 import { ApiKey, ApiKeyRole } from '../auth/entities/api-key.entity';
-import { AuthService } from '../auth/auth.service';
 import { PLAN_LIMITS } from '../auth/saas-plans';
 import type { UserPlan } from '../auth/entities/user.entity';
 import {
@@ -76,8 +74,6 @@ export class SessionController {
     private readonly sessionService: SessionService,
     private readonly auditService: AuditService,
     private readonly chatScope: ChatScopeService,
-    @Optional()
-    private readonly authService?: AuthService,
   ) {}
 
   private transformSession(session: Session): SessionResponseDto {
@@ -124,19 +120,7 @@ export class SessionController {
       sessionId: session.id,
       sessionName: session.name,
     });
-    const response = this.transformSession(session);
-    if (tenantUserId && this.authService) {
-      const minted = await this.authService.createApiKey(
-        {
-          name: `session:${session.name}`,
-          role: ApiKeyRole.USER,
-          allowedSessions: [session.id],
-        },
-        { userId: tenantUserId },
-      );
-      response.apiKey = minted.rawKey;
-    }
-    return response;
+    return this.transformSession(session);
   }
 
   @Get()
