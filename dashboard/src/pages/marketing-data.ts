@@ -68,7 +68,7 @@ export const FEATURE_MATRIX: MatrixGroup[] = [
       {
         feature: 'Session Engine',
         tooltip: 'WebSocket engine used for persistent connections',
-        values: ['Baileys', 'Baileys', 'Baileys + WWebJS', 'Baileys + WWebJS'],
+        values: ['WWebJS', 'WWebJS', 'Baileys + WWebJS', 'Baileys + WWebJS'],
       },
       {
         feature: 'Concurrent Active Sessions',

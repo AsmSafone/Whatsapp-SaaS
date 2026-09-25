@@ -46,10 +46,7 @@ export class IntegrationInstanceController {
 
   private resolveTenantUserId(apiKey?: ApiKey): string | null {
     if (!apiKey) return null;
-    if (apiKey.role === ApiKeyRole.ADMIN) {
-      return null;
-    }
-    return apiKey.userId ?? (apiKey.id.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
+    return apiKey.userId ?? (apiKey.id?.startsWith('user:') ? apiKey.id.replace('user:', '') : (apiKey.id ?? null));
   }
 
   @Post()

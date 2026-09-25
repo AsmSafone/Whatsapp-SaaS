@@ -125,28 +125,40 @@ export class PluginsService {
     };
   }
 
-  findAll(tenantUserId?: string | null): PluginDto[] {
+  findAll(tenantUserId?: string | null, isAdmin = false): PluginDto[] {
     const plugins = this.pluginLoader.getAllPlugins();
 
     return plugins
       .filter(plugin => {
-        if (!tenantUserId) return true;
+        // Built-in system plugins are platform-wide
+        if (this.pluginLoader.isBuiltIn(plugin.manifest.id)) return true;
+
         const owner = this.pluginLoader.getPluginOwner(plugin.manifest.id) ?? plugin.ownerUserId;
-        return !owner || owner === tenantUserId;
+        if (!owner) {
+          // Legacy plugin without owner: visible to admin only, never visible to regular users
+          return isAdmin;
+        }
+
+        // Strict isolation: user only sees their own plugins; admin only sees admin's plugins
+        return owner === tenantUserId;
       })
       .map(plugin => this.toDto(plugin, tenantUserId));
   }
 
-  findOne(id: string, tenantUserId?: string | null): PluginDto {
+  findOne(id: string, tenantUserId?: string | null, isAdmin = false): PluginDto {
     const plugin = this.pluginLoader.getPlugin(id);
 
     if (!plugin) {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
 
-    if (tenantUserId) {
+    if (!this.pluginLoader.isBuiltIn(id)) {
       const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-      if (owner && owner !== tenantUserId) {
+      if (!owner) {
+        if (!isAdmin) {
+          throw new NotFoundException(`Plugin ${id} not found`);
+        }
+      } else if (owner !== tenantUserId) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
     }
@@ -154,18 +166,23 @@ export class PluginsService {
     return this.toDto(plugin, tenantUserId);
   }
 
-  enable(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+  enable(id: string, tenantUserId?: string | null, isAdmin = false): Promise<{ success: boolean; message: string }> {
     return this.serialize(id, async () => {
       const plugin = this.pluginLoader.getPlugin(id);
       if (!plugin) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
 
-      if (tenantUserId) {
+      if (!this.pluginLoader.isBuiltIn(id)) {
         const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-        if (owner && owner !== tenantUserId) {
+        if (!owner) {
+          if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+        } else if (owner !== tenantUserId) {
           throw new NotFoundException(`Plugin ${id} not found`);
         }
+      }
+
+      if (tenantUserId) {
         this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: true });
         if (plugin.status !== PluginStatus.ENABLED) {
           try {
@@ -206,7 +223,7 @@ export class PluginsService {
     }
   }
 
-  disable(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
+  disable(id: string, tenantUserId?: string | null, isAdmin = false): Promise<{ success: boolean; message: string }> {
     return this.serialize(id, async () => {
       const plugin = this.pluginLoader.getPlugin(id);
 
@@ -214,11 +231,15 @@ export class PluginsService {
         if (!this.pluginLoader.getRegistryEntry(id)) {
           throw new NotFoundException(`Plugin ${id} not found`);
         }
-        if (tenantUserId) {
+        if (!this.pluginLoader.isBuiltIn(id)) {
           const owner = this.pluginLoader.getPluginOwner(id);
-          if (owner && owner !== tenantUserId) {
+          if (!owner) {
+            if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+          } else if (owner !== tenantUserId) {
             throw new NotFoundException(`Plugin ${id} not found`);
           }
+        }
+        if (tenantUserId) {
           this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: false });
           return { success: true, message: `Plugin ${id} disabled successfully` };
         }
@@ -226,11 +247,16 @@ export class PluginsService {
         return { success: true, message: `Plugin ${id} is not loaded; it will not be enabled on boot` };
       }
 
-      if (tenantUserId) {
+      if (!this.pluginLoader.isBuiltIn(id)) {
         const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-        if (owner && owner !== tenantUserId) {
+        if (!owner) {
+          if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+        } else if (owner !== tenantUserId) {
           throw new NotFoundException(`Plugin ${id} not found`);
         }
+      }
+
+      if (tenantUserId) {
         this.pluginLoader.setUserConfig(id, tenantUserId, { enabled: false });
         return { success: true, message: `Plugin ${id} disabled successfully` };
       }
@@ -277,19 +303,24 @@ export class PluginsService {
     }
   }
 
-  updateSessions(id: string, sessions: string[], tenantUserId?: string | null): PluginDto {
+  updateSessions(id: string, sessions: string[], tenantUserId?: string | null, isAdmin = false): PluginDto {
     const plugin = this.pluginLoader.getPlugin(id);
     if (!plugin) {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
 
-    if (tenantUserId) {
+    if (!this.pluginLoader.isBuiltIn(id)) {
       const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-      if (owner && owner !== tenantUserId) {
+      if (!owner) {
+        if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+      } else if (owner !== tenantUserId) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
+    }
+
+    if (tenantUserId) {
       this.pluginLoader.setUserConfig(id, tenantUserId, { activeSessions: sessions });
-      return this.findOne(id, tenantUserId);
+      return this.findOne(id, tenantUserId, isAdmin);
     }
 
     try {
@@ -297,13 +328,14 @@ export class PluginsService {
     } catch (error) {
       throw new BadRequestException(error instanceof Error ? error.message : String(error));
     }
-    return this.findOne(id);
+    return this.findOne(id, undefined, isAdmin);
   }
 
   updateConfig(
     id: string,
     config: Record<string, unknown>,
     tenantUserId?: string | null,
+    isAdmin = false,
   ): { success: boolean; message: string } {
     const plugin = this.pluginLoader.getPlugin(id);
 
@@ -311,11 +343,16 @@ export class PluginsService {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
 
-    if (tenantUserId) {
+    if (!this.pluginLoader.isBuiltIn(id)) {
       const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-      if (owner && owner !== tenantUserId) {
+      if (!owner) {
+        if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+      } else if (owner !== tenantUserId) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
+    }
+
+    if (tenantUserId) {
       try {
         const userCfg = this.pluginLoader.getUserConfig(id, tenantUserId);
         const existing = userCfg?.config ?? plugin.config;
@@ -352,6 +389,7 @@ export class PluginsService {
     sessionId: string,
     config: Record<string, unknown>,
     tenantUserId?: string | null,
+    isAdmin = false,
   ): { success: boolean; message: string } {
     const plugin = this.pluginLoader.getPlugin(id);
 
@@ -362,11 +400,16 @@ export class PluginsService {
       throw new BadRequestException(`Plugin ${id} is global (not session-scoped) and has no per-session config`);
     }
 
-    if (tenantUserId) {
+    if (!this.pluginLoader.isBuiltIn(id)) {
       const owner = this.pluginLoader.getPluginOwner(id) ?? plugin.ownerUserId;
-      if (owner && owner !== tenantUserId) {
+      if (!owner) {
+        if (!isAdmin) throw new NotFoundException(`Plugin ${id} not found`);
+      } else if (owner !== tenantUserId) {
         throw new NotFoundException(`Plugin ${id} not found`);
       }
+    }
+
+    if (tenantUserId) {
       try {
         const userCfg = this.pluginLoader.getUserConfig(id, tenantUserId);
         const existingMap = userCfg?.sessionConfig ?? {};
@@ -572,7 +615,7 @@ export class PluginsService {
    * Fetch the configured remote catalog (a plugins.json array) through the SSRF guard and annotate each
    * entry with this instance's install state (installed / installedVersion / updateAvailable).
    */
-  async getCatalog(): Promise<CatalogPlugin[]> {
+  async getCatalog(tenantUserId?: string | null, isAdmin = false): Promise<CatalogPlugin[]> {
     const url = this.configService.get<string>('plugins.catalogUrl');
     if (!url) return [];
 
@@ -596,7 +639,7 @@ export class PluginsService {
       );
     }
 
-    const installed = this.pluginLoader.getAllPlugins().map(p => ({ id: p.manifest.id, version: p.manifest.version }));
+    const installed = this.findAll(tenantUserId, isAdmin).map(p => ({ id: p.id, version: p.version }));
     return annotateCatalog(entries, installed);
   }
 
@@ -764,13 +807,18 @@ export class PluginsService {
   }
 
   /** Uninstall an installed user plugin: disable, unload, and delete its files. Built-ins are protected. */
-  uninstall(id: string, tenantUserId?: string | null): Promise<{ success: boolean; message: string }> {
-    return this.serialize(id, () => this.uninstallInner(id, tenantUserId));
+  uninstall(
+    id: string,
+    tenantUserId?: string | null,
+    isAdmin = false,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.serialize(id, () => this.uninstallInner(id, tenantUserId, isAdmin));
   }
 
   private async uninstallInner(
     id: string,
     tenantUserId?: string | null,
+    isAdmin = false,
   ): Promise<{ success: boolean; message: string }> {
     // As in `disable`: not loaded is not unknown. A plugin whose code went missing still owns a
     // registry entry with its config and secrets, and `uninstallPlugin` already tolerates having no
@@ -780,14 +828,17 @@ export class PluginsService {
       throw new NotFoundException(`Plugin ${id} not found`);
     }
 
-    if (tenantUserId) {
-      const owner = this.pluginLoader.getPluginOwner(id);
-      if (owner && owner !== tenantUserId) {
+    if (this.pluginLoader.isBuiltIn(id)) {
+      throw new BadRequestException('Built-in plugins cannot be uninstalled');
+    }
+
+    const owner = this.pluginLoader.getPluginOwner(id);
+    if (!owner) {
+      if (!isAdmin) {
         throw new ForbiddenException('Cannot uninstall a plugin you do not own');
       }
-      if (!owner && this.pluginLoader.isBuiltIn(id)) {
-        throw new BadRequestException('Built-in plugins cannot be uninstalled');
-      }
+    } else if (owner !== tenantUserId) {
+      throw new ForbiddenException('Cannot uninstall a plugin you do not own');
     }
 
     try {
@@ -796,6 +847,19 @@ export class PluginsService {
     } catch (error) {
       throw new BadRequestException(error instanceof Error ? error.message : String(error));
     }
+  }
+
+  /** Uninstall all plugins installed by a specific user and scrub user configuration. */
+  async uninstallAllForUser(userId: string): Promise<void> {
+    const owned = this.pluginLoader.getPluginsByOwner(userId);
+    for (const id of owned) {
+      try {
+        await this.uninstall(id, userId, true);
+      } catch (error) {
+        logger.warn(`Failed to uninstall plugin "${id}" for deleted user "${userId}": ${error}`);
+      }
+    }
+    this.pluginLoader.removeUserData(userId);
   }
 
   async healthCheck(id: string): Promise<{ healthy: boolean; message?: string }> {

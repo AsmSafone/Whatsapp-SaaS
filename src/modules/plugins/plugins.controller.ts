@@ -46,10 +46,7 @@ export class PluginsController {
 
   private resolveTenantUserId(apiKey?: ApiKey): string | null {
     if (!apiKey) return null;
-    if (apiKey.role === ApiKeyRole.ADMIN) {
-      return null;
-    }
-    return apiKey.userId ?? (apiKey.id.startsWith('user:') ? apiKey.id.replace('user:', '') : null);
+    return apiKey.userId ?? (apiKey.id?.startsWith('user:') ? apiKey.id.replace('user:', '') : (apiKey.id ?? null));
   }
 
   @Get()
@@ -57,7 +54,7 @@ export class PluginsController {
   @ApiOperation({ summary: 'List all plugins' })
   @ApiResponse({ status: 200, description: 'List of all plugins', type: PluginDto, isArray: true })
   findAll(@CurrentApiKey() actor?: ApiKey): PluginDto[] {
-    return this.pluginsService.findAll(this.resolveTenantUserId(actor));
+    return this.pluginsService.findAll(this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Post('install')
@@ -99,8 +96,8 @@ export class PluginsController {
   @ApiOperation({ summary: 'List the remote plugin catalog, annotated with install state' })
   @ApiResponse({ status: 200, description: 'Catalog entries', type: [PluginCatalogEntryDto] })
   @ApiResponse({ status: 400, description: 'Catalog could not be fetched or parsed' })
-  async catalog(): Promise<CatalogPlugin[]> {
-    return await this.pluginsService.getCatalog();
+  async catalog(@CurrentApiKey() actor?: ApiKey): Promise<CatalogPlugin[]> {
+    return await this.pluginsService.getCatalog(this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Get(':id')
@@ -109,7 +106,7 @@ export class PluginsController {
   @ApiResponse({ status: 200, description: 'Plugin details', type: PluginDto })
   @ApiResponse({ status: 404, description: 'Plugin not found' })
   findOne(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): PluginDto {
-    return this.pluginsService.findOne(id, this.resolveTenantUserId(actor));
+    return this.pluginsService.findOne(id, this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Post(':id/enable')
@@ -121,7 +118,7 @@ export class PluginsController {
     @Param('id') id: string,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.enable(id, this.resolveTenantUserId(actor));
+    return await this.pluginsService.enable(id, this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Post(':id/disable')
@@ -133,7 +130,7 @@ export class PluginsController {
     @Param('id') id: string,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.disable(id, this.resolveTenantUserId(actor));
+    return await this.pluginsService.disable(id, this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Put(':id/config')
@@ -145,7 +142,12 @@ export class PluginsController {
     @Body() configDto: PluginConfigDto,
     @CurrentApiKey() actor?: ApiKey,
   ): { success: boolean; message: string } {
-    return this.pluginsService.updateConfig(id, configDto.config, this.resolveTenantUserId(actor));
+    return this.pluginsService.updateConfig(
+      id,
+      configDto.config,
+      this.resolveTenantUserId(actor),
+      actor?.role === ApiKeyRole.ADMIN,
+    );
   }
 
   @Get(':id/config-ui')
@@ -162,9 +164,7 @@ export class PluginsController {
   @ApiResponse({ status: 404, description: 'Plugin not found or has no config UI' })
   getConfigUi(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): string {
     const tenantUserId = this.resolveTenantUserId(actor);
-    if (tenantUserId) {
-      this.pluginsService.findOne(id, tenantUserId);
-    }
+    this.pluginsService.findOne(id, tenantUserId, actor?.role === ApiKeyRole.ADMIN);
     return this.pluginsService.getConfigUiHtml(id);
   }
 
@@ -181,7 +181,8 @@ export class PluginsController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<{ success: boolean; message: string }> {
     const tenantUserId = this.resolveTenantUserId(actor);
-    if (tenantUserId) {
+    const isAdmin = actor?.role === ApiKeyRole.ADMIN;
+    if (tenantUserId && !isAdmin) {
       if (actor?.allowedSessions && !actor.allowedSessions.includes(sessionId)) {
         throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
       }
@@ -190,7 +191,7 @@ export class PluginsController {
         throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
       }
     }
-    return this.pluginsService.updateSessionConfig(id, sessionId, configDto.config, tenantUserId);
+    return this.pluginsService.updateSessionConfig(id, sessionId, configDto.config, tenantUserId, isAdmin);
   }
 
   @Put(':id/sessions')
@@ -211,7 +212,8 @@ export class PluginsController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<PluginDto> {
     const tenantUserId = this.resolveTenantUserId(actor);
-    if (tenantUserId) {
+    const isAdmin = actor?.role === ApiKeyRole.ADMIN;
+    if (tenantUserId && !isAdmin) {
       for (const s of dto.sessions) {
         if (s !== '*') {
           if (actor?.allowedSessions && !actor.allowedSessions.includes(s)) {
@@ -224,7 +226,7 @@ export class PluginsController {
         }
       }
     }
-    return this.pluginsService.updateSessions(id, dto.sessions, tenantUserId);
+    return this.pluginsService.updateSessions(id, dto.sessions, tenantUserId, isAdmin);
   }
 
   @Post(':id/update')
@@ -240,7 +242,7 @@ export class PluginsController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<PluginDto> {
     const tenantUserId = this.resolveTenantUserId(actor);
-    this.pluginsService.findOne(id, tenantUserId);
+    this.pluginsService.findOne(id, tenantUserId, actor?.role === ApiKeyRole.ADMIN);
     return await this.pluginsService.updateFromUrl(id, dto.url);
   }
 
@@ -255,7 +257,7 @@ export class PluginsController {
     @Param('id') id: string,
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<{ success: boolean; message: string }> {
-    return await this.pluginsService.uninstall(id, this.resolveTenantUserId(actor));
+    return await this.pluginsService.uninstall(id, this.resolveTenantUserId(actor), actor?.role === ApiKeyRole.ADMIN);
   }
 
   @Get(':id/health')
@@ -268,7 +270,7 @@ export class PluginsController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<{ healthy: boolean; message?: string }> {
     const tenantUserId = this.resolveTenantUserId(actor);
-    this.pluginsService.findOne(id, tenantUserId);
+    this.pluginsService.findOne(id, tenantUserId, actor?.role === ApiKeyRole.ADMIN);
     return await this.pluginsService.healthCheck(id);
   }
 }

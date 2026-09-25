@@ -43,7 +43,7 @@ export function Pricing() {
                 {plan.popular && (
                   <div className="zp-popular-badge">
                     <Star size={12} fill="currentColor" />
-                    <span>Most Popular Choice</span>
+                    <span>Most Popular</span>
                   </div>
                 )}
 
@@ -64,7 +64,7 @@ export function Pricing() {
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
                     <strong>
-                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
+                      {plan.sessions} Linked {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
                   <li>

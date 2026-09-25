@@ -362,6 +362,14 @@ export class PluginLoaderService implements OnModuleInit, OnApplicationBootstrap
     this.pluginStorage.setUserConfig(pluginId, userId, patch);
   }
 
+  getPluginsByOwner(ownerUserId: string): string[] {
+    return this.pluginStorage.getPluginsByOwner(ownerUserId);
+  }
+
+  removeUserData(userId: string): void {
+    this.pluginStorage.removeUserData(userId);
+  }
+
   /** Health across both tiers; the sandbox-routing implementation lives in PluginSandboxBridge. */
   checkPluginHealth(pluginId: string): Promise<{ healthy: boolean; message?: string }> {
     return this.sandboxBridge.checkPluginHealth(pluginId);

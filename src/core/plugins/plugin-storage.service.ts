@@ -258,6 +258,30 @@ export class PluginStorageService {
     }
   }
 
+  getPluginsByOwner(ownerUserId: string): string[] {
+    const list: string[] = [];
+    for (const [id, entry] of this.registry.entries()) {
+      if (entry.ownerUserId === ownerUserId) {
+        list.push(id);
+      }
+    }
+    return list;
+  }
+
+  removeUserData(userId: string): void {
+    let changed = false;
+    for (const entry of this.registry.values()) {
+      if (entry.userConfigs && entry.userConfigs[userId]) {
+        delete entry.userConfigs[userId];
+        entry.updatedAt = new Date();
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.saveRegistry();
+    }
+  }
+
   // ============================================================================
   // Plugin Data Storage (sandboxed per-plugin storage)
   // ============================================================================

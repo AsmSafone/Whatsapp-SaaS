@@ -7,12 +7,17 @@ import {
   Optional,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, getRepositoryToken } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { ModuleRef } from '@nestjs/core';
 import { randomBytes } from 'crypto';
 import { User, UserPlan } from './entities/user.entity';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { Session } from '../session/entities/session.entity';
+import { SessionService } from '../session/session.service';
+import { PluginsService } from '../plugins/plugins.service';
+import { PluginInstance } from '../integration/entities/plugin-instance.entity';
+import { ConversationMapping } from '../integration/entities/conversation-mapping.entity';
 import { hashPassword, signUserToken, verifyPassword, verifyUserToken } from './user-token';
 import { PLAN_LIMITS } from './saas-plans';
 import { RegisterDto } from './dto/account.dto';
@@ -49,6 +54,8 @@ export class AccountService {
     @Optional()
     @InjectRepository(ApiKey, 'main')
     private readonly apiKeys?: Repository<ApiKey>,
+    @Optional()
+    private readonly moduleRef?: ModuleRef,
   ) {}
 
   jwtSecret(): string {
@@ -349,7 +356,65 @@ export class AccountService {
       throw new ForbiddenException('The primary owner/admin account cannot be deleted');
     }
 
+    let sessionService: SessionService | null = null;
+    if (this.moduleRef) {
+      try {
+        sessionService = this.moduleRef.get(SessionService, { strict: false });
+      } catch {}
+    }
+
+    const ownedSessions = await this.sessions.find({
+      where: { ownerUserId: user.id },
+      select: { id: true },
+    });
+    const sessionIds = ownedSessions.map(s => s.id);
+
+    if (sessionService) {
+      for (const s of ownedSessions) {
+        try {
+          await sessionService.delete(s.id);
+        } catch {}
+      }
+    }
     await this.sessions.delete({ ownerUserId: user.id });
+
+    if (this.moduleRef && sessionIds.length > 0) {
+      try {
+        const convRepo = this.moduleRef.get<Repository<ConversationMapping>>(
+          getRepositoryToken(ConversationMapping, 'data'),
+          { strict: false },
+        );
+        if (convRepo) {
+          await convRepo.delete({ sessionId: In(sessionIds) });
+        }
+      } catch {}
+    }
+
+    if (this.moduleRef) {
+      try {
+        const pluginInstRepo = this.moduleRef.get<Repository<PluginInstance>>(
+          getRepositoryToken(PluginInstance, 'data'),
+          { strict: false },
+        );
+        if (pluginInstRepo) {
+          await pluginInstRepo.delete({ ownerUserId: user.id });
+        }
+      } catch {}
+    }
+
+    if (this.moduleRef) {
+      try {
+        const pluginsService = this.moduleRef.get(PluginsService, { strict: false });
+        if (pluginsService) {
+          await pluginsService.uninstallAllForUser(user.id);
+        }
+      } catch {}
+    }
+
+    if (this.apiKeys) {
+      await this.apiKeys.delete({ userId: user.id });
+    }
+
     await this.users.delete({ id: user.id });
 
     return { ok: true };
