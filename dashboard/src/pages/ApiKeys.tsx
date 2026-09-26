@@ -31,6 +31,7 @@ import {
   useRevokeApiKeyMutation,
   useSessionsQuery,
   useUpdateApiKeyMutation,
+  useAccountMeQuery,
 } from '../hooks/queries';
 import { PageHeader } from '../components/PageHeader';
 import { Modal } from '../components/Modal';
@@ -40,7 +41,7 @@ import { copyToClipboard } from '../utils/clipboard';
 import { sameSessionScope, sessionScopeNames } from '../utils/sessionScope';
 import './ApiKeys.css';
 
-const emptyKeyForm = { name: '', allowedSessions: [] as string[] };
+const emptyKeyForm = { name: '', allowedSessions: [] as string[], role: 'admin' as 'admin' | 'user' };
 
 function useWindowSize() {
   const [width, setWidth] = useState(window.innerWidth);
@@ -63,6 +64,8 @@ export function ApiKeys() {
   const { t } = useTranslation();
   const toast = useToast();
   useDocumentTitle(t('apiKeys.title'));
+  const { data: me } = useAccountMeQuery();
+  const isAdmin = me?.role === 'admin';
   const { data: apiKeys = [], isLoading: loading, isError: apiKeysError } = useApiKeysQuery();
   const { data: sessions = [] } = useSessionsQuery();
   const createMutation = useCreateApiKeyMutation();
@@ -75,6 +78,7 @@ export function ApiKeys() {
   const [copied, setCopied] = useState<string | null>(null);
   const [editingKey, setEditingKey] = useState<ApiKey | null>(null);
   const [editSessions, setEditSessions] = useState<string[]>([]);
+  const [editRole, setEditRole] = useState<'admin' | 'user'>('user');
   const [confirmAction, setConfirmAction] = useState<{ type: 'delete' | 'revoke'; id: string; name: string } | null>(
     null,
   );
@@ -99,6 +103,7 @@ export function ApiKeys() {
     try {
       const created = await createMutation.mutateAsync({
         name: newKey.name,
+        role: isAdmin ? newKey.role : 'user',
         ...(newKey.allowedSessions.length > 0 ? { allowedSessions: newKey.allowedSessions } : {}),
       });
       setCreatedKey(created.apiKey || null);
@@ -112,22 +117,24 @@ export function ApiKeys() {
   const openEditSessions = (apiKey: ApiKey) => {
     setEditingKey(apiKey);
     setEditSessions(apiKey.allowedSessions ?? []);
+    setEditRole((apiKey.role as 'admin' | 'user') || 'user');
   };
 
   const handleSaveSessions = async () => {
     if (!editingKey) return;
-    // An unchanged Save must not be sent. The server writes `allowedSessions` whenever the field is
-    // present, and storing [] over a key that was never scoped reads back as an authorization
-    // change: it drops every live /events socket holding that key and writes an audit row saying
-    // the scope moved when it did not.
-    if (sameSessionScope(editSessions, editingKey.allowedSessions ?? [])) {
+    const sameScope = sameSessionScope(editSessions, editingKey.allowedSessions ?? []);
+    const sameRole = !isAdmin || editRole === editingKey.role;
+    if (sameScope && sameRole) {
       setEditingKey(null);
       return;
     }
     try {
       await updateMutation.mutateAsync({
         id: editingKey.id,
-        data: { allowedSessions: editSessions },
+        data: {
+          allowedSessions: editSessions,
+          ...(isAdmin && editRole !== editingKey.role ? { role: editRole } : {}),
+        },
       });
       setEditingKey(null);
     } catch (err) {
@@ -173,7 +180,40 @@ export function ApiKeys() {
       columnHelper.columns([
         columnHelper.accessor('name', {
           header: () => t('apiKeys.columns.name'),
-          cell: info => <span className="name-cell">{info.getValue()}</span>,
+          cell: info => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span className="name-cell">{info.getValue()}</span>
+              {info.row.original.role === 'admin' ? (
+                <span
+                  style={{
+                    fontSize: '0.68rem',
+                    padding: '0.12rem 0.4rem',
+                    borderRadius: '4px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    color: '#ef4444',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  ADMIN
+                </span>
+              ) : (
+                <span
+                  style={{
+                    fontSize: '0.68rem',
+                    padding: '0.12rem 0.4rem',
+                    borderRadius: '4px',
+                    background: 'rgba(59, 130, 246, 0.15)',
+                    color: '#3b82f6',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  USER
+                </span>
+              )}
+            </div>
+          ),
         }),
         columnHelper.accessor('keyPrefix', {
           id: 'key',
@@ -357,6 +397,23 @@ export function ApiKeys() {
                 onChange={e => setNewKey({ ...newKey, name: e.target.value })}
                 aria-label={t('common.name')}
               />
+              {isAdmin && (
+                <div style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                  <label htmlFor="ak-role" style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.875rem' }}>
+                    {t('apiKeys.role', 'Key Role / Permissions')}
+                  </label>
+                  <select
+                    id="ak-role"
+                    className="custom-select"
+                    value={newKey.role}
+                    onChange={e => setNewKey({ ...newKey, role: e.target.value as 'admin' | 'user' })}
+                    style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  >
+                    <option value="admin">Admin — Full System & Tenant Control</option>
+                    <option value="user">User — Scoped to User Sessions & Data</option>
+                  </select>
+                </div>
+              )}
               <SessionScopePicker
                 sessions={sessions}
                 selectedIds={newKey.allowedSessions}
@@ -392,6 +449,23 @@ export function ApiKeys() {
           <p className="session-scope-edit-name">
             <strong>{editingKey.name}</strong>
           </p>
+          {isAdmin && (
+            <div style={{ marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+              <label htmlFor="edit-ak-role" style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.875rem' }}>
+                {t('apiKeys.role', 'Key Role / Permissions')}
+              </label>
+              <select
+                id="edit-ak-role"
+                className="custom-select"
+                value={editRole}
+                onChange={e => setEditRole(e.target.value as 'admin' | 'user')}
+                style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+              >
+                <option value="admin">Admin — Full System & Tenant Control</option>
+                <option value="user">User — Scoped to User Sessions & Data</option>
+              </select>
+            </div>
+          )}
           <SessionScopePicker
             sessions={sessions}
             selectedIds={editSessions}

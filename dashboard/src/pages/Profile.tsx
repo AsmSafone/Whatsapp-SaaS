@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   User as UserIcon,
   Mail,
@@ -93,6 +94,7 @@ const PLANS: PlanOption[] = [
 
 export function Profile() {
   useDocumentTitle('Profile & Account Settings — Zaptura WA');
+  const { t } = useTranslation();
   const toast = useToast();
 
   const { data: account, isLoading: isAccountLoading } = useAccountMeQuery();
@@ -121,7 +123,7 @@ export function Profile() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast.error('Name cannot be empty');
+      toast.error(t('profile.personalInfo.nameRequired'));
       return;
     }
     try {
@@ -129,9 +131,9 @@ export function Profile() {
         name: name.trim(),
         email: email.trim() || undefined,
       });
-      toast.success('Profile details updated successfully');
+      toast.success(t('profile.personalInfo.successMsg'));
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update profile';
+      const message = err instanceof Error ? err.message : t('common.errorGeneric');
       toast.error(message);
     }
   };
@@ -139,15 +141,15 @@ export function Profile() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword) {
-      toast.error('Please enter your current password');
+      toast.error(t('profile.security.currentRequired'));
       return;
     }
     if (newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters long');
+      toast.error(t('profile.security.minLength'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
+      toast.error(t('profile.security.mismatch'));
       return;
     }
 
@@ -156,12 +158,12 @@ export function Profile() {
         currentPassword,
         newPassword,
       });
-      toast.success('Password changed successfully');
+      toast.success(t('profile.security.successMsg'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to change password';
+      const message = err instanceof Error ? err.message : t('common.errorGeneric');
       toast.error(message);
     }
   };
@@ -171,9 +173,9 @@ export function Profile() {
     try {
       await changePlanMutation.mutateAsync(planId);
       const chosen = PLANS.find(p => p.id === planId)?.name ?? planId;
-      toast.success(`Successfully switched to ${chosen} plan`);
+      toast.success(t('profile.plans.successMsg', { plan: chosen }));
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update plan';
+      const message = err instanceof Error ? err.message : t('profile.plans.failedMsg');
       toast.error(message);
     }
   };
@@ -183,7 +185,7 @@ export function Profile() {
       <div className="profile-page loading">
         <div className="profile-loader">
           <Loader2 className="animate-spin" size={32} />
-          <p>Loading account details...</p>
+          <p>{t('profile.loading')}</p>
         </div>
       </div>
     );
@@ -197,8 +199,8 @@ export function Profile() {
   return (
     <div className="profile-page">
       <PageHeader
-        title="Profile & Settings"
-        subtitle="Manage your identity credentials, password security, and WhatsApp SaaS subscription plan."
+        title={t('profile.title')}
+        subtitle={t('profile.subtitle')}
       />
 
       {/* Account Overview Header Card */}
@@ -232,10 +234,10 @@ export function Profile() {
           <div className="quota-summary-header">
             <span className="quota-label">
               <Smartphone size={14} />
-              Whatsapp Session
+              {t('profile.overview.sessionLabel')}
             </span>
             <span className="quota-numbers">
-              <strong>{sessionCount}</strong> / {sessionLimit} used
+              <strong>{sessionCount}</strong> / {sessionLimit} {t('common.active').toLowerCase()}
             </span>
           </div>
           <div
@@ -259,14 +261,14 @@ export function Profile() {
               <UserIcon size={20} />
             </div>
             <div>
-              <h3 id="personal-info-heading">Personal Information</h3>
-              <p className="profile-card-desc">Update your display name and email address</p>
+              <h3 id="personal-info-heading">{t('profile.personalInfo.heading')}</h3>
+              <p className="profile-card-desc">{t('profile.personalInfo.desc')}</p>
             </div>
           </div>
 
           <form onSubmit={handleUpdateProfile} className="profile-form">
             <div className="form-group">
-              <label htmlFor="profile-name-input">Full Name</label>
+              <label htmlFor="profile-name-input">{t('profile.personalInfo.nameLabel')}</label>
               <div className="input-with-icon">
                 <UserIcon size={16} className="input-icon" />
                 <input
@@ -274,15 +276,15 @@ export function Profile() {
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="Your full name"
-                  aria-label="Full Name"
+                  placeholder={t('profile.personalInfo.namePlaceholder')}
+                  aria-label={t('profile.personalInfo.nameLabel')}
                   required
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="profile-email-input">Email Address</label>
+              <label htmlFor="profile-email-input">{t('profile.personalInfo.emailLabel')}</label>
               <div className="input-with-icon">
                 <Mail size={16} className="input-icon" />
                 <input
@@ -290,11 +292,11 @@ export function Profile() {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
-                  aria-label="Email Address"
+                  placeholder={t('profile.personalInfo.emailPlaceholder')}
+                  aria-label={t('profile.personalInfo.emailLabel')}
                 />
               </div>
-              <span className="field-hint">Used for sign-in and account recovery notices</span>
+              <span className="field-hint">{t('profile.personalInfo.emailHint')}</span>
             </div>
 
             <div className="form-actions">
@@ -302,17 +304,17 @@ export function Profile() {
                 type="submit"
                 className="btn-primary"
                 disabled={updateProfileMutation.isPending}
-                aria-label="Save Profile Changes"
+                aria-label={t('profile.personalInfo.saveBtn')}
               >
                 {updateProfileMutation.isPending ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    Saving Changes...
+                    {t('profile.personalInfo.saving')}
                   </>
                 ) : (
                   <>
                     <Check size={16} />
-                    Save Changes
+                    {t('profile.personalInfo.saveBtn')}
                   </>
                 )}
               </button>
@@ -327,14 +329,14 @@ export function Profile() {
               <Lock size={20} />
             </div>
             <div>
-              <h3 id="security-heading">Password & Security</h3>
-              <p className="profile-card-desc">Update your password to keep your account safe</p>
+              <h3 id="security-heading">{t('profile.security.heading')}</h3>
+              <p className="profile-card-desc">{t('profile.security.desc')}</p>
             </div>
           </div>
 
           <form onSubmit={handleChangePassword} className="profile-form">
             <div className="form-group">
-              <label htmlFor="profile-current-password">Current Password</label>
+              <label htmlFor="profile-current-password">{t('profile.security.currentPassword')}</label>
               <div className="input-with-icon">
                 <Lock size={16} className="input-icon" />
                 <input
@@ -342,15 +344,15 @@ export function Profile() {
                   type={showPassword ? 'text' : 'password'}
                   value={currentPassword}
                   onChange={e => setCurrentPassword(e.target.value)}
-                  placeholder="Enter current password"
-                  aria-label="Current Password"
+                  placeholder={t('profile.security.currentPasswordPlaceholder')}
+                  aria-label={t('profile.security.currentPassword')}
                   required
                 />
                 <button
                   type="button"
                   className="password-toggle-btn"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('profile.security.hidePassword') : t('profile.security.showPassword')}
                   tabIndex={0}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -359,7 +361,7 @@ export function Profile() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="profile-new-password">New Password</label>
+              <label htmlFor="profile-new-password">{t('profile.security.newPassword')}</label>
               <div className="input-with-icon">
                 <Lock size={16} className="input-icon" />
                 <input
@@ -367,15 +369,15 @@ export function Profile() {
                   type={showPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={e => setNewPassword(e.target.value)}
-                  placeholder="Min 8 characters"
-                  aria-label="New Password"
+                  placeholder={t('profile.security.newPasswordPlaceholder')}
+                  aria-label={t('profile.security.newPassword')}
                   required
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="profile-confirm-password">Confirm New Password</label>
+              <label htmlFor="profile-confirm-password">{t('profile.security.confirmPassword')}</label>
               <div className="input-with-icon">
                 <Lock size={16} className="input-icon" />
                 <input
@@ -383,8 +385,8 @@ export function Profile() {
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={e => setConfirmPassword(e.target.value)}
-                  placeholder="Repeat new password"
-                  aria-label="Confirm New Password"
+                  placeholder={t('profile.security.confirmPasswordPlaceholder')}
+                  aria-label={t('profile.security.confirmPassword')}
                   required
                 />
               </div>
@@ -395,17 +397,17 @@ export function Profile() {
                 type="submit"
                 className="btn-primary"
                 disabled={changePasswordMutation.isPending}
-                aria-label="Update Account Password"
+                aria-label={t('profile.security.updateBtn')}
               >
                 {changePasswordMutation.isPending ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    Updating Password...
+                    {t('profile.security.updating')}
                   </>
                 ) : (
                   <>
                     <Shield size={16} />
-                    Update Password
+                    {t('profile.security.updateBtn')}
                   </>
                 )}
               </button>
@@ -422,14 +424,12 @@ export function Profile() {
               <CreditCard size={20} />
             </div>
             <div>
-              <h3 id="plan-section-heading">Subscription Plan</h3>
-              <p className="profile-card-desc">
-                Select the plan that matches your WhatsApp traffic and active session requirements.
-              </p>
+              <h3 id="plan-section-heading">{t('profile.plans.heading')}</h3>
+              <p className="profile-card-desc">{t('profile.plans.desc')}</p>
             </div>
           </div>
           <div className="current-plan-indicator">
-            <span className="indicator-eyebrow">Active Tier</span>
+            <span className="indicator-eyebrow">{t('profile.plans.activeTier')}</span>
             <strong className="indicator-name">{currentPlan.toUpperCase()}</strong>
           </div>
         </div>
@@ -444,7 +444,7 @@ export function Profile() {
                 {plan.popular && (
                   <div className="plan-badge-popular">
                     <Zap size={12} />
-                    <span>Most Popular</span>
+                    <span>{t('profile.plans.mostPopular')}</span>
                   </div>
                 )}
 
@@ -457,13 +457,14 @@ export function Profile() {
                   <div className="plan-pricing">
                     <span className="price-currency">$</span>
                     <span className="price-amount">{plan.price}</span>
-                    <span className="price-period">/mo</span>
+                    <span className="price-period">{t('profile.plans.perMonth')}</span>
                   </div>
 
                   <div className="plan-sessions-pill">
                     <Smartphone size={14} />
                     <span>
-                      Up to <strong>{plan.sessions}</strong> WhatsApp {plan.sessions === 1 ? 'Session' : 'Sessions'}
+                      {t('profile.plans.upTo')} <strong>{plan.sessions}</strong> WhatsApp{' '}
+                      {plan.sessions === 1 ? t('profile.plans.session') : t('profile.plans.sessions')}
                     </span>
                   </div>
 
@@ -483,10 +484,10 @@ export function Profile() {
                       type="button"
                       className="btn-plan current"
                       disabled
-                      aria-label={`Current Plan: ${plan.name}`}
+                      aria-label={`${t('profile.plans.currentPlan')}: ${plan.name}`}
                     >
                       <Check size={16} />
-                      Current Plan
+                      {t('profile.plans.currentPlan')}
                     </button>
                   ) : (
                     <button
@@ -494,15 +495,15 @@ export function Profile() {
                       className="btn-plan upgrade"
                       onClick={() => handleSelectPlan(plan.id)}
                       disabled={changePlanMutation.isPending}
-                      aria-label={`Switch to ${plan.name} Plan`}
+                      aria-label={t('profile.plans.switchTo', { name: plan.name })}
                     >
                       {isSwitching ? (
                         <>
                           <Loader2 size={16} className="animate-spin" />
-                          Switching...
+                          {t('profile.plans.switching')}
                         </>
                       ) : (
-                        <>Switch to {plan.name}</>
+                        <>{t('profile.plans.switchTo', { name: plan.name })}</>
                       )}
                     </button>
                   )}

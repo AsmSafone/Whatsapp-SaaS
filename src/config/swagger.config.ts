@@ -138,7 +138,6 @@ export function createSwaggerConfig(): Omit<OpenAPIObject, 'paths'> {
       .addTag('plugins', 'Plugin catalog, installation, and per-user configuration (Tenant / Per-User)')
       .addTag('integration', 'Integration Fabric: provider webhooks and instances (Tenant / Per-User)')
       .addTag('auth', 'API key generation, listing, and revocation (Tenant / Per-User)')
-      .addTag('settings', '[Admin Only] Global application settings and engine configuration')
       .addTag('infrastructure', '[Admin Only] Infrastructure datastores, disk cleanup, and maintenance')
       .addTag('audit', '[Admin Only] Security audit logging and administration trail')
       .addTag('health', 'System health check and liveness probes')

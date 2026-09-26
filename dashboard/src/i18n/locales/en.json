@@ -1206,5 +1206,60 @@
       "success": "User deleted successfully",
       "cannotDeleteOwner": "Cannot delete the primary owner/admin account"
     }
+  },
+  "profile": {
+    "title": "Profile & Settings",
+    "subtitle": "Manage your identity credentials, password security, and subscription plan.",
+    "loading": "Loading account details...",
+    "overview": {
+      "sessionLabel": "WhatsApp Session",
+      "sessionsUsed": "{{count}} / {{limit}} used"
+    },
+    "personalInfo": {
+      "heading": "Personal Information",
+      "desc": "Update your display name and email address",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Your full name",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "your.email@example.com",
+      "emailHint": "Used for sign-in and account recovery notices",
+      "saveBtn": "Save Changes",
+      "saving": "Saving Changes...",
+      "successMsg": "Profile details updated successfully",
+      "nameRequired": "Name cannot be empty"
+    },
+    "security": {
+      "heading": "Password & Security",
+      "desc": "Update your password to keep your account safe",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Min 8 characters",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Repeat new password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "updateBtn": "Update Password",
+      "updating": "Updating Password...",
+      "successMsg": "Password changed successfully",
+      "currentRequired": "Please enter your current password",
+      "minLength": "New password must be at least 8 characters long",
+      "mismatch": "New passwords do not match"
+    },
+    "plans": {
+      "heading": "Subscription Plan",
+      "desc": "Select the plan that matches your WhatsApp traffic and active session requirements.",
+      "activeTier": "Active Tier",
+      "mostPopular": "Most Popular",
+      "perMonth": "/mo",
+      "upTo": "Up to",
+      "session": "Session",
+      "sessions": "Sessions",
+      "currentPlan": "Current Plan",
+      "switchTo": "Switch to {{name}}",
+      "switching": "Switching...",
+      "successMsg": "Successfully switched to {{plan}} plan",
+      "failedMsg": "Failed to update plan"
+    }
   }
 }

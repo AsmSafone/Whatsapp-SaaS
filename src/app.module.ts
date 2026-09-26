@@ -19,7 +19,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { EngineModule } from './engine/engine.module';
 import { LoggerModule } from './common/services/logger.module';
-import { SettingsModule } from './modules/settings/settings.module';
 import { InfraModule } from './modules/infra/infra.module';
 import { EventsModule } from './modules/events/events.module';
 import { ContactModule } from './modules/contact/contact.module';
@@ -295,7 +294,6 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
     TemplateModule,
     WebhookModule,
     HealthModule,
-    SettingsModule,
     InfraModule,
     ContactModule,
     GroupModule,

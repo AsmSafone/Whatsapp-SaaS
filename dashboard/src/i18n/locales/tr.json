@@ -1223,5 +1223,60 @@
       "success": "Kullanıcı başarıyla silindi",
       "cannotDeleteOwner": "Birincil sahip/yönetici hesabı silinemez"
     }
+  },
+  "profile": {
+    "title": "Profil ve Ayarlar",
+    "subtitle": "Kimlik bilgilerinizi, şifre güvenliğinizi ve abonelik planınızı yönetin.",
+    "loading": "Hesap detayları yükleniyor...",
+    "overview": {
+      "sessionLabel": "WhatsApp Oturumu",
+      "sessionsUsed": "{{count}} / {{limit}} kullanıldı"
+    },
+    "personalInfo": {
+      "heading": "Kişisel Bilgiler",
+      "desc": "Görünen adınızı ve e-posta adresinizi güncelleyin",
+      "nameLabel": "Tam Ad",
+      "namePlaceholder": "Tam adınız",
+      "emailLabel": "E-posta Adresi",
+      "emailPlaceholder": "e-postaniz@ornek.com",
+      "emailHint": "Giriş ve hesap kurtarma bildirimleri için kullanılır",
+      "saveBtn": "Değişiklikleri Kaydet",
+      "saving": "Değişiklikler Kaydediliyor...",
+      "successMsg": "Profil bilgileri başarıyla güncellendi",
+      "nameRequired": "Ad boş bırakılamaz"
+    },
+    "security": {
+      "heading": "Şifre ve Güvenlik",
+      "desc": "Hesabınızı güvende tutmak için şifrenizi güncelleyin",
+      "currentPassword": "Mevcut Şifre",
+      "currentPasswordPlaceholder": "Mevcut şifreyi girin",
+      "newPassword": "Yeni Şifre",
+      "newPasswordPlaceholder": "Min. 8 karakter",
+      "confirmPassword": "Yeni Şifreyi Onayla",
+      "confirmPasswordPlaceholder": "Yeni şifreyi tekrarlayın",
+      "showPassword": "Şifreyi göster",
+      "hidePassword": "Şifreyi gizle",
+      "updateBtn": "Şifreyi Güncelle",
+      "updating": "Şifre Güncelleniyor...",
+      "successMsg": "Şifre başarıyla değiştirildi",
+      "currentRequired": "Lütfen mevcut şifrenizi girin",
+      "minLength": "Yeni şifre en az 8 karakter olmalıdır",
+      "mismatch": "Yeni şifreler eşleşmiyor"
+    },
+    "plans": {
+      "heading": "Abonelik Planı",
+      "desc": "WhatsApp trafiğinize ve aktif oturum gereksinimlerinize uygun planı seçin.",
+      "activeTier": "Aktif Katman",
+      "mostPopular": "En Popüler",
+      "perMonth": "/ay",
+      "upTo": "Kadar",
+      "session": "Oturum",
+      "sessions": "Oturumlar",
+      "currentPlan": "Mevcut Plan",
+      "switchTo": "{{name}} planına geç",
+      "switching": "Geçiliyor...",
+      "successMsg": "{{plan}} planına başarıyla geçildi",
+      "failedMsg": "Plan güncellenemedi"
+    }
   }
 }

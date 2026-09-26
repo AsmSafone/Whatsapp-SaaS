@@ -55,14 +55,13 @@ export function ZapturaLogo({ size = 36, showText = true, subtitle, className = 
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <span
+              className="zaptura-logo-text"
               style={{
                 fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
                 fontWeight: 800,
                 fontSize: `${Math.max(16, Math.round(size * 0.58))}px`,
                 letterSpacing: '-0.03em',
-                background: 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #10b981 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: 'var(--text-primary)',
               }}
             >
               Zaptura

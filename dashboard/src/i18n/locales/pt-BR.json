@@ -1223,5 +1223,60 @@
       "success": "Usuário excluído com sucesso",
       "cannotDeleteOwner": "Não é possível excluir a conta do proprietário/administrador principal"
     }
+  },
+  "profile": {
+    "title": "Perfil e Configurações",
+    "subtitle": "Gerencie suas credenciais de identidade, segurança de senha e plano de assinatura.",
+    "loading": "Carregando detalhes da conta...",
+    "overview": {
+      "sessionLabel": "Sessão do WhatsApp",
+      "sessionsUsed": "{{count}} / {{limit}} usadas"
+    },
+    "personalInfo": {
+      "heading": "Informações Pessoais",
+      "desc": "Atualize seu nome de exibição e endereço de e-mail",
+      "nameLabel": "Nome Completo",
+      "namePlaceholder": "Seu nome completo",
+      "emailLabel": "Endereço de E-mail",
+      "emailPlaceholder": "seu.email@exemplo.com",
+      "emailHint": "Usado para login e avisos de recuperação de conta",
+      "saveBtn": "Salvar Alterações",
+      "saving": "Salvando Alterações...",
+      "successMsg": "Dados do perfil atualizados com sucesso",
+      "nameRequired": "O nome não pode estar vazio"
+    },
+    "security": {
+      "heading": "Senha e Segurança",
+      "desc": "Atualize sua senha para manter sua conta segura",
+      "currentPassword": "Senha Atual",
+      "currentPasswordPlaceholder": "Digite a senha atual",
+      "newPassword": "Nova Senha",
+      "newPasswordPlaceholder": "Mín. 8 caracteres",
+      "confirmPassword": "Confirmar Nova Senha",
+      "confirmPasswordPlaceholder": "Repita a nova senha",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
+      "updateBtn": "Atualizar Senha",
+      "updating": "Atualizando Senha...",
+      "successMsg": "Senha alterada com sucesso",
+      "currentRequired": "Por favor, insira sua senha atual",
+      "minLength": "A nova senha deve ter pelo menos 8 caracteres",
+      "mismatch": "As novas senhas não coincidem"
+    },
+    "plans": {
+      "heading": "Plano de Assinatura",
+      "desc": "Selecione o plano que corresponde ao seu tráfego do WhatsApp e requisitos de sessões ativas.",
+      "activeTier": "Nível Ativo",
+      "mostPopular": "Mais Popular",
+      "perMonth": "/mês",
+      "upTo": "Até",
+      "session": "Sessão",
+      "sessions": "Sessões",
+      "currentPlan": "Plano Atual",
+      "switchTo": "Mudar para {{name}}",
+      "switching": "Alterando...",
+      "successMsg": "Alternado com sucesso para o plano {{plan}}",
+      "failedMsg": "Falha ao atualizar o plano"
+    }
   }
 }

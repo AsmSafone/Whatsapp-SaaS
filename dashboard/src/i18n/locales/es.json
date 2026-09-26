@@ -1223,5 +1223,60 @@
       "success": "Usuario eliminado con éxito",
       "cannotDeleteOwner": "No se puede eliminar la cuenta principal del propietario/administrador"
     }
+  },
+  "profile": {
+    "title": "Perfil y Configuración",
+    "subtitle": "Gestiona tus credenciales de identidad, seguridad de contraseña y plan de suscripción.",
+    "loading": "Cargando detalles de la cuenta...",
+    "overview": {
+      "sessionLabel": "Sesión de WhatsApp",
+      "sessionsUsed": "{{count}} / {{limit}} usadas"
+    },
+    "personalInfo": {
+      "heading": "Información Personal",
+      "desc": "Actualiza tu nombre de pantalla y dirección de correo electrónico",
+      "nameLabel": "Nombre Completo",
+      "namePlaceholder": "Tu nombre completo",
+      "emailLabel": "Dirección de Correo Electrónico",
+      "emailPlaceholder": "tu.correo@ejemplo.com",
+      "emailHint": "Usado para el inicio de sesión y avisos de recuperación de cuenta",
+      "saveBtn": "Guardar Cambios",
+      "saving": "Guardando Cambios...",
+      "successMsg": "Datos del perfil actualizados correctamente",
+      "nameRequired": "El nombre no puede estar vacío"
+    },
+    "security": {
+      "heading": "Contraseña y Seguridad",
+      "desc": "Actualiza tu contraseña para mantener tu cuenta segura",
+      "currentPassword": "Contraseña Actual",
+      "currentPasswordPlaceholder": "Ingresa la contraseña actual",
+      "newPassword": "Nueva Contraseña",
+      "newPasswordPlaceholder": "Mín. 8 caracteres",
+      "confirmPassword": "Confirmar Nueva Contraseña",
+      "confirmPasswordPlaceholder": "Repite la nueva contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "updateBtn": "Actualizar Contraseña",
+      "updating": "Actualizando Contraseña...",
+      "successMsg": "Contraseña cambiada correctamente",
+      "currentRequired": "Por favor ingresa tu contraseña actual",
+      "minLength": "La nueva contraseña debe tener al menos 8 caracteres",
+      "mismatch": "Las nuevas contraseñas no coinciden"
+    },
+    "plans": {
+      "heading": "Plan de Suscripción",
+      "desc": "Selecciona el plan que se adapte a tu tráfico de WhatsApp y requisitos de sesiones activas.",
+      "activeTier": "Nivel Activo",
+      "mostPopular": "Más Popular",
+      "perMonth": "/mes",
+      "upTo": "Hasta",
+      "session": "Sesión",
+      "sessions": "Sesiones",
+      "currentPlan": "Plan Actual",
+      "switchTo": "Cambiar a {{name}}",
+      "switching": "Cambiando...",
+      "successMsg": "Cambiado exitosamente al plan {{plan}}",
+      "failedMsg": "Error al actualizar el plan"
+    }
   }
 }

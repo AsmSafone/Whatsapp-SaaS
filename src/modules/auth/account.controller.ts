@@ -64,8 +64,8 @@ export class AccountController {
       };
     }
     const user = await this.accounts.findById(actor.userId);
-    const isOwner = user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
-    const sessionCount = isOwner
+    const isAdmin = actor.role === ApiKeyRole.ADMIN || user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isAdmin
       ? await this.sessions
           .createQueryBuilder('s')
           .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: actor.userId })
@@ -79,7 +79,7 @@ export class AccountController {
       plan: user?.plan,
       sessionLimit: user ? PLAN_LIMITS[user.plan] : 1,
       sessionCount,
-      role: isOwner ? 'admin' : 'user',
+      role: isAdmin ? 'admin' : 'user',
     };
   }
 
@@ -90,8 +90,8 @@ export class AccountController {
       return { ok: false, message: 'Plan changes apply to user accounts only' };
     }
     const user = await this.accounts.setPlan(actor.userId, dto.plan);
-    const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
-    const sessionCount = isOwner
+    const isAdmin = actor?.role === ApiKeyRole.ADMIN || user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isAdmin
       ? await this.sessions
           .createQueryBuilder('s')
           .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: user.id })
@@ -120,7 +120,13 @@ export class AccountController {
       throw new UnauthorizedException('Profile updates apply to user accounts only');
     }
     const user = await this.accounts.updateProfile(actor.userId, dto);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    const isAdmin = actor?.role === ApiKeyRole.ADMIN || user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isAdmin
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: user.id })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: user.id } });
     const issued = this.accounts.issue(user);
     return { ...issued, sessionCount };
   }

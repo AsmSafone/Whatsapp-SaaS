@@ -1223,5 +1223,60 @@
       "success": "Utente eliminato con successo",
       "cannotDeleteOwner": "Impossibile eliminare l'account proprietario/amministratore principale"
     }
+  },
+  "profile": {
+    "title": "Profilo e Impostazioni",
+    "subtitle": "Gestisci le credenziali di identità, la sicurezza della password e il piano di abbonamento.",
+    "loading": "Caricamento dettagli account...",
+    "overview": {
+      "sessionLabel": "Sessione WhatsApp",
+      "sessionsUsed": "{{count}} / {{limit}} utilizzate"
+    },
+    "personalInfo": {
+      "heading": "Informazioni Personali",
+      "desc": "Aggiorna il tuo nome visualizzato e l'indirizzo email",
+      "nameLabel": "Nome Completo",
+      "namePlaceholder": "Il tuo nome completo",
+      "emailLabel": "Indirizzo Email",
+      "emailPlaceholder": "tua.email@esempio.it",
+      "emailHint": "Utilizzato per l'accesso e le notifiche di recupero account",
+      "saveBtn": "Salva Modifiche",
+      "saving": "Salvataggio in corso...",
+      "successMsg": "Dati del profilo aggiornati con successo",
+      "nameRequired": "Il nome non può essere vuoto"
+    },
+    "security": {
+      "heading": "Password e Sicurezza",
+      "desc": "Aggiorna la tua password per mantenere il tuo account al sicuro",
+      "currentPassword": "Password Attuale",
+      "currentPasswordPlaceholder": "Inserisci la password attuale",
+      "newPassword": "Nuova Password",
+      "newPasswordPlaceholder": "Min. 8 caratteri",
+      "confirmPassword": "Conferma Nuova Password",
+      "confirmPasswordPlaceholder": "Ripeti la nuova password",
+      "showPassword": "Mostra password",
+      "hidePassword": "Nascondi password",
+      "updateBtn": "Aggiorna Password",
+      "updating": "Aggiornamento password...",
+      "successMsg": "Password cambiata con successo",
+      "currentRequired": "Inserisci la tua password attuale",
+      "minLength": "La nuova password deve contenere almeno 8 caratteri",
+      "mismatch": "Le nuove password non coincidono"
+    },
+    "plans": {
+      "heading": "Piano di Abbonamento",
+      "desc": "Seleziona il piano adatto al tuo traffico WhatsApp e alle esigenze di sessioni attive.",
+      "activeTier": "Livello Attivo",
+      "mostPopular": "Più Popolare",
+      "perMonth": "/mese",
+      "upTo": "Fino a",
+      "session": "Sessione",
+      "sessions": "Sessioni",
+      "currentPlan": "Piano Attuale",
+      "switchTo": "Passa a {{name}}",
+      "switching": "Cambio in corso...",
+      "successMsg": "Passato con successo al piano {{plan}}",
+      "failedMsg": "Impossibile aggiornare il piano"
+    }
   }
 }

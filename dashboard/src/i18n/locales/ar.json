@@ -1238,5 +1238,60 @@
       "success": "تم حذف المستخدم بنجاح",
       "cannotDeleteOwner": "لا يمكن حذف حساب المسؤول الرئيسي"
     }
+  },
+  "profile": {
+    "title": "الملف الشخصي والإعدادات",
+    "subtitle": "إدارة بيانات هويتك وأمان كلمة المرور وخطة الاشتراك.",
+    "loading": "جاري تحميل تفاصيل الحساب...",
+    "overview": {
+      "sessionLabel": "جلسة واتساب",
+      "sessionsUsed": "{{count}} / {{limit}} مستخدم"
+    },
+    "personalInfo": {
+      "heading": "المعلومات الشخصية",
+      "desc": "تحديث اسمك المعروض وعنوان البريد الإلكتروني",
+      "nameLabel": "الاسم الكامل",
+      "namePlaceholder": "اسمك الكامل",
+      "emailLabel": "عنوان البريد الإلكتروني",
+      "emailPlaceholder": "your.email@example.com",
+      "emailHint": "يُستخدم لتسجيل الدخول وإشعارات استرداد الحساب",
+      "saveBtn": "حفظ التغييرات",
+      "saving": "جاري الحفظ...",
+      "successMsg": "تم تحديث بيانات الملف الشخصي بنجاح",
+      "nameRequired": "لا يمكن أن يكون الاسم فارغاً"
+    },
+    "security": {
+      "heading": "كلمة المرور والأمان",
+      "desc": "تحديث كلمة المرور للحفاظ على أمان حسابك",
+      "currentPassword": "كلمة المرور الحالية",
+      "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "newPasswordPlaceholder": "8 أحرف على الأقل",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور الجديدة",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "updateBtn": "تحديث كلمة المرور",
+      "updating": "جاري تحديث كلمة المرور...",
+      "successMsg": "تم تغيير كلمة المرور بنجاح",
+      "currentRequired": "يرجى إدخال كلمة المرور الحالية",
+      "minLength": "يجب أن تتكون كلمة المرور الجديدة من 8 أحرف على الأقل",
+      "mismatch": "كلمتا المرور الجديدتان غير متطابقتين"
+    },
+    "plans": {
+      "heading": "خطة الاشتراك",
+      "desc": "اختر الخطة التي تناسب حركة واتساب ومتطلبات الجلسات النشطة.",
+      "activeTier": "المستوى النشط",
+      "mostPopular": "الأكثر شيوعاً",
+      "perMonth": "/شهر",
+      "upTo": "حتى",
+      "session": "جلسة",
+      "sessions": "جلسات",
+      "currentPlan": "الخطة الحالية",
+      "switchTo": "التبديل إلى {{name}}",
+      "switching": "جاري التبديل...",
+      "successMsg": "تم التبديل بنجاح إلى خطة {{plan}}",
+      "failedMsg": "فشل تحديث الخطة"
+    }
   }
 }

@@ -60,6 +60,8 @@ export class AuthController {
   ): Promise<ApiKeyCreatedResponseDto> {
     if (actor?.role !== ApiKeyRole.ADMIN) {
       dto.role = ApiKeyRole.USER;
+    } else if (!dto.role) {
+      dto.role = ApiKeyRole.ADMIN;
     }
     const { apiKey, rawKey } = await this.authService.createApiKey(dto, { userId: actor?.userId ?? null });
     await this.auditService.logInfo(AuditAction.API_KEY_CREATED, {
@@ -119,7 +121,7 @@ export class AuthController {
   })
   async findOne(@Param('id') id: string, @CurrentApiKey() actor?: ApiKey): Promise<ApiKeyResponseDto> {
     const k = await this.authService.findOne(id);
-    if (actor?.userId && k.userId && k.userId !== actor.userId) {
+    if (actor?.role !== ApiKeyRole.ADMIN && (!k.userId || k.userId !== actor?.userId)) {
       throw new ForbiddenException('Cannot access another account API key');
     }
     return {
@@ -150,7 +152,7 @@ export class AuthController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyResponseDto> {
     const before = await this.authService.findOne(id);
-    if (actor?.userId && before.userId && before.userId !== actor.userId) {
+    if (actor?.role !== ApiKeyRole.ADMIN && (!before.userId || before.userId !== actor?.userId)) {
       throw new ForbiddenException('Cannot update another account API key');
     }
     if (actor?.role !== ApiKeyRole.ADMIN) {
@@ -197,7 +199,7 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'The key is the last usable admin key.' })
   async delete(@Param('id') id: string, @Req() req: Request, @CurrentApiKey() actor?: ApiKey): Promise<void> {
     const target = await this.authService.findOne(id);
-    if (actor?.userId && target.userId && target.userId !== actor.userId) {
+    if (actor?.role !== ApiKeyRole.ADMIN && (!target.userId || target.userId !== actor?.userId)) {
       throw new ForbiddenException('Cannot delete another account API key');
     }
     await this.authService.delete(id);
@@ -219,7 +221,7 @@ export class AuthController {
     @CurrentApiKey() actor?: ApiKey,
   ): Promise<ApiKeyResponseDto> {
     const target = await this.authService.findOne(id);
-    if (actor?.userId && target.userId && target.userId !== actor.userId) {
+    if (actor?.role !== ApiKeyRole.ADMIN && (!target.userId || target.userId !== actor?.userId)) {
       throw new ForbiddenException('Cannot revoke another account API key');
     }
     const k = await this.authService.revoke(id);

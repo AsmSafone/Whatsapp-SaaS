@@ -24,6 +24,12 @@ import { RegisterDto } from './dto/account.dto';
 import { readBootstrapAccount, writeBootstrapAccount } from './bootstrap-account-file';
 
 export function resolveDefaultAdminEmail(): string {
+  try {
+    const bootstrap = readBootstrapAccount({ warn: () => {} });
+    if (bootstrap?.email) {
+      return bootstrap.email.trim().toLowerCase();
+    }
+  } catch {}
   return (
     process.env.ADMIN_EMAIL?.trim().toLowerCase() ||
     process.env.DEFAULT_ADMIN_EMAIL?.trim().toLowerCase() ||

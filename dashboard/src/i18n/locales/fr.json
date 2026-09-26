@@ -1223,5 +1223,60 @@
       "success": "Utilisateur supprimé avec succès",
       "cannotDeleteOwner": "Impossible de supprimer le compte propriétaire/administrateur principal"
     }
+  },
+  "profile": {
+    "title": "Profil & Paramètres",
+    "subtitle": "Gérez vos identifiants, la sécurité de votre mot de passe et votre plan d'abonnement.",
+    "loading": "Chargement des détails du compte...",
+    "overview": {
+      "sessionLabel": "Session WhatsApp",
+      "sessionsUsed": "{{count}} / {{limit}} utilisées"
+    },
+    "personalInfo": {
+      "heading": "Informations Personnelles",
+      "desc": "Mettez à jour votre nom d'affichage et votre adresse e-mail",
+      "nameLabel": "Nom Complet",
+      "namePlaceholder": "Votre nom complet",
+      "emailLabel": "Adresse E-mail",
+      "emailPlaceholder": "votre.email@exemple.fr",
+      "emailHint": "Utilisé pour la connexion et les avis de récupération de compte",
+      "saveBtn": "Enregistrer les Modifications",
+      "saving": "Enregistrement en cours...",
+      "successMsg": "Données du profil mises à jour avec succès",
+      "nameRequired": "Le nom ne peut pas être vide"
+    },
+    "security": {
+      "heading": "Mot de Passe & Sécurité",
+      "desc": "Mettez à jour votre mot de passe pour sécuriser votre compte",
+      "currentPassword": "Mot de Passe Actuel",
+      "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
+      "newPassword": "Nouveau Mot de Passe",
+      "newPasswordPlaceholder": "Min. 8 caractères",
+      "confirmPassword": "Confirmer le Nouveau Mot de Passe",
+      "confirmPasswordPlaceholder": "Répétez le nouveau mot de passe",
+      "showPassword": "Afficher le mot de passe",
+      "hidePassword": "Masquer le mot de passe",
+      "updateBtn": "Mettre à Jour le Mot de Passe",
+      "updating": "Mise à jour du mot de passe...",
+      "successMsg": "Mot de passe changé avec succès",
+      "currentRequired": "Veuillez entrer votre mot de passe actuel",
+      "minLength": "Le nouveau mot de passe doit comporter au moins 8 caractères",
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas"
+    },
+    "plans": {
+      "heading": "Plan d'Abonnement",
+      "desc": "Sélectionnez le plan adapté à votre trafic WhatsApp et à vos besoins en sessions actives.",
+      "activeTier": "Niveau Actif",
+      "mostPopular": "Le Plus Populaire",
+      "perMonth": "/mois",
+      "upTo": "Jusqu'à",
+      "session": "Session",
+      "sessions": "Sessions",
+      "currentPlan": "Plan Actuel",
+      "switchTo": "Passer à {{name}}",
+      "switching": "Changement en cours...",
+      "successMsg": "Passage réussi au plan {{plan}}",
+      "failedMsg": "Échec de la mise à jour du plan"
+    }
   }
 }

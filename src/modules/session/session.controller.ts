@@ -106,16 +106,16 @@ export class SessionController {
   })
   @ApiResponse({ status: 409, description: 'Session name already exists' })
   async create(@Body() dto: CreateSessionDto, @CurrentApiKey() actor?: ApiKey): Promise<SessionResponseDto> {
-    const tenantUserId = this.resolveTenantUserId(actor);
-    if (tenantUserId && actor?.role !== ApiKeyRole.ADMIN) {
+    const creatorUserId = actor?.userId ?? (actor?.id?.startsWith('user:') ? actor.id.replace('user:', '') : null);
+    if (creatorUserId && actor?.role !== ApiKeyRole.ADMIN) {
       const plan = (actor?.plan as UserPlan | undefined) ?? 'starter';
       const limit = PLAN_LIMITS[plan] ?? 1;
-      const owned = await this.sessionService.findAll(undefined, { ownerUserId: tenantUserId, limit: 1000 });
+      const owned = await this.sessionService.findAll(undefined, { ownerUserId: creatorUserId, limit: 1000 });
       if (owned.length >= limit) {
         throw new ForbiddenException(`Plan '${plan}' allows ${limit} session(s). Upgrade to add more.`);
       }
     }
-    const session = await this.sessionService.create(dto, tenantUserId);
+    const session = await this.sessionService.create(dto, creatorUserId);
     await this.auditService.logInfo(AuditAction.SESSION_CREATED, {
       sessionId: session.id,
       sessionName: session.name,
@@ -124,6 +124,7 @@ export class SessionController {
   }
 
   @Get()
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'List all sessions' })
   @ApiResponse({
     status: 200,
@@ -165,6 +166,7 @@ export class SessionController {
 
   @ChatScoped('agnostic')
   @Get(':sessionId')
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'Get session by ID' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
   @ApiResponse({
@@ -182,6 +184,7 @@ export class SessionController {
   }
 
   @Get(':sessionId/config')
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'Get the tunable configuration for a session' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
   @ApiResponse({
@@ -233,6 +236,7 @@ export class SessionController {
   }
 
   @Get(':sessionId/proxy')
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({ summary: 'Get the per-session egress proxy configuration (credentials masked)' })
   @ApiParam({ name: 'sessionId', description: 'Session ID' })
   @ApiResponse({
@@ -929,6 +933,7 @@ export class SessionController {
   }
 
   @Get('stats/overview')
+  @RequireRole(ApiKeyRole.USER)
   @ApiOperation({
     summary: 'Get session statistics for multi-session monitoring',
   })

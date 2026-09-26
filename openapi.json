@@ -4323,28 +4323,6 @@
         "security": []
       }
     },
-    "/api/settings": {
-      "get": {
-        "operationId": "SettingsController_get",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Current settings",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SettingsResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get application settings",
-        "tags": [
-          "settings"
-        ]
-      }
-    },
     "/api/infra/status": {
       "get": {
         "operationId": "InfraStatusController_getStatus",
@@ -10018,10 +9996,6 @@
       "description": "Plugin management"
     },
     {
-      "name": "settings",
-      "description": "Application settings"
-    },
-    {
       "name": "infrastructure",
       "description": "Infrastructure & datastore management"
     },
@@ -13505,97 +13479,6 @@
         "required": [
           "status",
           "details"
-        ]
-      },
-      "SettingsGeneralDto": {
-        "type": "object",
-        "properties": {
-          "apiBaseUrl": {
-            "type": "string",
-            "description": "The advertised base URL (BASE_URL), the same value the startup banner and ingress URLs use.",
-            "example": "https://wa.example.com"
-          },
-          "autoReconnect": {
-            "type": "boolean",
-            "description": "Always true: the engine auto-reconnects on a transient disconnect and there is no global off switch. Attempts are unlimited by default; cap them per session with config.maxReconnectAttempts (0-20, PATCH /api/sessions/{sessionId}/config).",
-            "example": true
-          },
-          "debugMode": {
-            "type": "boolean",
-            "description": "Whether database query logging is on.",
-            "example": false
-          }
-        },
-        "required": [
-          "apiBaseUrl",
-          "autoReconnect",
-          "debugMode"
-        ]
-      },
-      "SettingsApiDto": {
-        "type": "object",
-        "properties": {
-          "rateLimit": {
-            "type": "number",
-            "description": "Requests allowed per window.",
-            "example": 100
-          },
-          "rateLimitWindow": {
-            "type": "number",
-            "description": "Window length in milliseconds.",
-            "example": 60000
-          },
-          "enableDocs": {
-            "type": "boolean",
-            "description": "Whether Swagger is actually served — off by default in production.",
-            "example": false
-          }
-        },
-        "required": [
-          "rateLimit",
-          "rateLimitWindow",
-          "enableDocs"
-        ]
-      },
-      "SettingsNotificationsDto": {
-        "type": "object",
-        "properties": {
-          "emailEnabled": {
-            "type": "boolean",
-            "example": false
-          },
-          "notificationEmail": {
-            "type": "string",
-            "example": ""
-          },
-          "webhookAlerts": {
-            "type": "boolean",
-            "example": true
-          }
-        },
-        "required": [
-          "emailEnabled",
-          "notificationEmail",
-          "webhookAlerts"
-        ]
-      },
-      "SettingsResponseDto": {
-        "type": "object",
-        "properties": {
-          "general": {
-            "$ref": "#/components/schemas/SettingsGeneralDto"
-          },
-          "api": {
-            "$ref": "#/components/schemas/SettingsApiDto"
-          },
-          "notifications": {
-            "$ref": "#/components/schemas/SettingsNotificationsDto"
-          }
-        },
-        "required": [
-          "general",
-          "api",
-          "notifications"
         ]
       },
       "InfraDatabaseStatusDto": {

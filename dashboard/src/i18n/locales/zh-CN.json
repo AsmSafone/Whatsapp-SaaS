@@ -1223,5 +1223,60 @@
       "success": "用户删除成功",
       "cannotDeleteOwner": "无法删除主所有者/管理员账户"
     }
+  },
+  "profile": {
+    "title": "个人资料与设置",
+    "subtitle": "管理您的身份凭证、密码安全和订阅计划。",
+    "loading": "正在加载账户详情...",
+    "overview": {
+      "sessionLabel": "WhatsApp 会话",
+      "sessionsUsed": "已使用 {{count}} / {{limit}}"
+    },
+    "personalInfo": {
+      "heading": "个人信息",
+      "desc": "更新您的显示名称和电子邮件地址",
+      "nameLabel": "全名",
+      "namePlaceholder": "您的全名",
+      "emailLabel": "电子邮件地址",
+      "emailPlaceholder": "your.email@example.com",
+      "emailHint": "用于登录和账户恢复通知",
+      "saveBtn": "保存更改",
+      "saving": "正在保存更改...",
+      "successMsg": "个人资料信息更新成功",
+      "nameRequired": "名称不能为空"
+    },
+    "security": {
+      "heading": "密码与安全",
+      "desc": "更新您的密码以保护账户安全",
+      "currentPassword": "当前密码",
+      "currentPasswordPlaceholder": "输入当前密码",
+      "newPassword": "新密码",
+      "newPasswordPlaceholder": "至少 8 个字符",
+      "confirmPassword": "确认新密码",
+      "confirmPasswordPlaceholder": "重复输入新密码",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码",
+      "updateBtn": "更新密码",
+      "updating": "正在更新密码...",
+      "successMsg": "密码更改成功",
+      "currentRequired": "请输入您的当前密码",
+      "minLength": "新密码至少需要 8 个字符",
+      "mismatch": "两次输入的新密码不一致"
+    },
+    "plans": {
+      "heading": "订阅计划",
+      "desc": "选择适合您的 WhatsApp 流量和活跃会话需求的计划。",
+      "activeTier": "当前等级",
+      "mostPopular": "最受欢迎",
+      "perMonth": "/月",
+      "upTo": "最多",
+      "session": "会话",
+      "sessions": "会话",
+      "currentPlan": "当前计划",
+      "switchTo": "切换到 {{name}}",
+      "switching": "切换中...",
+      "successMsg": "已成功切换到 {{plan}} 计划",
+      "failedMsg": "计划更新失败"
+    }
   }
 }

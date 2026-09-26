@@ -17,8 +17,6 @@ import {
   Lock,
   MessageSquare,
   Mic,
-  Pause,
-  Play,
   Plus,
   QrCode,
   RotateCcw,
@@ -596,7 +594,7 @@ export function Landing() {
         ...prev,
         {
           id: userMsgId + 1,
-          from: 'out',
+          from: fromUser ? 'out' : 'in',
           text: replyText,
           type: replyType,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -968,9 +966,29 @@ export function Landing() {
                           aria-label={playingVoiceId === msg.id ? 'Pause voice message' : 'Play voice message'}
                         >
                           {playingVoiceId === msg.id ? (
-                            <Pause size={15} fill="#ffffff" stroke="#ffffff" />
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="#ffffff"
+                              style={{ width: 16, height: 16, display: 'block' }}
+                              aria-hidden="true"
+                            >
+                              <rect x="6" y="4" width="4" height="16" rx="1" fill="#ffffff" />
+                              <rect x="14" y="4" width="4" height="16" rx="1" fill="#ffffff" />
+                            </svg>
                           ) : (
-                            <Play size={15} fill="#ffffff" stroke="#ffffff" className="zp-play-icon" />
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="#ffffff"
+                              className="zp-play-icon"
+                              style={{ width: 16, height: 16, display: 'block', marginLeft: 2 }}
+                              aria-hidden="true"
+                            >
+                              <polygon points="6,4 20,12 6,20" fill="#ffffff" />
+                            </svg>
                           )}
                         </button>
                         <div className="zp-wa-voice-waveform">

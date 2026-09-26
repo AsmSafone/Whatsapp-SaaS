@@ -1323,10 +1323,27 @@
 }
 
 .zp-shell .zp-wa-voice-play-btn svg {
-  display: block;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  display: block !important;
   fill: #ffffff !important;
   stroke: #ffffff !important;
   color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-wa-voice-play-btn svg path,
+.zp-shell .zp-wa-voice-play-btn svg polyline,
+.zp-shell .zp-wa-voice-play-btn svg polygon,
+.zp-shell .zp-wa-voice-play-btn svg circle,
+.zp-shell .zp-wa-voice-play-btn svg line,
+.zp-shell .zp-wa-voice-play-btn svg rect {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 .zp-shell .zp-wa-voice-play-btn:hover {

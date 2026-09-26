@@ -5,6 +5,7 @@
   --primary-text: #0e7490;
   --primary-hover: #06b6d4;
   --primary-soft: rgba(34, 211, 238, 0.14);
+  --btn-primary-text: #0f172a; /* dark text on the light/cyan primary in dark mode — 9:1 AAA */
   --bg-light: #070b12;
   --bg-white: #0d1520;
   --bg-card: #111827;
@@ -64,6 +65,7 @@
   --primary-text: #0369a1;
   --primary-hover: #0ea5e9;
   --primary-soft: rgba(2, 132, 199, 0.09);
+  --btn-primary-text: #ffffff; /* white text on the darker blue primary in light mode */
   --bg-light: #f8fafc;
   --bg-white: #ffffff;
   --bg-card: #ffffff;
@@ -88,6 +90,7 @@
     --primary-text: #0369a1;
     --primary-hover: #0ea5e9;
     --primary-soft: rgba(2, 132, 199, 0.09);
+    --btn-primary-text: #ffffff; /* white text on the darker blue primary in light mode */
     --bg-light: #f8fafc;
     --bg-white: #ffffff;
     --bg-card: #ffffff;

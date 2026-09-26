@@ -1223,5 +1223,60 @@
       "success": "사용자가 성공적으로 삭제되었습니다",
       "cannotDeleteOwner": "기본 소유자/관리자 계정은 삭제할 수 없습니다"
     }
+  },
+  "profile": {
+    "title": "프로필 및 설정",
+    "subtitle": "신원 자격 증명, 비밀번호 보안 및 구독 플랜을 관리합니다.",
+    "loading": "계정 세부정보 로딩 중...",
+    "overview": {
+      "sessionLabel": "WhatsApp 세션",
+      "sessionsUsed": "{{count}} / {{limit}} 사용됨"
+    },
+    "personalInfo": {
+      "heading": "개인 정보",
+      "desc": "표시 이름과 이메일 주소를 업데이트하세요",
+      "nameLabel": "전체 이름",
+      "namePlaceholder": "전체 이름을 입력하세요",
+      "emailLabel": "이메일 주소",
+      "emailPlaceholder": "your.email@example.com",
+      "emailHint": "로그인 및 계정 복구 알림에 사용됩니다",
+      "saveBtn": "변경사항 저장",
+      "saving": "저장 중...",
+      "successMsg": "프로필 정보가 성공적으로 업데이트되었습니다",
+      "nameRequired": "이름은 비워둘 수 없습니다"
+    },
+    "security": {
+      "heading": "비밀번호 및 보안",
+      "desc": "계정을 안전하게 유지하려면 비밀번호를 업데이트하세요",
+      "currentPassword": "현재 비밀번호",
+      "currentPasswordPlaceholder": "현재 비밀번호 입력",
+      "newPassword": "새 비밀번호",
+      "newPasswordPlaceholder": "최소 8자",
+      "confirmPassword": "새 비밀번호 확인",
+      "confirmPasswordPlaceholder": "새 비밀번호 반복",
+      "showPassword": "비밀번호 표시",
+      "hidePassword": "비밀번호 숨기기",
+      "updateBtn": "비밀번호 업데이트",
+      "updating": "비밀번호 업데이트 중...",
+      "successMsg": "비밀번호가 성공적으로 변경되었습니다",
+      "currentRequired": "현재 비밀번호를 입력해 주세요",
+      "minLength": "새 비밀번호는 최소 8자 이상이어야 합니다",
+      "mismatch": "새 비밀번호가 일치하지 않습니다"
+    },
+    "plans": {
+      "heading": "구독 플랜",
+      "desc": "WhatsApp 트래픽 및 활성 세션 요구사항에 맞는 플랜을 선택하세요.",
+      "activeTier": "현재 티어",
+      "mostPopular": "가장 인기 있는",
+      "perMonth": "/월",
+      "upTo": "최대",
+      "session": "세션",
+      "sessions": "세션",
+      "currentPlan": "현재 플랜",
+      "switchTo": "{{name}}으로 전환",
+      "switching": "전환 중...",
+      "successMsg": "{{plan}} 플랜으로 성공적으로 전환되었습니다",
+      "failedMsg": "플랜 업데이트 실패"
+    }
   }
 }

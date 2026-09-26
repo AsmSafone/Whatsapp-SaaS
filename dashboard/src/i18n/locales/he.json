@@ -1232,5 +1232,60 @@
       "success": "המשתמש נמחק בהצלחה",
       "cannotDeleteOwner": "לא ניתן למחוק את חשבון הבעלים/מנהל הראשי"
     }
+  },
+  "profile": {
+    "title": "פרופיל והגדרות",
+    "subtitle": "נהל את פרטי הזהות שלך, אבטחת הסיסמה ותוכנית המנוי.",
+    "loading": "טוען פרטי חשבון...",
+    "overview": {
+      "sessionLabel": "סשן WhatsApp",
+      "sessionsUsed": "{{count}} / {{limit}} בשימוש"
+    },
+    "personalInfo": {
+      "heading": "מידע אישי",
+      "desc": "עדכן את שם התצוגה וכתובת האימייל שלך",
+      "nameLabel": "שם מלא",
+      "namePlaceholder": "השם המלא שלך",
+      "emailLabel": "כתובת אימייל",
+      "emailPlaceholder": "your.email@example.com",
+      "emailHint": "משמש לכניסה ולהודעות שחזור חשבון",
+      "saveBtn": "שמור שינויים",
+      "saving": "שומר שינויים...",
+      "successMsg": "פרטי הפרופיל עודכנו בהצלחה",
+      "nameRequired": "השם אינו יכול להיות ריק"
+    },
+    "security": {
+      "heading": "סיסמה ואבטחה",
+      "desc": "עדכן את הסיסמה שלך כדי לשמור על החשבון בטוח",
+      "currentPassword": "סיסמה נוכחית",
+      "currentPasswordPlaceholder": "הכנס סיסמה נוכחית",
+      "newPassword": "סיסמה חדשה",
+      "newPasswordPlaceholder": "מינימום 8 תווים",
+      "confirmPassword": "אמת סיסמה חדשה",
+      "confirmPasswordPlaceholder": "חזור על הסיסמה החדשה",
+      "showPassword": "הצג סיסמה",
+      "hidePassword": "הסתר סיסמה",
+      "updateBtn": "עדכן סיסמה",
+      "updating": "מעדכן סיסמה...",
+      "successMsg": "הסיסמה שונתה בהצלחה",
+      "currentRequired": "אנא הכנס את הסיסמה הנוכחית שלך",
+      "minLength": "הסיסמה החדשה חייבת להיות לפחות 8 תווים",
+      "mismatch": "הסיסמאות החדשות אינן תואמות"
+    },
+    "plans": {
+      "heading": "תוכנית מנוי",
+      "desc": "בחר את התוכנית המתאימה לתעבורת ה-WhatsApp שלך ולדרישות הסשן הפעיל.",
+      "activeTier": "רמה פעילה",
+      "mostPopular": "הפופולרי ביותר",
+      "perMonth": "/חודש",
+      "upTo": "עד",
+      "session": "סשן",
+      "sessions": "סשנים",
+      "currentPlan": "תוכנית נוכחית",
+      "switchTo": "עבור ל-{{name}}",
+      "switching": "עובר...",
+      "successMsg": "עבר בהצלחה לתוכנית {{plan}}",
+      "failedMsg": "עדכון התוכנית נכשל"
+    }
   }
 }

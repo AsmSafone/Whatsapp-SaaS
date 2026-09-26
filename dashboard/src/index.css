@@ -353,9 +353,9 @@ select:disabled {
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: var(--primary, #25d366);
-  /* Dark text on the WhatsApp green: 9.0:1 (AAA). White was 1.98:1, failing even the AA
-     large-text floor - the single worst contrast pair in the dashboard. */
-  color: #0f172a;
+  /* Use theme-aware text colour: dark surfaces use a light/cyan primary → dark text has AAA
+     contrast; light surfaces use a darker blue primary → white text gives better contrast. */
+  color: var(--btn-primary-text, #0f172a);
   border: 1px solid transparent;
   border-radius: 8px;
   font-size: 0.9375rem;

@@ -1223,5 +1223,60 @@
       "success": "Benutzer erfolgreich gelöscht",
       "cannotDeleteOwner": "Das primäre Besitzer-/Admin-Konto kann nicht gelöscht werden"
     }
+  },
+  "profile": {
+    "title": "Profil & Einstellungen",
+    "subtitle": "Verwalten Sie Ihre Identitätsdaten, Passwortsicherheit und Ihren Abonnementplan.",
+    "loading": "Kontodaten werden geladen...",
+    "overview": {
+      "sessionLabel": "WhatsApp-Sitzung",
+      "sessionsUsed": "{{count}} / {{limit}} verwendet"
+    },
+    "personalInfo": {
+      "heading": "Persönliche Informationen",
+      "desc": "Aktualisieren Sie Ihren Anzeigenamen und Ihre E-Mail-Adresse",
+      "nameLabel": "Vollständiger Name",
+      "namePlaceholder": "Ihr vollständiger Name",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "ihre.email@beispiel.de",
+      "emailHint": "Wird für die Anmeldung und Kontowiederherstellungshinweise verwendet",
+      "saveBtn": "Änderungen speichern",
+      "saving": "Änderungen werden gespeichert...",
+      "successMsg": "Profildaten erfolgreich aktualisiert",
+      "nameRequired": "Name darf nicht leer sein"
+    },
+    "security": {
+      "heading": "Passwort & Sicherheit",
+      "desc": "Aktualisieren Sie Ihr Passwort, um Ihr Konto sicher zu halten",
+      "currentPassword": "Aktuelles Passwort",
+      "currentPasswordPlaceholder": "Aktuelles Passwort eingeben",
+      "newPassword": "Neues Passwort",
+      "newPasswordPlaceholder": "Min. 8 Zeichen",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Neues Passwort wiederholen",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort ausblenden",
+      "updateBtn": "Passwort aktualisieren",
+      "updating": "Passwort wird aktualisiert...",
+      "successMsg": "Passwort erfolgreich geändert",
+      "currentRequired": "Bitte geben Sie Ihr aktuelles Passwort ein",
+      "minLength": "Das neue Passwort muss mindestens 8 Zeichen lang sein",
+      "mismatch": "Die neuen Passwörter stimmen nicht überein"
+    },
+    "plans": {
+      "heading": "Abonnementplan",
+      "desc": "Wählen Sie den Plan, der zu Ihrem WhatsApp-Datenverkehr und Ihren aktiven Sitzungsanforderungen passt.",
+      "activeTier": "Aktive Stufe",
+      "mostPopular": "Am beliebtesten",
+      "perMonth": "/Monat",
+      "upTo": "Bis zu",
+      "session": "Sitzung",
+      "sessions": "Sitzungen",
+      "currentPlan": "Aktueller Plan",
+      "switchTo": "Zu {{name}} wechseln",
+      "switching": "Wird gewechselt...",
+      "successMsg": "Erfolgreich zu {{plan}}-Plan gewechselt",
+      "failedMsg": "Plan konnte nicht aktualisiert werden"
+    }
   }
 }
