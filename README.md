@@ -98,7 +98,7 @@ These are practical guardrails, not guarantees — but they materially reduce th
 
 A few things that look like bugs but are actually server-side WhatsApp policy, not Zaptura defects — we track them separately so we can distinguish them from real bugs:
 
-- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves Zaptura, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of Zaptura. We track it in [#830](https://github.com/AsmSafone/Whatsapp-SaaS/issues/830).
+- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves Zaptura, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of Zaptura. We track it in [#830](https://github.com/AsmSafone/ZapturaWA/issues/830).
 - **Accounts that get restricted cannot be "unrestricted" by us.** If WhatsApp disables a number, you need to appeal through their channels — Zaptura has no lever to pull.
 
 ### Compliance
@@ -168,7 +168,7 @@ For any deployment where ethical, legal, or regulatory compliance matters (healt
 
 ```bash
 # Clone and start
-git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+git clone https://github.com/AsmSafone/ZapturaWA.git
 cd Zaptura
 docker compose -f docker-compose.dev.yml up -d
 
@@ -193,7 +193,7 @@ docker compose -f docker-compose.dev.yml up -d
 
 ```bash
 # Clone repository
-git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+git clone https://github.com/AsmSafone/ZapturaWA.git
 cd Zaptura
 
 # Install the locked dependencies (includes dashboard)
@@ -475,7 +475,7 @@ See [LICENSE](./LICENSE) for details.
 
 **Zaptura** – Free, Open Source WhatsApp API Gateway
 
-[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🐛 Report Bug](https://github.com/AsmSafone/Whatsapp-SaaS/issues) · [💡 Request Feature](https://github.com/AsmSafone/Whatsapp-SaaS/issues)
+[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🐛 Report Bug](https://github.com/AsmSafone/ZapturaWA/issues) · [💡 Request Feature](https://github.com/AsmSafone/ZapturaWA/issues)
 
 <br/>
 

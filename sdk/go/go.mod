@@ -1,3 +1,3 @@
-module github.com/AsmSafone/Whatsapp-SaaS/sdk/go
+module github.com/AsmSafone/ZapturaWA/sdk/go
 
 go 1.22

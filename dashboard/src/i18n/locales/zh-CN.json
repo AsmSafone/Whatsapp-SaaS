@@ -12,6 +12,8 @@
     "cancel": "取消",
     "delete": "删除",
     "create": "创建",
+    "created": "已创建",
+    "edit": "编辑",
     "save": "Save",
     "close": "关闭",
     "showApiKey": "显示 API 密钥",
@@ -60,11 +62,14 @@
     "sessions": "会话",
     "chats": "聊天",
     "webhooks": "Webhooks",
+    "automation": "自动化",
     "templates": "Templates",
     "apiKeys": "API 密钥",
     "messageTester": "消息测试器",
+    "playground": "演练场",
     "infrastructure": "基础设施",
     "plugins": "插件",
+    "users": "用户",
     "logs": "日志",
     "profile": "个人资料"
   },
@@ -268,7 +273,8 @@
     "disconnected": "已断开",
     "action_required": "需要操作",
     "failed": "失败",
-    "authenticating": "正在验证..."
+    "authenticating": "正在验证...",
+    "logged_out": "已登出"
   },
   "sessions": {
     "title": "会话",
@@ -312,6 +318,11 @@
       "successDescGeneric": "会话已删除",
       "errorTitle": "删除失败",
       "errorDefault": "删除会话失败"
+    },
+    "start": {
+      "teardownPendingTitle": "会话启动中",
+      "teardownPending": "此会话的凭据拆除仍在处理中。请稍候再试。",
+      "errorTitle": "启动失败"
     },
     "qr": {
       "title": "扫描 QR 码",
@@ -399,10 +410,10 @@
       "confirm": "取消关联",
       "successTitle": "设备已取消关联",
       "success": "取消关联已完成：设备已登出，本地会话凭据已清除。重新连接需要新的二维码扫描或配对码。",
-      "failedTitle": "取消关联失败",
-      "failed": "无法取消关联该会话。",
       "incompleteTitle": "取消关联未完成",
-      "incomplete": "会话已在本地停止，但登出操作未完成——设备可能仍处于关联状态。请启动会话后重新尝试取消关联。"
+      "incomplete": "会话已在本地停止，但登出操作未完成——设备可能仍处于关联状态。请启动会话后重新尝试取消关联。",
+      "failedTitle": "取消关联失败",
+      "failed": "无法取消关联该会话。"
     },
     "pairing": {
       "tabQr": "QR 码",
@@ -422,11 +433,6 @@
       "step3": "<strong>3.</strong> 点击<strong>关联设备</strong>，然后点击<strong>改用电话号码关联</strong>",
       "step4": "<strong>4.</strong> 在手机上输入上方显示的 8 位字符配对码",
       "waitingConnection": "正在等待您的手机完成关联…"
-    },
-    "start": {
-      "teardownPendingTitle": "会话启动中",
-      "teardownPending": "此会话的凭据拆除仍在处理中。请稍候再试。",
-      "errorTitle": "启动失败"
     },
     "restriction": {
       "reachout_timelock": "新会话被阻止",
@@ -514,30 +520,94 @@
       "delete": "删除"
     },
     "eventDescriptions": {
-      "message.received": "收到消息时",
-      "message.sent": "发送消息时",
-      "message.ack": "消息的送达或已读状态变化时",
-      "message.failed": "发出的消息投递失败时",
-      "message.revoked": "消息被撤回时",
-      "message.reaction": "添加、更改或移除回应时",
-      "message.edited": "消息被编辑时",
-      "session.status": "会话状态变化时",
-      "session.qr": "生成 QR 码时",
-      "session.authenticated": "会话完成配对并就绪时",
-      "session.disconnected": "会话断开时",
-      "session.reconnect_loop": "会话反复重连失败时",
-      "session.restriction": "WhatsApp 限制账号或解除限制时",
-      "presence.update": "已订阅的聊天上线、正在输入或下线时",
-      "group.join": "有成员加入或被添加到群组时",
-      "group.leave": "有成员退出或被移出群组时",
-      "group.update": "群组名称、描述或设置变化时",
-      "group.join_request": "有人申请加入此会话管理的群组时",
-      "call.received": "来电开始响铃时",
-      "call.accepted": "来电被接听时",
-      "call.rejected": "来电被拒接时",
-      "call.missed": "来电未接听时",
-      "status.received": "联系人发布状态时",
-      "all": "所有事件"
+      "all": "所有事件",
+      "message": {
+        "received": "收到消息时",
+        "sent": "发送消息时",
+        "ack": "消息的送达或已读状态变化时",
+        "failed": "发出的消息投递失败时",
+        "revoked": "消息被撤回时",
+        "reaction": "添加、更改或移除回应时",
+        "edited": "消息被编辑时"
+      },
+      "session": {
+        "status": "会话状态变化时",
+        "qr": "生成 QR 码时",
+        "authenticated": "会话完成配对并就绪时",
+        "disconnected": "会话断开时",
+        "reconnect_loop": "会话反复重连失败时",
+        "restriction": "WhatsApp 限制账号或解除限制时"
+      },
+      "presence": {
+        "update": "已订阅的聊天上线、正在输入或下线时"
+      },
+      "group": {
+        "join": "有成员加入或被添加到群组时",
+        "leave": "有成员退出或被移出群组时",
+        "update": "群组名称、描述或设置变化时",
+        "join_request": "有人申请加入此会话管理的群组时"
+      },
+      "call": {
+        "received": "来电开始响铃时",
+        "accepted": "来电被接听时",
+        "rejected": "来电被拒接时",
+        "missed": "来电未接听时"
+      },
+      "status": {
+        "received": "联系人发布状态时"
+      }
+    }
+  },
+  "automation": {
+    "title": "自动化",
+    "subtitle": "为入站消息配置自动回复和关键词触发器",
+    "newRule": "新建规则",
+    "editRule": "编辑自动化规则",
+    "selectSession": "选择会话",
+    "searchPlaceholder": "搜索规则、条件或回复...",
+    "triggers": "触发器",
+    "reply": "回复",
+    "allInbound": "所有入站消息",
+    "cooldownLabel": "每对话冷却 {{count}} 秒",
+    "noSessionsTitle": "无可用 WhatsApp 会话",
+    "noSessionsDesc": "您需要一个活动的会话来设置自动化规则。请先创建或连接会话。",
+    "stats": {
+      "total": "总规则数",
+      "active": "已启用",
+      "paused": "已暂停"
+    },
+    "empty": {
+      "title": "暂无自动化规则",
+      "desc": "创建您的首条自动回复规则，根据关键词或自定义条件自动回答入站消息。",
+      "noMatch": "未找到匹配规则",
+      "searchDesc": "清除搜索以查看所有规则。"
+    },
+    "form": {
+      "nameLabel": "规则名称",
+      "namePlaceholder": "例如：欢迎消息或价格咨询",
+      "nameHint": "一个用于在仪表板中识别该规则的名称。",
+      "conditionsLabel": "触发条件",
+      "conditionsHint": "添加过滤器以按正文、发件人或类型匹配消息。若为空，则对所有入站消息作出回复。",
+      "replyLabel": "自动回复文本",
+      "replyPlaceholder": "在此输入自动回复内容...",
+      "replyHint": "当条件匹配时将自动发送此消息。",
+      "cooldownLabel": "静默冷却时间（秒）",
+      "cooldownHint": "每对话静默期，防止机器人之间无限回复循环（默认：60 秒）。",
+      "enabledLabel": "立即启用此规则"
+    },
+    "deleteConfirmTitle": "删除自动化规则",
+    "deleteConfirmMessage": "确定要删除规则 \"{{name}}\" 吗？此操作无法撤销。",
+    "toasts": {
+      "created": "规则创建成功",
+      "updated": "规则更新成功",
+      "deleted": "规则删除成功",
+      "activated": "规则已激活",
+      "paused": "规则已暂停",
+      "nameRequired": "规则名称为必填项",
+      "replyRequired": "回复内容为必填项",
+      "saveFailed": "保存规则失败",
+      "deleteFailed": "删除规则失败",
+      "updateFailed": "更新规则失败"
     }
   },
   "templates": {
@@ -593,6 +663,7 @@
     "title": "API 密钥",
     "subtitle": "管理用于认证和访问控制的 API 密钥",
     "createBtn": "创建 API 密钥",
+    "documentation": "文档",
     "modalTitle": "创建 API 密钥",
     "createdTitle": "API 密钥已创建",
     "createdHint": "请立即复制此密钥。之后将无法再次查看。",
@@ -858,6 +929,7 @@
     },
     "storage": {
       "title": "存储配置",
+      "s3Unreachable": "S3（无法连接）",
       "local": "本地文件系统",
       "localDesc": "在本地存储媒体文件",
       "s3": "Amazon S3",
@@ -870,32 +942,12 @@
       "accessKey": "访问密钥",
       "secretKey": "秘密密钥",
       "endpoint": "自定义端点（可选）",
-      "endpointHint": "适用于 MinIO 或其他兼容 S3 的服务",
-      "s3Unreachable": "S3（无法连接）"
+      "endpointHint": "适用于 MinIO 或其他兼容 S3 的服务"
     },
     "statusLabels": {
       "connected": "已连接",
       "disconnected": "已断开",
       "disabled": "已禁用"
-    },
-    "restart": {
-      "idleTitle": "⚙️ 配置已保存",
-      "restartingTitle": "🔄 正在重启服务器...",
-      "waitingTitle": "⏳ 请稍候...",
-      "successTitle": "✅ 服务器就绪",
-      "errorTitle": "❌ 重启失败",
-      "idleDesc": "配置已保存到 <code>.env.generated</code>。<br/>需要重启服务器才能应用更改。",
-      "later": "稍后重启",
-      "now": "立即重启",
-      "restartingMsg": "服务器正在重启... {{count}} 秒",
-      "checking": "正在检查服务器状态...",
-      "dontClose": "请不要关闭此窗口",
-      "successMsg": "服务器已恢复在线！页面将自动重新加载。",
-      "errorMsg": "服务器在 30 秒后仍无响应。请检查 Docker 日志并手动重启。",
-      "reload": "重新加载页面"
-    },
-    "toasts": {
-      "saveFailed": "保存失败"
     },
     "envPinNote": "已由环境变量 {{name}} 锁定 —— 此为当前运行值；在取消该变量之前，仪表盘的更改不会生效。",
     "pendingRestartNote": "已保存，但尚未生效 —— 请重启服务器以应用此更改。",
@@ -917,6 +969,25 @@
       "invalidFile": "该文件不是有效的 Zaptura 数据备份。",
       "importTooLarge": "备份超出请求大小限制。请在服务器上调高 BODY_SIZE_LIMIT 后重试。"
     },
+    "restart": {
+      "idleTitle": "⚙️ 配置已保存",
+      "restartingTitle": "🔄 正在重启服务器...",
+      "waitingTitle": "⏳ 请稍候...",
+      "successTitle": "✅ 服务器就绪",
+      "errorTitle": "❌ 重启失败",
+      "idleDesc": "配置已保存到 <code>.env.generated</code>。<br/>需要重启服务器才能应用更改。",
+      "later": "稍后重启",
+      "now": "立即重启",
+      "restartingMsg": "服务器正在重启... {{count}} 秒",
+      "checking": "正在检查服务器状态...",
+      "dontClose": "请不要关闭此窗口",
+      "successMsg": "服务器已恢复在线！页面将自动重新加载。",
+      "errorMsg": "服务器在 30 秒后仍无响应。请检查 Docker 日志并手动重启。",
+      "reload": "重新加载页面"
+    },
+    "toasts": {
+      "saveFailed": "保存失败"
+    },
     "statusLoadError": "无法加载当前基础设施状态。请刷新重试。"
   },
   "plugins": {
@@ -924,6 +995,8 @@
     "subtitle": "安装、配置和管理扩展",
     "refresh": "刷新",
     "builtIn": "内置",
+    "myPlugin": "我的插件",
+    "customPlugin": "自定义插件",
     "noDescription": "没有可用描述",
     "enable": "启用",
     "disable": "禁用",
@@ -999,7 +1072,6 @@
       "title": "实例",
       "description": "为此集成按账户配置实例。每个实例都有自己的签名密钥和接入 URL。",
       "create": "创建实例",
-      "save": "Save",
       "empty": "暂无实例。创建一个以获取接入 URL 和密钥。",
       "loadError": "加载实例失败。",
       "allSessions": "所有会话",
@@ -1083,5 +1155,73 @@
       "current": "当前会话"
     },
     "loading": "搜索中…"
+  },
+  "playground": {
+    "title": "API 演练场",
+    "subtitle": "以交互方式测试 WhatsApp API 端点"
+  },
+  "users": {
+    "title": "用户",
+    "subtitle": "管理已注册的租户账户、订阅套餐与权限",
+    "totalUsers": "总用户数",
+    "activeSessions": "活跃会话",
+    "starterUsers": "入门版用户",
+    "proUsers": "专业版用户",
+    "plusUsers": "增强版用户",
+    "businessUsers": "企业版用户",
+    "searchPlaceholder": "按姓名或邮箱搜索用户...",
+    "filterPlan": "所有套餐",
+    "noUsersFound": "未找到用户",
+    "noUsersMatch": "没有符合搜索条件的用户",
+    "ownerBadge": "管理员",
+    "columns": {
+      "user": "用户",
+      "role": "角色",
+      "plan": "套餐",
+      "sessions": "会话用量",
+      "joined": "加入时间",
+      "actions": "操作"
+    },
+    "sessionsUsage": "{{count}} / {{limit}} 个会话",
+    "actions": {
+      "changePlan": "更改套餐",
+      "resetPassword": "重置密码",
+      "deleteUser": "删除用户"
+    },
+    "changePlanModal": {
+      "title": "更改订阅套餐",
+      "subtitle": "调整 {{name}} ({{email}}) 的套餐等级和会话限额",
+      "currentPlan": "当前套餐",
+      "selectPlan": "选择新套餐",
+      "confirm": "更新套餐",
+      "cancel": "取消",
+      "starterDesc": "包含 1 个 WhatsApp 会话",
+      "proDesc": "包含 3 个 WhatsApp 会话",
+      "plusDesc": "包含 6 个 WhatsApp 会话",
+      "businessDesc": "包含 10 个 WhatsApp 会话",
+      "updating": "正在更新套餐...",
+      "success": "套餐更新成功"
+    },
+    "resetPasswordModal": {
+      "title": "重置密码",
+      "subtitle": "为 {{name}} ({{email}}) 设置新密码",
+      "newPassword": "新密码",
+      "placeholder": "至少 8 个字符",
+      "confirm": "重置密码",
+      "cancel": "取消",
+      "resetting": "正在重置密码...",
+      "success": "密码重置成功",
+      "lengthError": "密码长度必须至少为 8 个字符"
+    },
+    "deleteModal": {
+      "title": "删除用户账户",
+      "confirmMessage": "确定要删除用户 <strong>{{name}}</strong> ({{email}}) 吗？",
+      "warning": "这将永久删除该用户账户及其关联的所有 WhatsApp 会话。此操作无法撤销。",
+      "confirm": "删除用户",
+      "cancel": "取消",
+      "deleting": "正在删除用户...",
+      "success": "用户删除成功",
+      "cannotDeleteOwner": "无法删除主所有者/管理员账户"
+    }
   }
 }

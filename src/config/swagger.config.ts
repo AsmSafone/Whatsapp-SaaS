@@ -6,14 +6,6 @@ import { DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
  */
 export const API_KEY_SECURITY_SCHEME = 'X-API-Key';
 
-/**
- * Security scheme name for the METRICS_TOKEN bearer that gates `GET /api/metrics`.
- * The endpoint is @Public() at the API-key guard and enforces the token itself, so the
- * operation carries this scheme (which overrides the document's global X-API-Key
- * requirement per OpenAPI 3) instead of the API-key one.
- */
-export const METRICS_BEARER_SCHEME = 'metrics-bearer';
-
 // Routes whose controllers are @Public() — the ApiKeyGuard skips them at runtime, but the
 // global X-API-Key requirement applied below would otherwise make the spec claim they need a
 // key. Mirror the @Public() decorators: add a path here when you add one there.
@@ -121,44 +113,35 @@ export function createSwaggerConfig(): Omit<OpenAPIObject, 'paths'> {
       )
       .setVersion(version)
       .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, API_KEY_SECURITY_SCHEME)
-      // The METRICS_TOKEN bearer gates only GET /api/metrics (applied per-operation there —
-      // NOT as a global requirement, since every other route uses the API key).
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'opaque',
-          description: 'METRICS_TOKEN for the GET /api/metrics scrape endpoint',
-        },
-        METRICS_BEARER_SCHEME,
-      )
       // Apply the scheme globally so Swagger UI sends the key with every request
       // (mirrors the global ApiKeyGuard). Without this, "Authorize" is cosmetic.
       .addSecurityRequirements(API_KEY_SECURITY_SCHEME)
       .setContact('Zaptura', 'https://zaptura.io', 'support@zaptura.io')
-      .addTag('account', 'Zaptura account registration and login')
-      .addTag('sessions', 'WhatsApp session management')
-      .addTag('messages', 'Send and manage messages')
-      .addTag('webhooks', 'Webhook configuration')
-      .addTag('contacts', 'Contact management')
-      .addTag('groups', 'Group management')
-      .addTag('labels', 'Label management (WhatsApp Business)')
-      .addTag('channels', 'Channel/Newsletter management')
-      .addTag('catalog', 'Product catalog (WhatsApp Business)')
-      .addTag('status', 'Status/Stories')
-      .addTag('calls', 'Call handling')
-      .addTag('profile', 'Own profile management')
-      .addTag('search', 'Global message search')
-      .addTag('statistics', 'Usage statistics')
-      .addTag('templates', 'Message templates')
-      .addTag('plugins', 'Plugin management')
-      .addTag('settings', 'Application settings')
-      .addTag('infrastructure', 'Infrastructure & datastore management')
-      .addTag('integration', 'Integration Fabric (provider webhooks & instances)')
-      .addTag('auth', 'API key management')
-      .addTag('audit', 'Audit log')
-      .addTag('metrics', 'Prometheus metrics')
-      .addTag('health', 'Health check endpoints')
+      .addTag('account', 'Tenant account registration, authentication, and plan queries')
+      .addTag('admin-users', '[Admin Only] User account administration, plan management, and password resets')
+      .addTag('sessions', 'WhatsApp session lifecycle and multi-device connection management (Tenant / Per-User)')
+      .addTag('messages', 'Send and manage WhatsApp messages, text, media, and location (Tenant / Per-User)')
+      .addTag('media', 'Media file upload, preview, and conversion for WhatsApp chats (Tenant / Per-User)')
+      .addTag('automation', 'Automated keyword, event, and autoreply response rules (Tenant / Per-User)')
+      .addTag('webhooks', 'Webhook event configuration, filtering, and delivery logs (Tenant / Per-User)')
+      .addTag('contacts', 'Contact management and address book queries (Tenant / Per-User)')
+      .addTag('groups', 'WhatsApp group creation, metadata, and participant management (Tenant / Per-User)')
+      .addTag('labels', 'Label management for WhatsApp Business (Tenant / Per-User)')
+      .addTag('channels', 'Channel and newsletter management (Tenant / Per-User)')
+      .addTag('catalog', 'Product catalog management for WhatsApp Business (Tenant / Per-User)')
+      .addTag('status', 'Status and story broadcast handling (Tenant / Per-User)')
+      .addTag('calls', 'WhatsApp voice and video call handling (Tenant / Per-User)')
+      .addTag('profile', 'Own WhatsApp profile and presence management (Tenant / Per-User)')
+      .addTag('search', 'Global message and contact search (Tenant / Per-User)')
+      .addTag('statistics', 'Account and session usage statistics (Tenant / Per-User)')
+      .addTag('templates', 'Message templates and parameter injection (Tenant / Per-User)')
+      .addTag('plugins', 'Plugin catalog, installation, and per-user configuration (Tenant / Per-User)')
+      .addTag('integration', 'Integration Fabric: provider webhooks and instances (Tenant / Per-User)')
+      .addTag('auth', 'API key generation, listing, and revocation (Tenant / Per-User)')
+      .addTag('settings', '[Admin Only] Global application settings and engine configuration')
+      .addTag('infrastructure', '[Admin Only] Infrastructure datastores, disk cleanup, and maintenance')
+      .addTag('audit', '[Admin Only] Security audit logging and administration trail')
+      .addTag('health', 'System health check and liveness probes')
       // ORDER MATTERS. Swagger UI resolves "Try it" against servers[0], substituting the variable
       // defaults — it does not consider the origin the page was served from. A templated server
       // alone therefore aimed every request at `http://localhost:2785`, so on any deployment that

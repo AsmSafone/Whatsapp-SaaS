@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📚 Documentation
-    url: https://github.com/AsmSafone/Whatsapp-SaaS/tree/main/docs
+    url: https://github.com/AsmSafone/ZapturaWA/tree/main/docs
     about: Setup, API specification, and operational guides.
   - name: 🔒 Report a security vulnerability
-    url: https://github.com/AsmSafone/Whatsapp-SaaS/security/advisories/new
+    url: https://github.com/AsmSafone/ZapturaWA/security/advisories/new
     about: Please report vulnerabilities privately — not as a public issue.

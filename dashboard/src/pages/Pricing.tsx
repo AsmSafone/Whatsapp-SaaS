@@ -64,7 +64,7 @@ export function Pricing() {
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
                     <strong>
-                      {plan.sessions} Linked {plan.sessions > 1 ? 'Accounts' : 'Account'}
+                      {plan.sessions} Whatsapp {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
                   <li>

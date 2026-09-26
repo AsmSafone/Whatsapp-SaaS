@@ -12,6 +12,8 @@
     "cancel": "ביטול",
     "delete": "מחיקה",
     "create": "יצירה",
+    "created": "נוצר",
+    "edit": "עריכה",
     "save": "Save",
     "close": "סגירה",
     "showApiKey": "הצג מפתח API",
@@ -60,11 +62,14 @@
     "sessions": "Sessions",
     "chats": "שיחות",
     "webhooks": "Webhooks",
+    "automation": "אוטומציה",
     "templates": "Templates",
     "apiKeys": "מפתחות API",
     "messageTester": "בדיקת הודעות",
+    "playground": "סביבת בדיקות",
     "infrastructure": "תשתית",
     "plugins": "תוספים",
+    "users": "משתמשים",
     "logs": "לוגים",
     "profile": "פרופיל"
   },
@@ -89,8 +94,6 @@
     "noMessageYet": "אין הודעות עדיין",
     "unreadBadge": "{{count}} הודעה שלא נקראה",
     "unreadBadge_other": "{{count}} הודעות שלא נקראו",
-    "unreadBadge_two": "שתי הודעות שלא נקראו",
-    "unreadBadge_many": "{{count}} הודעות שלא נקראו",
     "loadingMessages": "טוען הודעות...",
     "loadingOlderMessages": "טוען הודעות ישנות יותר...",
     "loadOlderMessagesError": "טעינת ההודעות הישנות נכשלה. גלול למעלה כדי לנסות שוב.",
@@ -133,9 +136,6 @@
     },
     "status": {
       "itemCount": "עדכון {{count}}",
-      "itemCount_one": "עדכון {{count}}",
-      "itemCount_two": "{{count}} עדכונים",
-      "itemCount_many": "{{count}} עדכונים",
       "itemCount_other": "{{count}} עדכונים",
       "empty": "לאף איש קשר אין סטטוס פעיל.",
       "loadError": "טעינת הסטטוסים נכשלה.",
@@ -154,7 +154,10 @@
       "post": "פרסם",
       "posted": "הסטטוס פורסם",
       "postFailed": "לא ניתן היה לפרסם את הסטטוס",
-      "imageFile": "תמונת סטטוס"
+      "imageFile": "תמונת סטטוס",
+      "itemCount_one": "עדכון {{count}}",
+      "itemCount_two": "{{count}} עדכונים",
+      "itemCount_many": "{{count}} עדכונים"
     },
     "channels": {
       "notSupported": "ערוצים אינם נתמכים במנוע Baileys.",
@@ -182,7 +185,9 @@
       "delivered": "נמסר",
       "read": "נקרא",
       "failed": "נכשל"
-    }
+    },
+    "unreadBadge_two": "שתי הודעות שלא נקראו",
+    "unreadBadge_many": "{{count}} הודעות שלא נקראו"
   },
   "errorBoundary": {
     "title": "משהו השתבש",
@@ -275,7 +280,8 @@
     "disconnected": "מנותק",
     "action_required": "נדרשת פעולה",
     "failed": "נכשל",
-    "authenticating": "מאמת..."
+    "authenticating": "מאמת...",
+    "logged_out": "מנותק"
   },
   "sessions": {
     "title": "Sessions",
@@ -297,7 +303,7 @@
       "title": "יצירת Session חדש",
       "label": "שם Session",
       "placeholder": "לדוגמה: marketing-bot",
-      "hint": "מותר להשתמש באותיות לועזיות קטנות, ספרות ומקפים בלבד. לדוגמה: <code>customer-support</code>, <code>bot-1</code>",
+      "hint": "מותר להשתמש באותיות לועזיות קטנות, ספרות ומקפים בלבד. לדוגמה: <code>bot-1</code>",
       "invalidChars": "תווים לא חוקיים. מותרות אותיות לועזיות קטנות, ספרות ומקפים בלבד.",
       "tooLong": "אורך השם מוגבל ל-50 תווים ({{length}}/50).",
       "duplicate": "כבר קיים Session עם שם זה.",
@@ -319,6 +325,11 @@
       "successDescGeneric": "ה-Session נמחק",
       "errorTitle": "המחיקה נכשלה",
       "errorDefault": "מחיקת ה-Session נכשלה"
+    },
+    "start": {
+      "teardownPendingTitle": "הפעלת סשן",
+      "teardownPending": "פירוק אישורים לסשן זה עדיין מתבצע. המתן רגע ונסה שוב.",
+      "errorTitle": "ההפעלה נכשלה"
     },
     "qr": {
       "title": "סריקת QR",
@@ -406,10 +417,10 @@
       "confirm": "ביטול קישור",
       "successTitle": "המכשיר נותק",
       "success": "ביטול הקישור הושלם: המכשיר נותק ואישורי הסשן המקומיים נמחקו. חיבור מחדש דורש סריקת QR חדשה או קוד הוראה.",
-      "failedTitle": "ביטול הקישור נכשל",
-      "failed": "לא ניתן לבטל את קישור הסשן.",
       "incompleteTitle": "ביטול קישור חלקי",
-      "incomplete": "הסשן נעצר מקומית, אך פעולת ההתנתקות אינה מושלמת — ייתכן שהמכשיר עדיין מקושר. הפעל את הסשן ונסה שוב את ביטול הקישור."
+      "incomplete": "הסשן נעצר מקומית, אך פעולת ההתנתקות אינה מושלמת — ייתכן שהמכשיר עדיין מקושר. הפעל את הסשן ונסה שוב את ביטול הקישור.",
+      "failedTitle": "ביטול הקישור נכשל",
+      "failed": "לא ניתן לבטל את קישור הסשן."
     },
     "pairing": {
       "tabQr": "קוד QR",
@@ -429,11 +440,6 @@
       "step3": "<strong>3.</strong> יש להקיש על <strong>קישור מכשיר</strong>, ולאחר מכן על <strong>קישור עם מספר טלפון במקום זאת</strong>",
       "step4": "<strong>4.</strong> יש להזין במכשיר את הקוד בן 8 התווים המוצג למעלה",
       "waitingConnection": "ממתין לקישור המכשיר שלך…"
-    },
-    "start": {
-      "teardownPendingTitle": "הפעלת סשן",
-      "teardownPending": "פירוק אישורים לסשן זה עדיין מתבצע. המתן רגע ונסה שוב.",
-      "errorTitle": "ההפעלה נכשלה"
     },
     "restriction": {
       "reachout_timelock": "צ׳אטים חדשים חסומים",
@@ -456,12 +462,10 @@
     "available": "אירועים זמינים",
     "saveChanges": "שמירת שינויים",
     "filters": {
-      "badge": "{{count}} מסנן",
-      "badge_other": "{{count}} מסננים",
-      "badge_many": "{{count}} מסננים",
-      "badge_two": "שני מסננים",
       "title": "מסננים (אופציונלי)",
       "hint": "הפעלה רק כאשר כל התנאים מתקיימים. חל על אירועי הודעות.",
+      "badge": "{{count}} מסנן",
+      "badge_other": "{{count}} מסננים",
       "addCondition": "הוספת תנאי",
       "removeCondition": "הסרת תנאי",
       "caseSensitive": "תלוי רישיות",
@@ -490,7 +494,9 @@
       },
       "fieldLabel": "שדה סינון",
       "operatorLabel": "אופרטור סינון",
-      "valueLabel": "ערך סינון"
+      "valueLabel": "ערך סינון",
+      "badge_many": "{{count}} מסננים",
+      "badge_two": "שני מסננים"
     },
     "columns": {
       "url": "כתובת URL",
@@ -523,30 +529,94 @@
       "delete": "מחיקה"
     },
     "eventDescriptions": {
-      "message.received": "כאשר מתקבלת הודעה",
-      "message.sent": "כאשר נשלחת הודעה",
-      "message.ack": "כאשר סטטוס המסירה או הקריאה של הודעה משתנה",
-      "message.failed": "כאשר מסירת הודעה יוצאת נכשלת",
-      "message.revoked": "כאשר הודעה נמחקת אצל כולם",
-      "message.reaction": "כאשר תגובה נוספת, משתנה או מוסרת",
-      "message.edited": "כאשר הודעה נערכת",
-      "session.status": "כאשר הסטטוס של Session משתנה",
-      "session.qr": "כאשר נוצר קוד QR",
-      "session.authenticated": "כאשר Session מקושר ומוכן",
-      "session.disconnected": "כאשר Session מתנתק",
-      "session.reconnect_loop": "כאשר Session נכשל שוב ושוב בהתחברות מחדש",
-      "session.restriction": "כאשר WhatsApp מגביל את החשבון או מסיר הגבלה",
-      "presence.update": "כאשר צ'אט במעקב מתחבר, מקליד או מתנתק",
-      "group.join": "כאשר משתתפים מצטרפים לקבוצה או מתווספים אליה",
-      "group.leave": "כאשר משתתפים עוזבים קבוצה או מוסרים ממנה",
-      "group.update": "כאשר השם, התיאור או ההגדרות של קבוצה משתנים",
-      "group.join_request": "כאשר מישהו מבקש להצטרף לקבוצה שה-Session הזה מנהל",
-      "call.received": "כאשר שיחה נכנסת מתחילה לצלצל",
-      "call.accepted": "כאשר עונים לשיחה",
-      "call.rejected": "כאשר שיחה נדחית",
-      "call.missed": "כאשר שיחה לא נענית",
-      "status.received": "כאשר איש קשר מפרסם סטטוס",
-      "all": "כל האירועים"
+      "all": "כל האירועים",
+      "message": {
+        "received": "כאשר מתקבלת הודעה",
+        "sent": "כאשר נשלחת הודעה",
+        "ack": "כאשר סטטוס המסירה או הקריאה של הודעה משתנה",
+        "failed": "כאשר מסירת הודעה יוצאת נכשלת",
+        "revoked": "כאשר הודעה נמחקת אצל כולם",
+        "reaction": "כאשר תגובה נוספת, משתנה או מוסרת",
+        "edited": "כאשר הודעה נערכת"
+      },
+      "session": {
+        "status": "כאשר הסטטוס של Session משתנה",
+        "qr": "כאשר נוצר קוד QR",
+        "authenticated": "כאשר Session מקושר ומוכן",
+        "disconnected": "כאשר Session מתנתק",
+        "reconnect_loop": "כאשר Session נכשל שוב ושוב בהתחברות מחדש",
+        "restriction": "כאשר WhatsApp מגביל את החשבון או מסיר הגבלה"
+      },
+      "presence": {
+        "update": "כאשר צ'אט במעקב מתחבר, מקליד או מתנתק"
+      },
+      "group": {
+        "join": "כאשר משתתפים מצטרפים לקבוצה או מתווספים אליה",
+        "leave": "כאשר משתתפים עוזבים קבוצה או מוסרים ממנה",
+        "update": "כאשר השם, התיאור או ההגדרות של קבוצה משתנים",
+        "join_request": "כאשר מישהו מבקש להצטרף לקבוצה שה-Session הזה מנהל"
+      },
+      "call": {
+        "received": "כאשר שיחה נכנסת מתחילה לצלצל",
+        "accepted": "כאשר עונים לשיחה",
+        "rejected": "כאשר שיחה נדחית",
+        "missed": "כאשר שיחה לא נענית"
+      },
+      "status": {
+        "received": "כאשר איש קשר מפרסם סטטוס"
+      }
+    }
+  },
+  "automation": {
+    "title": "אוטומציה",
+    "subtitle": "הגדרת מענה אוטומטי וטריגרים של מילות מפתח עבור הודעות נכנסות",
+    "newRule": "כלל חדש",
+    "editRule": "עריכת כלל אוטומציה",
+    "selectSession": "בחר הפעלה",
+    "searchPlaceholder": "חיפוש כללים, תנאים או תגובות...",
+    "triggers": "טריגרים",
+    "reply": "תגובה",
+    "allInbound": "כל ההודעות הנכנסות",
+    "cooldownLabel": "{{count}} שניות המתנה לכל צ'אט",
+    "noSessionsTitle": "אין הפעלות וואטסאפ זמינות",
+    "noSessionsDesc": "דרושה הפעלה פעילה כדי להגדיר כללי אוטומציה. אנא צור או חבר הפעלה תחילה.",
+    "stats": {
+      "total": "סך הכל כללים",
+      "active": "פעיל",
+      "paused": "מושהה"
+    },
+    "empty": {
+      "title": "אין עדיין כללי אוטומציה",
+      "desc": "צור את כלל המענה האוטומטי הראשון שלך כדי להשיב אוטומטית להודעות נכנסות על פי מילות מפתח או תנאים מותאמים אישית.",
+      "noMatch": "לא נמצאו כללים תואמים",
+      "searchDesc": "נסה לנקות את שאילתת החיפוש כדי לראות את כל הכללים."
+    },
+    "form": {
+      "nameLabel": "שם הכלל",
+      "namePlaceholder": "לדוגמה: הודעת ברוכים הבאים או מענה מחירון אוטומטי",
+      "nameHint": "שם תיאורי לזיהוי כלל זה בלוח הבקרה.",
+      "conditionsLabel": "תנאי טריגר",
+      "conditionsHint": "הוסף מסננים להתאמת הודעות נכנסות לפי מילת מפתח בטקסט, שולח או סוג הודעה. אם ריק, הכלל יענה לכל הודעה נכנסת.",
+      "replyLabel": "טקסט מענה אוטומטי",
+      "replyPlaceholder": "הקלד את הודעת המענה האוטומטי כאן...",
+      "replyHint": "הודעה זו תישלח אוטומטית כאשר התנאים יתקיימו.",
+      "cooldownLabel": "זמן השהיה (בשניות)",
+      "cooldownHint": "תקופת שקט לכל צ'אט למניעת לולאות מענה אינסופיות של בוטים (ברירת מחדל: 60 שניות).",
+      "enabledLabel": "הפעל כלל זה באופן מיידי"
+    },
+    "deleteConfirmTitle": "מחיקת כלל אוטומציה",
+    "deleteConfirmMessage": "האם אתה בטוח שברצונך למחוק את הכלל \"{{name}}\"? פעולה זו אינה ניתנת לביטול.",
+    "toasts": {
+      "created": "הכלל נוצר בהצלחה",
+      "updated": "הכלל עודכן בהצלחה",
+      "deleted": "הכלל נמחק בהצלחה",
+      "activated": "הכלל הופעל",
+      "paused": "הכלל הושהה",
+      "nameRequired": "נדרש שם לכלל",
+      "replyRequired": "נדרש טקסט מענה",
+      "saveFailed": "שמירת הכלל נכשלה",
+      "deleteFailed": "מחיקת הכלל נכשלה",
+      "updateFailed": "עדכון הכלל נכשל"
     }
   },
   "templates": {
@@ -602,6 +672,7 @@
     "title": "מפתחות API",
     "subtitle": "ניהול מפתחות API לאימות ובקרת גישה",
     "createBtn": "יצירת מפתח API",
+    "documentation": "תיעוד",
     "modalTitle": "יצירת מפתח API",
     "createdTitle": "מפתח ה-API נוצר",
     "createdHint": "יש להעתיק את המפתח כעת. לא ניתן יהיה לצפות בו שוב.",
@@ -867,6 +938,7 @@
     },
     "storage": {
       "title": "הגדרות אחסון",
+      "s3Unreachable": "S3 (לא נגיש)",
       "local": "מערכת קבצים מקומית",
       "localDesc": "אחסון קבצי מדיה מקומית",
       "s3": "Amazon S3",
@@ -879,32 +951,12 @@
       "accessKey": "Access Key",
       "secretKey": "Secret Key",
       "endpoint": "Endpoint מותאם (אופציונלי)",
-      "endpointHint": "עבור MinIO או שירותים אחרים תואמי S3",
-      "s3Unreachable": "S3 (לא נגיש)"
+      "endpointHint": "עבור MinIO או שירותים אחרים תואמי S3"
     },
     "statusLabels": {
       "connected": "מחובר",
       "disconnected": "מנותק",
       "disabled": "מושבת"
-    },
-    "restart": {
-      "idleTitle": "⚙️ התצורה נשמרה",
-      "restartingTitle": "🔄 מאתחל את השרת...",
-      "waitingTitle": "⏳ אנא להמתין...",
-      "successTitle": "✅ השרת מוכן",
-      "errorTitle": "❌ האתחול נכשל",
-      "idleDesc": "התצורה נשמרה ל-<code>.env.generated</code>.<br/>נדרש אתחול שרת כדי להחיל את השינויים.",
-      "later": "אתחול מאוחר יותר",
-      "now": "אתחול עכשיו",
-      "restartingMsg": "השרת מתאתחל... {{count}} שניות",
-      "checking": "בודק את סטטוס השרת...",
-      "dontClose": "אין לסגור חלון זה",
-      "successMsg": "השרת חזר לפעולה! הדף ייטען מחדש אוטומטית.",
-      "errorMsg": "השרת לא הגיב לאחר 30 שניות. יש לבדוק את לוגי Docker ולאתחל ידנית.",
-      "reload": "טעינת הדף מחדש"
-    },
-    "toasts": {
-      "saveFailed": "השמירה נכשלה"
     },
     "envPinNote": "מקובע על ידי משתנה הסביבה {{name}} — זהו הערך הפעיל; שינויים בלוח הבקרה לא ייכנסו לתוקף עד שמשתנה זה יבוטל.",
     "pendingRestartNote": "נשמר, אך טרם הוחל — הפעילו מחדש את השרת כדי שהשינוי ייכנס לתוקף.",
@@ -926,6 +978,25 @@
       "invalidFile": "הקובץ הזה אינו גיבוי נתונים תקין של Zaptura.",
       "importTooLarge": "הגיבוי גדול מדי עבור מגבלת הבקשה. הגדילו את BODY_SIZE_LIMIT בשרת ונסו שוב."
     },
+    "restart": {
+      "idleTitle": "⚙️ התצורה נשמרה",
+      "restartingTitle": "🔄 מאתחל את השרת...",
+      "waitingTitle": "⏳ אנא להמתין...",
+      "successTitle": "✅ השרת מוכן",
+      "errorTitle": "❌ האתחול נכשל",
+      "idleDesc": "התצורה נשמרה ל-<code>.env.generated</code>.<br/>נדרש אתחול שרת כדי להחיל את השינויים.",
+      "later": "אתחול מאוחר יותר",
+      "now": "אתחול עכשיו",
+      "restartingMsg": "השרת מתאתחל... {{count}} שניות",
+      "checking": "בודק את סטטוס השרת...",
+      "dontClose": "אין לסגור חלון זה",
+      "successMsg": "השרת חזר לפעולה! הדף ייטען מחדש אוטומטית.",
+      "errorMsg": "השרת לא הגיב לאחר 30 שניות. יש לבדוק את לוגי Docker ולאתחל ידנית.",
+      "reload": "טעינת הדף מחדש"
+    },
+    "toasts": {
+      "saveFailed": "השמירה נכשלה"
+    },
     "statusLoadError": "לא ניתן לטעון את מצב התשתית הנוכחי. רעננו כדי לנסות שוב."
   },
   "plugins": {
@@ -933,6 +1004,8 @@
     "subtitle": "התקנה, הגדרה וניהול של הרחבות",
     "refresh": "רענון",
     "builtIn": "מובנה",
+    "myPlugin": "התוסף שלי",
+    "customPlugin": "תוסף מותאם אישית",
     "noDescription": "אין תיאור זמין",
     "enable": "הפעלה",
     "disable": "השבתה",
@@ -1008,7 +1081,6 @@
       "title": "מופעים",
       "description": "הקצו מופעים לכל חשבון עבור אינטגרציה זו. לכל מופע יש מפתח חתימה סודי וכתובת URL לקליטה משלו.",
       "create": "יצירת מופע",
-      "save": "Save",
       "empty": "אין עדיין מופעים. צרו מופע כדי לקבל כתובת URL וסוד.",
       "loadError": "טעינת המופעים נכשלה.",
       "allSessions": "כל ה-Sessions",
@@ -1092,5 +1164,73 @@
       "current": "הפעלה זו"
     },
     "loading": "מחפש…"
+  },
+  "playground": {
+    "title": "סביבת בדיקות",
+    "subtitle": "בדוק הודעות ונקודות קצה של WhatsApp API באופן אינטראקטיבי"
+  },
+  "users": {
+    "title": "משתמשים",
+    "subtitle": "ניהול חשבונות לקוחות רשומים, מנויים והרשאות גישה",
+    "totalUsers": "סך הכל משתמשים",
+    "activeSessions": "הפעלות פעילות",
+    "starterUsers": "תוכנית Starter",
+    "proUsers": "תוכנית Pro",
+    "plusUsers": "תוכנית Plus",
+    "businessUsers": "תוכנית Business",
+    "searchPlaceholder": "חיפוש משתמשים לפי שם או דוא\"ל...",
+    "filterPlan": "כל התוכניות",
+    "noUsersFound": "לא נמצאו משתמשים",
+    "noUsersMatch": "אין משתמשים התואמים לחיפוש שלך",
+    "ownerBadge": "מנהל מערכת",
+    "columns": {
+      "user": "משתמש",
+      "role": "תפקיד",
+      "plan": "תוכנית",
+      "sessions": "שימוש בהפעלות",
+      "joined": "הצטרף ב-",
+      "actions": "פעולות"
+    },
+    "sessionsUsage": "{{count}} מתוך {{limit}} הפעלות",
+    "actions": {
+      "changePlan": "שנה תוכנית",
+      "resetPassword": "איפוס סיסמה",
+      "deleteUser": "מחק משתמש"
+    },
+    "changePlanModal": {
+      "title": "שינוי תוכנית מנוי",
+      "subtitle": "התאמת רמת המנוי ומגבלות ההפעלה עבור {{name}} ({{email}})",
+      "currentPlan": "תוכנית נוכחית",
+      "selectPlan": "בחר תוכנית חדשה",
+      "confirm": "עדכן תוכנית",
+      "cancel": "ביטול",
+      "starterDesc": "כולל הפעלת וואטסאפ אחת (1)",
+      "proDesc": "כולל 3 הפעלות וואטסאפ",
+      "plusDesc": "כולל 6 הפעלות וואטסאפ",
+      "businessDesc": "כולל 10 הפעלות וואטסאפ",
+      "updating": "מעדכן תוכנית...",
+      "success": "התוכנית עודכנה בהצלחה"
+    },
+    "resetPasswordModal": {
+      "title": "איפוס סיסמה",
+      "subtitle": "הגדר סיסמה חדשה עבור {{name}} ({{email}})",
+      "newPassword": "סיסמה חדשה",
+      "placeholder": "לפחות 8 תווים",
+      "confirm": "איפוס סיסמה",
+      "cancel": "ביטול",
+      "resetting": "מאפס סיסמה...",
+      "success": "הסיסמה אופסה בהצלחה",
+      "lengthError": "הסיסמה חייבת להכיל לפחות 8 תווים"
+    },
+    "deleteModal": {
+      "title": "מחיקת חשבון משתמש",
+      "confirmMessage": "האם אתה בטוח שברצונך למחוק את המשתמש <strong>{{name}}</strong> ({{email}})?",
+      "warning": "פעולה זו תמחק לצמיתות את חשבון המשתמש ואת כל הפעלות הוואטסאפ המשויכות. לא ניתן לבטל פעולה זו.",
+      "confirm": "מחק משתמש",
+      "cancel": "ביטול",
+      "deleting": "מוחק משתמש...",
+      "success": "המשתמש נמחק בהצלחה",
+      "cannotDeleteOwner": "לא ניתן למחוק את חשבון הבעלים/מנהל הראשי"
+    }
   }
 }

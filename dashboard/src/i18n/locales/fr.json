@@ -12,6 +12,8 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "create": "Créer",
+    "created": "Créé",
+    "edit": "Modifier",
     "save": "Save",
     "close": "Fermer",
     "showApiKey": "Afficher la clé API",
@@ -60,11 +62,14 @@
     "sessions": "Sessions",
     "chats": "Discussions",
     "webhooks": "Webhooks",
+    "automation": "Automatisation",
     "templates": "Templates",
     "apiKeys": "Clés API",
     "messageTester": "Testeur de messages",
+    "playground": "Playground",
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
+    "users": "Utilisateurs",
     "logs": "Journaux",
     "profile": "Profil"
   },
@@ -268,7 +273,8 @@
     "disconnected": "Déconnecté",
     "action_required": "Action requise",
     "failed": "Échec",
-    "authenticating": "Authentification..."
+    "authenticating": "Authentification...",
+    "logged_out": "Déconnecté"
   },
   "sessions": {
     "title": "Sessions",
@@ -290,7 +296,7 @@
       "title": "Créer une nouvelle session",
       "label": "Nom de la session",
       "placeholder": "ex : marketing-bot",
-      "hint": "Utilisez uniquement des lettres minuscules, des chiffres et des tirets. Exemple : <code>customer-support</code>, <code>bot-1</code>",
+      "hint": "Utilisez uniquement des lettres minuscules, des chiffres et des tirets. Exemple : <code>bot-1</code>",
       "invalidChars": "Caractères invalides. Seuls les lettres minuscules, les chiffres et les tirets sont autorisés.",
       "tooLong": "Le nom doit contenir 50 caractères ou moins ({{length}}/50).",
       "duplicate": "Une session avec ce nom existe déjà.",
@@ -312,6 +318,11 @@
       "successDescGeneric": "Session supprimée",
       "errorTitle": "Échec de la suppression",
       "errorDefault": "Impossible de supprimer la session"
+    },
+    "start": {
+      "teardownPendingTitle": "Démarrage de la session",
+      "teardownPending": "Un nettoyage d'identifiants pour cette session est encore en cours. Patientez un instant et réessayez.",
+      "errorTitle": "Échec du démarrage"
     },
     "qr": {
       "title": "Scanner le code QR",
@@ -399,10 +410,10 @@
       "confirm": "Dissocier",
       "successTitle": "Appareil dissocié",
       "success": "Dissociation terminée : l'appareil a été déconnecté et les identifiants de session locaux ont été effacés. Reconnecter nécessite un nouveau QR code ou code d'association.",
-      "failedTitle": "Échec de la dissociation",
-      "failed": "Impossible de dissocier la session.",
       "incompleteTitle": "Dissociation incomplète",
-      "incomplete": "La session s'est arrêtée localement, mais l'opération de déconnexion est incomplète — l'appareil peut encore être associé. Démarrez la session et relancez la dissociation."
+      "incomplete": "La session s'est arrêtée localement, mais l'opération de déconnexion est incomplète — l'appareil peut encore être associé. Démarrez la session et relancez la dissociation.",
+      "failedTitle": "Échec de la dissociation",
+      "failed": "Impossible de dissocier la session."
     },
     "pairing": {
       "tabQr": "Code QR",
@@ -422,11 +433,6 @@
       "step3": "<strong>3.</strong> Appuyez sur <strong>Connecter un appareil</strong>, puis sur <strong>Lier avec un numéro de téléphone</strong>",
       "step4": "<strong>4.</strong> Saisissez sur votre téléphone le code à 8 caractères affiché ci-dessus",
       "waitingConnection": "En attente de la liaison de votre téléphone…"
-    },
-    "start": {
-      "teardownPendingTitle": "Démarrage de la session",
-      "teardownPending": "Un nettoyage d'identifiants pour cette session est encore en cours. Patientez un instant et réessayez.",
-      "errorTitle": "Échec du démarrage"
     },
     "restriction": {
       "reachout_timelock": "Nouvelles discussions bloquées",
@@ -514,30 +520,94 @@
       "delete": "Supprimer"
     },
     "eventDescriptions": {
-      "message.received": "Lorsqu'un message est reçu",
-      "message.sent": "Lorsqu'un message est envoyé",
-      "message.ack": "Lorsque l'état de remise ou de lecture d'un message change",
-      "message.failed": "Lorsqu'un message sortant n'a pas pu être remis",
-      "message.revoked": "Lorsqu'un message est supprimé pour tout le monde",
-      "message.reaction": "Lorsqu'une réaction est ajoutée, modifiée ou retirée",
-      "message.edited": "Lorsqu'un message est modifié",
-      "session.status": "Lorsque l'état d'une session change",
-      "session.qr": "Lorsqu'un code QR est généré",
-      "session.authenticated": "Lorsqu'une session est associée et prête",
-      "session.disconnected": "Lorsqu'une session se déconnecte",
-      "session.reconnect_loop": "Lorsqu'une session échoue à se reconnecter à plusieurs reprises",
-      "session.restriction": "Lorsque WhatsApp restreint le compte ou lève une restriction",
-      "presence.update": "Lorsqu'un chat suivi passe en ligne, écrit ou se déconnecte",
-      "group.join": "Lorsque des participants rejoignent un groupe ou y sont ajoutés",
-      "group.leave": "Lorsque des participants quittent un groupe ou en sont retirés",
-      "group.update": "Lorsque le nom, la description ou les paramètres d'un groupe changent",
-      "group.join_request": "Lorsque quelqu'un demande à rejoindre un groupe administré par cette session",
-      "call.received": "Lorsqu'un appel entrant commence à sonner",
-      "call.accepted": "Lorsqu'un appel est décroché",
-      "call.rejected": "Lorsqu'un appel est refusé",
-      "call.missed": "Lorsqu'un appel reste sans réponse",
-      "status.received": "Lorsqu'un contact publie un statut",
-      "all": "Tous les événements"
+      "all": "Tous les événements",
+      "message": {
+        "received": "Lorsqu'un message est reçu",
+        "sent": "Lorsqu'un message est envoyé",
+        "ack": "Lorsque l'état de remise ou de lecture d'un message change",
+        "failed": "Lorsqu'un message sortant n'a pas pu être remis",
+        "revoked": "Lorsqu'un message est supprimé pour tout le monde",
+        "reaction": "Lorsqu'une réaction est ajoutée, modifiée ou retirée",
+        "edited": "Lorsqu'un message est modifié"
+      },
+      "session": {
+        "status": "Lorsque l'état d'une session change",
+        "qr": "Lorsqu'un code QR est généré",
+        "authenticated": "Lorsqu'une session est associée et prête",
+        "disconnected": "Lorsqu'une session se déconnecte",
+        "reconnect_loop": "Lorsqu'une session échoue à se reconnecter à plusieurs reprises",
+        "restriction": "Lorsque WhatsApp restreint le compte ou lève une restriction"
+      },
+      "presence": {
+        "update": "Lorsqu'un chat suivi passe en ligne, écrit ou se déconnecte"
+      },
+      "group": {
+        "join": "Lorsque des participants rejoignent un groupe ou y sont ajoutés",
+        "leave": "Lorsque des participants quittent un groupe ou en sont retirés",
+        "update": "Lorsque le nom, la description ou les paramètres d'un groupe changent",
+        "join_request": "Lorsque quelqu'un demande à rejoindre un groupe administré par cette session"
+      },
+      "call": {
+        "received": "Lorsqu'un appel entrant commence à sonner",
+        "accepted": "Lorsqu'un appel est décroché",
+        "rejected": "Lorsqu'un appel est refusé",
+        "missed": "Lorsqu'un appel reste sans réponse"
+      },
+      "status": {
+        "received": "Lorsqu'un contact publie un statut"
+      }
+    }
+  },
+  "automation": {
+    "title": "Automatisation",
+    "subtitle": "Configurez des réponses automatiques et des déclencheurs par mots-clés pour les messages entrants",
+    "newRule": "Nouvelle règle",
+    "editRule": "Modifier la règle d'automatisation",
+    "selectSession": "Sélectionner une session",
+    "searchPlaceholder": "Rechercher des règles, conditions ou réponses...",
+    "triggers": "Déclencheurs",
+    "reply": "Réponse",
+    "allInbound": "Tous les messages entrants",
+    "cooldownLabel": "{{count}}s d'attente par discussion",
+    "noSessionsTitle": "Aucune session WhatsApp disponible",
+    "noSessionsDesc": "Vous avez besoin d'une session active pour configurer des règles d'automatisation. Veuillez d'abord créer ou connecter une session.",
+    "stats": {
+      "total": "Total des règles",
+      "active": "Actives",
+      "paused": "En pause"
+    },
+    "empty": {
+      "title": "Aucune règle d'automatisation pour le moment",
+      "desc": "Créez votre première règle de réponse automatique pour répondre aux messages entrants selon des mots-clés ou des conditions personnalisées.",
+      "noMatch": "Aucune règle correspondante trouvée",
+      "searchDesc": "Effacez votre recherche pour afficher toutes les règles."
+    },
+    "form": {
+      "nameLabel": "Nom de la règle",
+      "namePlaceholder": "ex. Message de bienvenue ou Infos tarifs",
+      "nameHint": "Un nom descriptif pour identifier cette règle dans le tableau de bord.",
+      "conditionsLabel": "Conditions de déclenchement",
+      "conditionsHint": "Ajoutez des filtres pour faire correspondre les messages par mot-clé, expéditeur ou type. Si vide, répond à chaque message entrant.",
+      "replyLabel": "Texte de réponse automatique",
+      "replyPlaceholder": "Tapez le texte de réponse automatique ici...",
+      "replyHint": "Ce message sera envoyé automatiquement lorsque les conditions sont remplies.",
+      "cooldownLabel": "Délai d'attente / Cooldown (secondes)",
+      "cooldownHint": "Période d'attente par discussion pour éviter les boucles infinies de réponse entre bots (par défaut : 60s).",
+      "enabledLabel": "Activer cette règle immédiatement"
+    },
+    "deleteConfirmTitle": "Supprimer la règle d'automatisation",
+    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer la règle \"{{name}}\" ? Cette action ne peut pas être annulée.",
+    "toasts": {
+      "created": "Règle créée avec succès",
+      "updated": "Règle mise à jour avec succès",
+      "deleted": "Règle supprimée avec succès",
+      "activated": "Règle activée",
+      "paused": "Règle mise en pause",
+      "nameRequired": "Le nom de la règle est requis",
+      "replyRequired": "Le texte de réponse est requis",
+      "saveFailed": "Échec de l'enregistrement de la règle",
+      "deleteFailed": "Échec de la suppression de la règle",
+      "updateFailed": "Échec de la mise à jour de la règle"
     }
   },
   "templates": {
@@ -593,6 +663,7 @@
     "title": "Clés API",
     "subtitle": "Gérez les clés API pour l'authentification et le contrôle d'accès",
     "createBtn": "Créer une clé API",
+    "documentation": "Documentation",
     "modalTitle": "Créer une clé API",
     "createdTitle": "Clé API créée",
     "createdHint": "Copiez cette clé maintenant. Vous ne pourrez plus la revoir.",
@@ -858,6 +929,7 @@
     },
     "storage": {
       "title": "Configuration du stockage",
+      "s3Unreachable": "S3 (injoignable)",
       "local": "Système de fichiers local",
       "localDesc": "Stocker les fichiers médias localement",
       "s3": "Amazon S3",
@@ -870,32 +942,12 @@
       "accessKey": "Clé d'accès",
       "secretKey": "Clé secrète",
       "endpoint": "Point de terminaison personnalisé (optionnel)",
-      "endpointHint": "Pour MinIO ou d'autres services compatibles S3",
-      "s3Unreachable": "S3 (injoignable)"
+      "endpointHint": "Pour MinIO ou d'autres services compatibles S3"
     },
     "statusLabels": {
       "connected": "Connecté",
       "disconnected": "Déconnecté",
       "disabled": "Désactivé"
-    },
-    "restart": {
-      "idleTitle": "⚙️ Configuration enregistrée",
-      "restartingTitle": "🔄 Redémarrage du serveur...",
-      "waitingTitle": "⏳ Veuillez patienter...",
-      "successTitle": "✅ Serveur prêt",
-      "errorTitle": "❌ Échec du redémarrage",
-      "idleDesc": "La configuration a été enregistrée dans <code>.env.generated</code>.<br/>Un redémarrage du serveur est nécessaire pour appliquer les modifications.",
-      "later": "Redémarrer plus tard",
-      "now": "Redémarrer maintenant",
-      "restartingMsg": "Redémarrage du serveur... {{count}}s",
-      "checking": "Vérification du statut du serveur...",
-      "dontClose": "Veuillez ne pas fermer cette fenêtre",
-      "successMsg": "Le serveur est de nouveau en ligne ! La page va se recharger automatiquement.",
-      "errorMsg": "Le serveur n'a pas répondu après 30 secondes. Veuillez vérifier les journaux Docker et redémarrer manuellement.",
-      "reload": "Recharger la page"
-    },
-    "toasts": {
-      "saveFailed": "Échec de l'enregistrement"
     },
     "envPinNote": "Défini par la variable d'environnement {{name}} — c'est la valeur en cours d'exécution ; les modifications du tableau de bord ne s'appliqueront pas tant que cette variable n'est pas supprimée.",
     "pendingRestartNote": "Enregistré, mais pas encore appliqué — redémarrez le serveur pour que cette modification prenne effet.",
@@ -917,6 +969,25 @@
       "invalidFile": "Ce fichier n'est pas une sauvegarde de données Zaptura valide.",
       "importTooLarge": "La sauvegarde dépasse la limite de la requête. Augmentez BODY_SIZE_LIMIT sur le serveur, puis réessayez."
     },
+    "restart": {
+      "idleTitle": "⚙️ Configuration enregistrée",
+      "restartingTitle": "🔄 Redémarrage du serveur...",
+      "waitingTitle": "⏳ Veuillez patienter...",
+      "successTitle": "✅ Serveur prêt",
+      "errorTitle": "❌ Échec du redémarrage",
+      "idleDesc": "La configuration a été enregistrée dans <code>.env.generated</code>.<br/>Un redémarrage du serveur est nécessaire pour appliquer les modifications.",
+      "later": "Redémarrer plus tard",
+      "now": "Redémarrer maintenant",
+      "restartingMsg": "Redémarrage du serveur... {{count}}s",
+      "checking": "Vérification du statut du serveur...",
+      "dontClose": "Veuillez ne pas fermer cette fenêtre",
+      "successMsg": "Le serveur est de nouveau en ligne ! La page va se recharger automatiquement.",
+      "errorMsg": "Le serveur n'a pas répondu après 30 secondes. Veuillez vérifier les journaux Docker et redémarrer manuellement.",
+      "reload": "Recharger la page"
+    },
+    "toasts": {
+      "saveFailed": "Échec de l'enregistrement"
+    },
     "statusLoadError": "Impossible de charger l'état actuel de l'infrastructure. Actualisez pour réessayer."
   },
   "plugins": {
@@ -924,6 +995,8 @@
     "subtitle": "Installez, configurez et gérez les extensions",
     "refresh": "Actualiser",
     "builtIn": "Intégré",
+    "myPlugin": "Mon plugin",
+    "customPlugin": "Plugin personnalisé",
     "noDescription": "Aucune description disponible",
     "enable": "Activer",
     "disable": "Désactiver",
@@ -999,7 +1072,6 @@
       "title": "Instances",
       "description": "Provisionnez des instances par compte pour cette intégration. Chaque instance dispose de son propre secret de signature et de sa propre URL d'entrée.",
       "create": "Créer une instance",
-      "save": "Save",
       "empty": "Aucune instance pour le moment. Créez-en une pour obtenir une URL d'entrée et un secret.",
       "loadError": "Échec du chargement des instances.",
       "allSessions": "Toutes les sessions",
@@ -1083,5 +1155,73 @@
       "current": "Cette session"
     },
     "loading": "Recherche…"
+  },
+  "playground": {
+    "title": "Playground API",
+    "subtitle": "Testez les points de terminaison de l'API WhatsApp de manière interactive"
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "subtitle": "Gérez les comptes d'utilisateurs locataires, les abonnements et les accès",
+    "totalUsers": "Total des utilisateurs",
+    "activeSessions": "Sessions actives",
+    "starterUsers": "Forfait Starter",
+    "proUsers": "Forfait Pro",
+    "plusUsers": "Forfait Plus",
+    "businessUsers": "Forfait Business",
+    "searchPlaceholder": "Rechercher des utilisateurs par nom ou e-mail...",
+    "filterPlan": "Tous les forfaits",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "noUsersMatch": "Aucun utilisateur ne correspond à votre recherche",
+    "ownerBadge": "Admin",
+    "columns": {
+      "user": "Utilisateur",
+      "role": "Rôle",
+      "plan": "Forfait",
+      "sessions": "Utilisation des sessions",
+      "joined": "Inscrit le",
+      "actions": "Actions"
+    },
+    "sessionsUsage": "{{count}} sur {{limit}} sessions",
+    "actions": {
+      "changePlan": "Changer de forfait",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "deleteUser": "Supprimer l'utilisateur"
+    },
+    "changePlanModal": {
+      "title": "Changer de forfait d'abonnement",
+      "subtitle": "Ajustez le niveau de forfait et les limites de session pour {{name}} ({{email}})",
+      "currentPlan": "Forfait actuel",
+      "selectPlan": "Sélectionner un nouveau forfait",
+      "confirm": "Mettre à jour le forfait",
+      "cancel": "Annuler",
+      "starterDesc": "1 session WhatsApp incluse",
+      "proDesc": "3 sessions WhatsApp incluses",
+      "plusDesc": "6 sessions WhatsApp incluses",
+      "businessDesc": "10 sessions WhatsApp incluses",
+      "updating": "Mise à jour du forfait...",
+      "success": "Forfait mis à jour avec succès"
+    },
+    "resetPasswordModal": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Définir un nouveau mot de passe pour {{name}} ({{email}})",
+      "newPassword": "Nouveau mot de passe",
+      "placeholder": "Au moins 8 caractères",
+      "confirm": "Réinitialiser le mot de passe",
+      "cancel": "Annuler",
+      "resetting": "Réinitialisation du mot de passe...",
+      "success": "Mot de passe réinitialisé avec succès",
+      "lengthError": "Le mot de passe doit comporter au moins 8 caractères"
+    },
+    "deleteModal": {
+      "title": "Supprimer le compte utilisateur",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>{{name}}</strong> ({{email}}) ?",
+      "warning": "Cela supprimera définitivement le compte utilisateur et toutes les sessions WhatsApp associées. Cette action ne peut pas être annulée.",
+      "confirm": "Supprimer l'utilisateur",
+      "cancel": "Annuler",
+      "deleting": "Suppression de l'utilisateur...",
+      "success": "Utilisateur supprimé avec succès",
+      "cannotDeleteOwner": "Impossible de supprimer le compte propriétaire/administrateur principal"
+    }
   }
 }

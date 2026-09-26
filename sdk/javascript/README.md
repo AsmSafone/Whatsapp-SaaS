@@ -1,6 +1,6 @@
 # @asmsafone/zaptura
 
-Official JavaScript/TypeScript SDK for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) WhatsApp API Gateway.
+Official JavaScript/TypeScript SDK for the [Zaptura](https://github.com/AsmSafone/ZapturaWA) WhatsApp API Gateway.
 
 Ships dual CJS + ESM builds with bundled type declarations.
 

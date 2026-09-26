@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	zaptura "github.com/AsmSafone/Whatsapp-SaaS/sdk/go"
+	zaptura "github.com/AsmSafone/ZapturaWA/sdk/go"
 )
 
 func ExampleNew() {

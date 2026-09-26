@@ -27,8 +27,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/AsmSafone/Whatsapp-SaaS"
-Repository = "https://github.com/AsmSafone/Whatsapp-SaaS"
+Homepage = "https://github.com/AsmSafone/ZapturaWA"
+Repository = "https://github.com/AsmSafone/ZapturaWA"
 
 [tool.setuptools.packages.find]
 include = ["zaptura*"]

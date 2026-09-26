@@ -182,13 +182,10 @@ export class PluginsController {
   ): Promise<{ success: boolean; message: string }> {
     const tenantUserId = this.resolveTenantUserId(actor);
     const isAdmin = actor?.role === ApiKeyRole.ADMIN;
-    if (tenantUserId && !isAdmin) {
-      if (actor?.allowedSessions && !actor.allowedSessions.includes(sessionId)) {
-        throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
-      }
+    if (tenantUserId) {
       const session = await this.sessionRepo.findOne({ where: { id: sessionId } });
       if (!session || session.ownerUserId !== tenantUserId) {
-        throw new ForbiddenException("Cannot configure a session outside the account's allowed sessions");
+        throw new ForbiddenException("Cannot configure a session outside your account's sessions");
       }
     }
     return this.pluginsService.updateSessionConfig(id, sessionId, configDto.config, tenantUserId, isAdmin);
@@ -197,7 +194,7 @@ export class PluginsController {
   @Put(':id/sessions')
   @RequireRole(ApiKeyRole.USER)
   @RequireUnscopedKey()
-  @ApiOperation({ summary: "Set which sessions a session-scoped plugin is activated for (['*'] = all)" })
+  @ApiOperation({ summary: "Set which sessions a session-scoped plugin is activated for (['*'] = all user sessions)" })
   @ApiResponse({ status: 200, description: 'Plugin session activation updated', type: PluginDto })
   @ApiResponse({ status: 400, description: 'Plugin is global (not session-scoped)' })
   @ApiResponse({
@@ -213,15 +210,19 @@ export class PluginsController {
   ): Promise<PluginDto> {
     const tenantUserId = this.resolveTenantUserId(actor);
     const isAdmin = actor?.role === ApiKeyRole.ADMIN;
-    if (tenantUserId && !isAdmin) {
-      for (const s of dto.sessions) {
-        if (s !== '*') {
-          if (actor?.allowedSessions && !actor.allowedSessions.includes(s)) {
-            throw new ForbiddenException(`Session ${s} is outside your account's allowed sessions`);
-          }
-          const session = await this.sessionRepo.findOne({ where: { id: s } });
-          if (!session || session.ownerUserId !== tenantUserId) {
-            throw new ForbiddenException(`Session ${s} is outside your account's allowed sessions`);
+    if (tenantUserId) {
+      const mySessions = await this.sessionRepo.find({
+        where: { ownerUserId: tenantUserId },
+        select: { id: true },
+      });
+      const mySessionIds = new Set(mySessions.map(s => s.id));
+      if (dto.sessions.includes('*')) {
+        // Expand '*' so plugins are applied ONLY to this user's sessions, never all system sessions
+        dto.sessions = Array.from(mySessionIds);
+      } else {
+        for (const s of dto.sessions) {
+          if (!mySessionIds.has(s)) {
+            throw new ForbiddenException(`Session ${s} does not belong to your account`);
           }
         }
       }

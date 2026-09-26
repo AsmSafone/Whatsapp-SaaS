@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
@@ -14,11 +14,36 @@ interface LoginProps {
 export function Login({ onLogin }: LoginProps) {
   const { t } = useTranslation();
   useDocumentTitle('Sign In — Zaptura WA');
+  const containerRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const normX = (x / rect.width - 0.5) * 2;
+    const normY = (y / rect.height - 0.5) * 2;
+
+    el.style.setProperty('--mouse-x', `${x}px`);
+    el.style.setProperty('--mouse-y', `${y}px`);
+    el.style.setProperty('--mouse-tilt-x', `${normX * 24}px`);
+    el.style.setProperty('--mouse-tilt-y', `${normY * 18}px`);
+    el.style.setProperty('--mouse-opacity', '1');
+  };
+
+  const handleMouseLeave = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.style.setProperty('--mouse-opacity', '0');
+    el.style.setProperty('--mouse-tilt-x', '0px');
+    el.style.setProperty('--mouse-tilt-y', '0px');
+  };
   const finishWithToken = async (token: string) => {
     const response = await fetch(`${API_BASE_URL}/auth/validate`, {
       method: 'POST',
@@ -62,9 +87,10 @@ export function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="login-container">
+    <div className="login-container" ref={containerRef} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
       {/* Ambient background glow elements */}
       <div className="login-ambient" aria-hidden="true" />
+      <div className="login-interactive-glow" aria-hidden="true" />
       <div className="login-grid-bg" aria-hidden="true" />
 
       <div className="login-top-bar">

@@ -21,7 +21,7 @@ lines receive no backports — please upgrade older deployments.
 Report it privately through either channel:
 
 - **GitHub Security Advisories** (preferred) — open a private report at
-  <https://github.com/AsmSafone/Whatsapp-SaaS/security/advisories/new>
+  <https://github.com/AsmSafone/ZapturaWA/security/advisories/new>
 - **Email** — yudhi@asmsafone.com
 
 Please include, where possible:

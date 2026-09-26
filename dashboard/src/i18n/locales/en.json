@@ -60,6 +60,7 @@
     "sessions": "Sessions",
     "chats": "Chats",
     "webhooks": "Webhooks",
+    "automation": "Automation",
     "templates": "Templates",
     "apiKeys": "API Keys",
     "messageTester": "Playground",
@@ -236,7 +237,7 @@
       "lastActive": "Last Active",
       "actions": "Actions"
     },
-    "noSessions": "No sessions found. Create one to get started.",
+    "noSessions": "No sessions found. Create a new session to get started.",
     "view": "View",
     "disconnect": "Disconnect",
     "disconnectFailed": "Could not disconnect the session",
@@ -292,7 +293,7 @@
       "title": "Create New Session",
       "label": "Session Name",
       "placeholder": "e.g., marketing-bot",
-      "hint": "Use lowercase letters, numbers, and hyphens only. Example: <code>customer-support</code>, <code>bot-1</code>",
+      "hint": "Use lowercase letters, numbers, and hyphens only. Example: <code>bot-1</code>",
       "invalidChars": "Invalid characters. Only lowercase letters, numbers, and hyphens allowed.",
       "tooLong": "Name must be 50 characters or less ({{length}}/50).",
       "duplicate": "Session with this name already exists.",
@@ -540,6 +541,58 @@
       "call.missed": "When a call goes unanswered",
       "status.received": "When a contact posts a status",
       "all": "All events"
+    }
+  },
+  "automation": {
+    "title": "Automation",
+    "subtitle": "Configure automated replies and keyword triggers for incoming messages",
+    "newRule": "New Rule",
+    "editRule": "Edit Automation Rule",
+    "selectSession": "Select session",
+    "searchPlaceholder": "Search rules, conditions, or replies...",
+    "triggers": "Triggers",
+    "reply": "Reply",
+    "allInbound": "All Inbound Messages",
+    "cooldownLabel": "{{count}}s cooldown per chat",
+    "noSessionsTitle": "No WhatsApp Sessions Available",
+    "noSessionsDesc": "You need an active session to set up automation rules. Please create or connect a session first.",
+    "stats": {
+      "total": "Total Rules",
+      "active": "Active",
+      "paused": "Paused"
+    },
+    "empty": {
+      "title": "No Automation Rules Yet",
+      "desc": "Create your first autoreply rule to automatically answer inbound messages based on keywords or custom conditions.",
+      "noMatch": "No matching rules found",
+      "searchDesc": "Try clearing your search query to see all rules."
+    },
+    "form": {
+      "nameLabel": "Rule Name",
+      "namePlaceholder": "e.g. Welcome Message or Pricing Auto-reply",
+      "nameHint": "A descriptive name to identify this rule in the dashboard.",
+      "conditionsLabel": "Trigger Conditions",
+      "conditionsHint": "Add filters to match incoming messages by body keyword, sender, or message type. If empty, the rule answers every inbound message.",
+      "replyLabel": "Auto-Reply Text",
+      "replyPlaceholder": "Type the automated response message here...",
+      "replyHint": "This message will be sent automatically when the conditions match.",
+      "cooldownLabel": "Quiet Cooldown (seconds)",
+      "cooldownHint": "Quiet period per chat to prevent infinite bot reply loops (default: 60s).",
+      "enabledLabel": "Enable this rule immediately"
+    },
+    "deleteConfirmTitle": "Delete Automation Rule",
+    "deleteConfirmMessage": "Are you sure you want to delete the rule \"{{name}}\"? This action cannot be undone.",
+    "toasts": {
+      "created": "Rule created successfully",
+      "updated": "Rule updated successfully",
+      "deleted": "Rule deleted successfully",
+      "activated": "Rule activated",
+      "paused": "Rule paused",
+      "nameRequired": "Rule name is required",
+      "replyRequired": "Reply text is required",
+      "saveFailed": "Failed to save rule",
+      "deleteFailed": "Failed to delete rule",
+      "updateFailed": "Failed to update rule"
     }
   },
   "templates": {
@@ -987,8 +1040,8 @@
     },
     "sessions": {
       "activationTitle": "Run for",
-      "activationDesc": "Choose which sessions this plugin runs for.",
-      "allSessions": "All sessions",
+      "activationDesc": "Choose which of your sessions this plugin runs for.",
+      "allSessions": "All my sessions",
       "specificSessions": "Specific sessions",
       "noSessions": "No sessions yet.",
       "saveActivation": "Save activation",

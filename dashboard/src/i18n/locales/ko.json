@@ -12,6 +12,8 @@
     "cancel": "취소",
     "delete": "삭제",
     "create": "생성",
+    "created": "생성됨",
+    "edit": "수정",
     "save": "Save",
     "close": "닫기",
     "showApiKey": "API 키 표시",
@@ -60,11 +62,14 @@
     "sessions": "세션",
     "chats": "채팅",
     "webhooks": "웹훅",
+    "automation": "자동화",
     "templates": "템플릿",
     "apiKeys": "API 키",
     "messageTester": "메시지 테스터",
+    "playground": "플레이그라운드",
     "infrastructure": "인프라",
     "plugins": "플러그인",
+    "users": "사용자",
     "logs": "로그",
     "profile": "프로필"
   },
@@ -268,7 +273,8 @@
     "disconnected": "연결 끊김",
     "action_required": "조치 필요",
     "failed": "실패",
-    "authenticating": "인증하는 중..."
+    "authenticating": "인증하는 중...",
+    "logged_out": "로그아웃됨"
   },
   "sessions": {
     "title": "세션",
@@ -290,7 +296,7 @@
       "title": "새 세션 생성",
       "label": "세션 이름",
       "placeholder": "예: marketing-bot",
-      "hint": "소문자, 숫자, 하이픈만 사용하세요. 예: <code>customer-support</code>, <code>bot-1</code>",
+      "hint": "소문자, 숫자, 하이픈만 사용하세요. 예: <code>bot-1</code>",
       "invalidChars": "잘못된 문자입니다. 소문자, 숫자, 하이픈만 사용할 수 있습니다.",
       "tooLong": "이름은 50자 이하여야 합니다 ({{length}}/50).",
       "duplicate": "같은 이름의 세션이 이미 존재합니다.",
@@ -312,6 +318,11 @@
       "successDescGeneric": "세션이 삭제되었습니다",
       "errorTitle": "삭제 실패",
       "errorDefault": "세션을 삭제하지 못했습니다"
+    },
+    "start": {
+      "teardownPendingTitle": "세션 시작 중",
+      "teardownPending": "이 세션의 자격 증명 해체가 아직 진행 중입니다. 잠시 기다린 후 다시 시도하세요.",
+      "errorTitle": "시작 실패"
     },
     "qr": {
       "title": "QR 코드 스캔",
@@ -399,10 +410,10 @@
       "confirm": "연결 해제",
       "successTitle": "기기 연결 해제됨",
       "success": "연결 해제 완료: 기기가 로그아웃되고 로컬 세션 자격 증명이 삭제되었습니다. 다시 연결하려면 새로운 QR 스캔 또는 페어링 코드가 필요합니다.",
-      "failedTitle": "연결 해제 실패",
-      "failed": "세션 연결 해제에 실패했습니다.",
       "incompleteTitle": "연결 해제 미완료",
-      "incomplete": "세션이 로컬에서 중지되었지만 로그아웃 작업이 완료되지 않았습니다. 기기가 여전히 연결되어 있을 수 있습니다. 세션을 시작하고 연결 해제를 다시 시도하세요."
+      "incomplete": "세션이 로컬에서 중지되었지만 로그아웃 작업이 완료되지 않았습니다. 기기가 여전히 연결되어 있을 수 있습니다. 세션을 시작하고 연결 해제를 다시 시도하세요.",
+      "failedTitle": "연결 해제 실패",
+      "failed": "세션 연결 해제에 실패했습니다."
     },
     "pairing": {
       "tabQr": "QR 코드",
@@ -422,11 +433,6 @@
       "step3": "<strong>3.</strong> <strong>기기 연결</strong>을 누른 다음 <strong>전화번호로 연결하기</strong>를 누르세요",
       "step4": "<strong>4.</strong> 위에 표시된 8자리 코드를 휴대폰에 입력하세요",
       "waitingConnection": "휴대폰이 연결되기를 기다리는 중…"
-    },
-    "start": {
-      "teardownPendingTitle": "세션 시작 중",
-      "teardownPending": "이 세션의 자격 증명 해체가 아직 진행 중입니다. 잠시 기다린 후 다시 시도하세요.",
-      "errorTitle": "시작 실패"
     },
     "restriction": {
       "reachout_timelock": "새 대화 차단됨",
@@ -514,30 +520,94 @@
       "delete": "삭제"
     },
     "eventDescriptions": {
-      "message.received": "메시지를 받았을 때",
-      "message.sent": "메시지를 보냈을 때",
-      "message.ack": "메시지의 전달 또는 읽음 상태가 바뀌었을 때",
-      "message.failed": "보낸 메시지의 전달이 실패했을 때",
-      "message.revoked": "메시지가 모두에게서 삭제되었을 때",
-      "message.reaction": "반응이 추가, 변경 또는 삭제되었을 때",
-      "message.edited": "메시지가 수정되었을 때",
-      "session.status": "세션 상태가 바뀌었을 때",
-      "session.qr": "QR 코드가 생성되었을 때",
-      "session.authenticated": "세션이 연결되어 준비되었을 때",
-      "session.disconnected": "세션 연결이 끊어졌을 때",
-      "session.reconnect_loop": "세션 재연결이 계속 실패할 때",
-      "session.restriction": "WhatsApp이 계정을 제한하거나 제한을 해제했을 때",
-      "presence.update": "구독한 채팅이 온라인이 되거나 입력 중이거나 오프라인이 되었을 때",
-      "group.join": "참여자가 그룹에 참여하거나 추가되었을 때",
-      "group.leave": "참여자가 그룹을 나가거나 내보내졌을 때",
-      "group.update": "그룹 이름, 설명 또는 설정이 바뀌었을 때",
-      "group.join_request": "이 세션이 관리하는 그룹에 누군가 참여를 요청했을 때",
-      "call.received": "수신 통화가 울리기 시작했을 때",
-      "call.accepted": "통화가 연결되었을 때",
-      "call.rejected": "통화가 거절되었을 때",
-      "call.missed": "통화에 응답하지 않았을 때",
-      "status.received": "연락처가 상태를 게시했을 때",
-      "all": "모든 이벤트"
+      "all": "모든 이벤트",
+      "message": {
+        "received": "메시지를 받았을 때",
+        "sent": "메시지를 보냈을 때",
+        "ack": "메시지의 전달 또는 읽음 상태가 바뀌었을 때",
+        "failed": "보낸 메시지의 전달이 실패했을 때",
+        "revoked": "메시지가 모두에게서 삭제되었을 때",
+        "reaction": "반응이 추가, 변경 또는 삭제되었을 때",
+        "edited": "메시지가 수정되었을 때"
+      },
+      "session": {
+        "status": "세션 상태가 바뀌었을 때",
+        "qr": "QR 코드가 생성되었을 때",
+        "authenticated": "세션이 연결되어 준비되었을 때",
+        "disconnected": "세션 연결이 끊어졌을 때",
+        "reconnect_loop": "세션 재연결이 계속 실패할 때",
+        "restriction": "WhatsApp이 계정을 제한하거나 제한을 해제했을 때"
+      },
+      "presence": {
+        "update": "구독한 채팅이 온라인이 되거나 입력 중이거나 오프라인이 되었을 때"
+      },
+      "group": {
+        "join": "참여자가 그룹에 참여하거나 추가되었을 때",
+        "leave": "참여자가 그룹을 나가거나 내보내졌을 때",
+        "update": "그룹 이름, 설명 또는 설정이 바뀌었을 때",
+        "join_request": "이 세션이 관리하는 그룹에 누군가 참여를 요청했을 때"
+      },
+      "call": {
+        "received": "수신 통화가 울리기 시작했을 때",
+        "accepted": "통화가 연결되었을 때",
+        "rejected": "통화가 거절되었을 때",
+        "missed": "통화에 응답하지 않았을 때"
+      },
+      "status": {
+        "received": "연락처가 상태를 게시했을 때"
+      }
+    }
+  },
+  "automation": {
+    "title": "자동화",
+    "subtitle": "수신 메시지에 대한 자동 응답 및 키워드 트리거를 구성합니다",
+    "newRule": "새 규칙",
+    "editRule": "자동화 규칙 수정",
+    "selectSession": "세션 선택",
+    "searchPlaceholder": "규칙, 조건 또는 응답 검색...",
+    "triggers": "트리거",
+    "reply": "응답",
+    "allInbound": "모든 수신 메시지",
+    "cooldownLabel": "대화당 {{count}}초 대기 시간",
+    "noSessionsTitle": "사용 가능한 WhatsApp 세션이 없습니다",
+    "noSessionsDesc": "자동화 규칙을 설정하려면 활성 세션이 필요합니다. 먼저 세션을 생성하거나 연결하세요.",
+    "stats": {
+      "total": "총 규칙",
+      "active": "활성",
+      "paused": "일시 중지됨"
+    },
+    "empty": {
+      "title": "자동화 규칙이 아직 없습니다",
+      "desc": "키워드 또는 사용자 정의 조건에 따라 수신 메시지에 자동으로 응답하는 첫 번째 자동 응답 규칙을 생성하세요.",
+      "noMatch": "일치하는 규칙이 없습니다",
+      "searchDesc": "모든 규칙을 보려면 검색어를 지우세요."
+    },
+    "form": {
+      "nameLabel": "규칙 이름",
+      "namePlaceholder": "예: 환영 메시지 또는 요금 안내",
+      "nameHint": "대시보드에서 이 규칙을 식별할 수 있는 이름입니다.",
+      "conditionsLabel": "트리거 조건",
+      "conditionsHint": "내용, 발신자 또는 유형별로 메시지를 일치시키는 필터를 추가합니다. 비워두면 모든 수신 메시지에 응답합니다.",
+      "replyLabel": "자동 응답 메시지",
+      "replyPlaceholder": "자동 응답 내용을 여기에 입력하세요...",
+      "replyHint": "조건이 일치하면 이 메시지가 자동으로 전송됩니다.",
+      "cooldownLabel": "쿨다운 대기 시간(초)",
+      "cooldownHint": "봇 간의 무한 응답 루프를 방지하기 위한 대화별 대기 시간입니다(기본값: 60초).",
+      "enabledLabel": "이 규칙을 즉시 활성화"
+    },
+    "deleteConfirmTitle": "자동화 규칙 삭제",
+    "deleteConfirmMessage": "\"{{name}}\" 규칙을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "toasts": {
+      "created": "규칙이 성공적으로 생성되었습니다",
+      "updated": "규칙이 성공적으로 업데이트되었습니다",
+      "deleted": "규칙이 성공적으로 삭제되었습니다",
+      "activated": "규칙이 활성화되었습니다",
+      "paused": "규칙이 일시 중지되었습니다",
+      "nameRequired": "규칙 이름은 필수 항목입니다",
+      "replyRequired": "응답 텍스트는 필수 항목입니다",
+      "saveFailed": "규칙 저장 실패",
+      "deleteFailed": "규칙 삭제 실패",
+      "updateFailed": "규칙 업데이트 실패"
     }
   },
   "templates": {
@@ -593,6 +663,7 @@
     "title": "API 키",
     "subtitle": "인증 및 접근 제어를 위한 API 키를 관리하세요",
     "createBtn": "API 키 생성",
+    "documentation": "문서",
     "modalTitle": "API 키 생성",
     "createdTitle": "API 키 생성 완료",
     "createdHint": "지금 이 키를 복사해 두세요. 다시 확인할 수 없습니다.",
@@ -924,6 +995,8 @@
     "subtitle": "확장 기능을 설치, 구성, 관리하세요",
     "refresh": "새로고침",
     "builtIn": "내장",
+    "myPlugin": "내 플러그인",
+    "customPlugin": "사용자 정의 플러그인",
     "noDescription": "설명 없음",
     "enable": "사용",
     "disable": "사용 안 함",
@@ -999,7 +1072,6 @@
       "title": "인스턴스",
       "description": "이 연동을 위해 계정별 인스턴스를 프로비저닝하세요. 각 인스턴스는 고유한 서명 시크릿과 인그레스 URL을 가집니다.",
       "create": "인스턴스 생성",
-      "save": "Save",
       "empty": "아직 인스턴스가 없습니다. 인스턴스를 만들면 인그레스 URL과 시크릿을 받을 수 있습니다.",
       "loadError": "인스턴스를 불러오지 못했습니다.",
       "allSessions": "모든 세션",
@@ -1083,5 +1155,73 @@
       "current": "현재 세션"
     },
     "loading": "검색하는 중…"
+  },
+  "playground": {
+    "title": "API 플레이그라운드",
+    "subtitle": "WhatsApp API 엔드포인트를 대화형으로 테스트하세요"
+  },
+  "users": {
+    "title": "사용자",
+    "subtitle": "등록된 테넌트 계정, 구독 요금제 및 액세스 권한을 관리합니다",
+    "totalUsers": "총 사용자",
+    "activeSessions": "활성 세션",
+    "starterUsers": "스타터 플랜",
+    "proUsers": "프로 플랜",
+    "plusUsers": "플러스 플랜",
+    "businessUsers": "비즈니스 플랜",
+    "searchPlaceholder": "이름 또는 이메일로 사용자 검색...",
+    "filterPlan": "모든 요금제",
+    "noUsersFound": "사용자를 찾을 수 없습니다",
+    "noUsersMatch": "검색과 일치하는 사용자가 없습니다",
+    "ownerBadge": "관리자",
+    "columns": {
+      "user": "사용자",
+      "role": "역할",
+      "plan": "요금제",
+      "sessions": "세션 사용량",
+      "joined": "가입일",
+      "actions": "작업"
+    },
+    "sessionsUsage": "{{limit}}개 중 {{count}}개 세션 사용 중",
+    "actions": {
+      "changePlan": "요금제 변경",
+      "resetPassword": "비밀번호 재설정",
+      "deleteUser": "사용자 삭제"
+    },
+    "changePlanModal": {
+      "title": "구독 요금제 변경",
+      "subtitle": "{{name}} ({{email}})의 요금제 등급 및 세션 한도를 조정합니다",
+      "currentPlan": "현재 요금제",
+      "selectPlan": "새 요금제 선택",
+      "confirm": "요금제 업데이트",
+      "cancel": "취소",
+      "starterDesc": "WhatsApp 세션 1개 포함",
+      "proDesc": "WhatsApp 세션 3개 포함",
+      "plusDesc": "WhatsApp 세션 6개 포함",
+      "businessDesc": "WhatsApp 세션 10개 포함",
+      "updating": "요금제 업데이트 중...",
+      "success": "요금제가 성공적으로 업데이트되었습니다"
+    },
+    "resetPasswordModal": {
+      "title": "비밀번호 재설정",
+      "subtitle": "{{name}} ({{email}})의 새 비밀번호를 설정합니다",
+      "newPassword": "새 비밀번호",
+      "placeholder": "최소 8자 이상",
+      "confirm": "비밀번호 재설정",
+      "cancel": "취소",
+      "resetting": "비밀번호 재설정 중...",
+      "success": "비밀번호가 성공적으로 재설정되었습니다",
+      "lengthError": "비밀번호는 최소 8자 이상이어야 합니다"
+    },
+    "deleteModal": {
+      "title": "사용자 계정 삭제",
+      "confirmMessage": "<strong>{{name}}</strong> ({{email}}) 사용자를 삭제하시겠습니까?",
+      "warning": "이 작업은 사용자 계정과 연결된 모든 WhatsApp 세션을 영구적으로 삭제합니다. 이 작업은 취소할 수 없습니다.",
+      "confirm": "사용자 삭제",
+      "cancel": "취소",
+      "deleting": "사용자 삭제 중...",
+      "success": "사용자가 성공적으로 삭제되었습니다",
+      "cannotDeleteOwner": "기본 소유자/관리자 계정은 삭제할 수 없습니다"
+    }
   }
 }

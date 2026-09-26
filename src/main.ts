@@ -170,7 +170,14 @@ async function bootstrap() {
     exemptPublicOperations(document);
     SwaggerModule.setup('api/docs', app, document, {
       customSiteTitle: 'Zaptura API Documentation',
-      customCss: '.swagger-ui .topbar { display: none !important; }',
+      customCss: `
+        .swagger-ui .topbar { display: none !important; }
+        .swagger-ui .servers,
+        .swagger-ui .servers-container,
+        .swagger-ui .schemes-server-container,
+        .swagger-ui .servers-title,
+        .swagger-ui label[for="servers"] { display: none !important; }
+      `,
       swaggerOptions: {
         persistAuthorization: true,
       },

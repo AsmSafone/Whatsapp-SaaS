@@ -172,6 +172,34 @@ export interface TemplatePayload {
   footer?: string | null;
 }
 
+export interface AutomationRule {
+  id: string;
+  sessionId: string;
+  name: string;
+  enabled: boolean;
+  conditions?: WebhookFilters | null;
+  replyText: string;
+  cooldownSeconds: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAutomationRulePayload {
+  name: string;
+  replyText: string;
+  conditions?: WebhookFilters | null;
+  cooldownSeconds?: number;
+  enabled?: boolean;
+}
+
+export interface UpdateAutomationRulePayload {
+  name?: string;
+  replyText?: string;
+  conditions?: WebhookFilters | null;
+  cooldownSeconds?: number;
+  enabled?: boolean;
+}
+
 export interface ApiKey {
   id: string;
   name: string;
@@ -933,6 +961,28 @@ export const templateApi = {
     }),
   delete: (sessionId: string, id: string) =>
     request<void>(`/sessions/${sessionId}/templates/${id}`, { method: 'DELETE' }),
+};
+
+// =============================================================================
+// Automation Rules API
+// =============================================================================
+
+export const automationApi = {
+  list: (sessionId: string) => request<AutomationRule[]>(`/sessions/${sessionId}/automation-rules`),
+  get: (sessionId: string, ruleId: string) =>
+    request<AutomationRule>(`/sessions/${sessionId}/automation-rules/${ruleId}`),
+  create: (sessionId: string, data: CreateAutomationRulePayload) =>
+    request<AutomationRule>(`/sessions/${sessionId}/automation-rules`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (sessionId: string, ruleId: string, data: UpdateAutomationRulePayload) =>
+    request<AutomationRule>(`/sessions/${sessionId}/automation-rules/${ruleId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (sessionId: string, ruleId: string) =>
+    request<void>(`/sessions/${sessionId}/automation-rules/${ruleId}`, { method: 'DELETE' }),
 };
 
 // =============================================================================

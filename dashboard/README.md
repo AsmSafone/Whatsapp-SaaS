@@ -96,4 +96,4 @@ VITE_WS_URL=http://localhost:2785
 
 ## 📄 License
 
-MIT License - Part of the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) project.
+MIT License - Part of the [Zaptura](https://github.com/AsmSafone/ZapturaWA) project.

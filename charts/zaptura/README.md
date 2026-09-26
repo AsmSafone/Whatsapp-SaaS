@@ -1,6 +1,6 @@
 # zaptura
 
-Helm chart for [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) — WhatsApp API.
+Helm chart for [Zaptura](https://github.com/AsmSafone/ZapturaWA) — WhatsApp API.
 
 > **Single instance only.** A session lease stops two pods from launching the same session,
 > but API-key socket eviction, WS rate-limit buckets and in-flight bulk batches are still

@@ -217,7 +217,7 @@ export class InfraUpdateCheckResponseDto {
     type: String,
     nullable: true,
     description: 'Release notes page for `latest`.',
-    example: 'https://github.com/AsmSafone/Whatsapp-SaaS/releases/tag/v0.23.6',
+    example: 'https://github.com/AsmSafone/ZapturaWA/releases/tag/v0.23.6',
   })
   releaseUrl!: string | null;
 }

@@ -4,7 +4,7 @@
 
 Zaptura provides official n8n community nodes for integrating WhatsApp automation into n8n workflows. This enables users to build powerful automations combining WhatsApp messaging with hundreds of other services available in n8n.
 
-**Repository:** https://github.com/AsmSafone/Whatsapp-SaaS-n8n
+**Repository:** https://github.com/AsmSafone/ZapturaWA-n8n
 **npm Package:** `@asmsafone/n8n-nodes-zaptura`
 
 ## Architecture
@@ -300,7 +300,7 @@ Always use the correct format for chat IDs:
 ### Building from Source
 
 ```bash
-git clone https://github.com/AsmSafone/Whatsapp-SaaS-n8n.git
+git clone https://github.com/AsmSafone/ZapturaWA-n8n.git
 cd Zaptura-n8n
 npm install
 npm run build

@@ -17,20 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `POST /api/sessions/:sessionId/messages/click-button` sends a structured button/list reply against a stored WhatsApp Business prompt on Baileys (whatsapp-web.js returns `501`). Classic `buttonsMessage` / `templateMessage` / `listMessage` prompts are supported; native-flow `interactiveMessage` replies are unverified. The SDKs expose it as `messages.clickButton` (JavaScript, Java, PHP), `messages.click_button` (Python) and `Messages.ClickButton` (Go). Thanks @gabrielmmoraes1999.
 - The dashboard Chats thread shows a quote preview and call detail on history-loaded messages, which previously rendered on live messages only. Thanks @gabrielmmoraes1999.
 - The dashboard Chats thread renders inbound Baileys prompt `buttons` and taps them through `POST .../messages/click-button`; prompt choices are also kept in persisted message `metadata` so they survive reload for rendering. Clicking still requires the prompt to be in the engine store, so an evicted prompt 404s. Thanks @gabrielmmoraes1999.
-- Webhook and automation filters accept a `chatId` condition, so a webhook can be scoped to specific groups or chats instead of only to a sender ([#1634](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1634)). Thanks @krishshah9944 and @bhavyachopra99.
-- The dashboard Message Tester sends to several groups at once: the Group dropdown is now a searchable checkbox list, and each selected group is messaged in turn ([#1650](https://github.com/AsmSafone/Whatsapp-SaaS/pull/1650)). Thanks @C24212.
+- Webhook and automation filters accept a `chatId` condition, so a webhook can be scoped to specific groups or chats instead of only to a sender ([#1634](https://github.com/AsmSafone/ZapturaWA/issues/1634)). Thanks @krishshah9944 and @bhavyachopra99.
+- The dashboard Message Tester sends to several groups at once: the Group dropdown is now a searchable checkbox list, and each selected group is messaged in turn ([#1650](https://github.com/AsmSafone/ZapturaWA/pull/1650)). Thanks @C24212.
 - The dashboard Templates list has a delete button on each row, so a template can be deleted without opening it in the editor first. Like the editor's delete button, it shows only for keys that can write templates. Thanks @C24212.
 - On the dashboard Chats page, Escape closes the open chat, channel or status viewer and returns to the list. It leaves the key alone while a dialog, a menu or the media viewer is open, since those handle Escape themselves. Thanks @C24212.
 - The dashboard Message Tester's Bulk mode can attach a file or a media URL, sent as image, video, audio or document, with the message text as the caption of an image, video or document; audio carries none, so text next to audio is refused. An inline file too large to repeat for every recipient is refused before sending. Thanks @C24212.
-- The dashboard sidebar tells admins when a newer Zaptura release exists, as a link to its release notes next to the version. `GET /api/infra/update-check` (ADMIN) reads the latest published GitHub release through the SSRF-guarded fetch and caches it for six hours, and a failed check never surfaces as an error; `UPDATE_CHECK_ENABLED=false` turns the request off ([#988](https://github.com/AsmSafone/Whatsapp-SaaS/issues/988), [#1678](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1678)). Thanks @voosam and @OneArmArmy for the request.
-- whatsapp-web.js sessions log the WhatsApp Web build their page actually runs when they reach `ready` (`web_version_running`), and warn with both builds when it is not the pinned one (`web_version_pin_not_applied`), since a pin is not guaranteed to hold ([#1679](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1679)). Thanks @DavidgFernandes for the report.
+- The dashboard sidebar tells admins when a newer Zaptura release exists, as a link to its release notes next to the version. `GET /api/infra/update-check` (ADMIN) reads the latest published GitHub release through the SSRF-guarded fetch and caches it for six hours, and a failed check never surfaces as an error; `UPDATE_CHECK_ENABLED=false` turns the request off ([#988](https://github.com/AsmSafone/ZapturaWA/issues/988), [#1678](https://github.com/AsmSafone/ZapturaWA/issues/1678)). Thanks @voosam and @OneArmArmy for the request.
+- whatsapp-web.js sessions log the WhatsApp Web build their page actually runs when they reach `ready` (`web_version_running`), and warn with both builds when it is not the pinned one (`web_version_pin_not_applied`), since a pin is not guaranteed to hold ([#1679](https://github.com/AsmSafone/ZapturaWA/issues/1679)). Thanks @DavidgFernandes for the report.
 
 ### Changed
 
 - Baileys `listMessage`, `buttonsResponseMessage`, `templateButtonReplyMessage` and `listResponseMessage` now classify as `type: "text"` (they previously fell through to `unknown`). Consumers filtering on `type` will see those shapes as text. Thanks @gabrielmmoraes1999.
 - The PostgreSQL data connection is pinned to UTC: parameters bind as UTC, naive timestamps read back as UTC, every pooled connection sets its session `TimeZone`, and boot fails when the effective zone is not UTC year round.
 - Credentials on a `socks4://` session proxy are reported at session start as unauthenticatable: SOCKS4 sends the user name as the connect request's user id and drops the password.
-- whatsapp-web.js clicks a `WWEBJS_ONBOARDING_CONTINUE_LABELS` label only on a button inside a visible dialog. It matched any visible button with that exact text anywhere on the page, and every click counts toward the limit that moves a ready session to `action_required` ([#1679](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1679)). Thanks @DavidgFernandes for the report.
+- whatsapp-web.js clicks a `WWEBJS_ONBOARDING_CONTINUE_LABELS` label only on a button inside a visible dialog. It matched any visible button with that exact text anywhere on the page, and every click counts toward the limit that moves a ready session to `action_required` ([#1679](https://github.com/AsmSafone/ZapturaWA/issues/1679)). Thanks @DavidgFernandes for the report.
 - The `session:created` plugin hook carries the session in the REST API shape, without `proxyUrl` or `config`, as `session:deleted` already did.
 - `POST /api/plugins/{id}/disable` on the engine `engine.type` selects answers `success: false` instead of reporting a disable that never took effect.
 - whatsapp-web.js sessions with no WA Web version pin no longer read or write `./.wwebjs_cache/`, so they always load WhatsApp's live build.
@@ -64,22 +64,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A send that quotes a message stores the quoted text, whatever the send is. Only replies did: an image, video, document, location, contact, poll or text sent with `quotedMessageId` stored the quoted id with an empty body, and the dashboard drew a blank quote box above it. A quoted message that has no text of its own, a caption-less image for instance, still renders as an empty box; only its text is recovered here.
 - A template prompt that numbers only some of its buttons no longer answers the bot with an index belonging to a different button. A template that carries its own numbering is answered with it, one that carries none is answered by position, and a choice left unnumbered inside a numbered template is answered by id alone, with no index at all. Such a choice is still offered in `buttons[]` and still accepted by the click route.
 - Baileys sessions list the saved address book again after a process restart. WhatsApp sends neither history nor an app-state snapshot to a device that has synced once, and the contact store is in memory, so a restarted gateway answered `GET /api/sessions/:sessionId/contacts` with only the peers it had seen since. Each session now re-pulls the snapshot of the app-state collection that carries saved contacts, once per engine start. That also repairs a PARTIAL address book, which is the usual shape: during the initial sync the library's event buffer folds the saved-contact updates into the history batch it is already holding, where their names are stripped as chat titles, so the store keeps plenty of contacts with the saved ones missing. The list is also the address book only: a peer known by pushname alone is no longer listed, while `GET .../contacts/:contactId` still resolves it with `isMyContact: false`, and a chat title from history sync no longer overwrites a saved name. Thanks @gabrielmmoraes1999.
-- whatsapp-web.js sessions send media again on the WhatsApp Web builds rolled out on 2026-09-17: the library spread the media model into the outgoing message after its id, and the model's private `__x_id` clobbered it, so every image, video, audio, document and status media send failed with `Data passed to getter must include an id property` while text kept working. An install-time patch carries upstream's one-line fix until a whatsapp-web.js release ships it ([#1643](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1643), [#1636](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1636)). Thanks @15874611923 and @Magnarks for the reports.
-- An ingress route can declare `dedupOn: "body"` to key provider retries on the raw body instead of the delivery-id header. A provider that mints a fresh delivery id on every retry attempt, as supabase/auth does inside its hook retry loop, was never deduplicated when an ack was lost, so the contact received the message twice; routes that do not declare it keep the header ([#1641](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1641)).
-- Baileys sessions record a message the account sent from its phone while the gateway was down, and dispatch `message.sent` for it, as they already did for one sent while the gateway was online. The offline replay carried the same `append` tag as the library's echo of an API send, which the upsert handler dropped wholesale; it now skips only the ids this session sent itself, and the phone's reactions, edits and revokes from that window are replayed the same way ([#1667](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1667)).
-- Baileys sessions no longer drop the inbound messages WhatsApp queued while they were down. The offline replay is tagged `append`, which the upsert handler treated as history and skipped for anything older than the reconnect, so every message sent during an outage was never stored and never dispatched ([#1660](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1660)). Thanks @fransarni for the report.
-- A whatsapp-web.js session that comes up without its page-side call hook says so in the log instead of silently never reporting an incoming call. The library installs the hook only when the page's call-collection module exposes an `on` method, so a WhatsApp Web build that keeps the module but drops that method leaves calls undetected while messages keep working. The check stays quiet when it cannot tell, and is skipped entirely when the `patch-wwebjs-ready-sync` install-time patch is missing, since a session can then reach ready before the hook is installed and the warning would be false ([#1655](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1655)).
-- Stopping, unlinking or force-killing a session announces `session.status: disconnected` after the engine is released, not while it is still tearing down, so a dashboard tab or a webhook consumer no longer learns the session is down in the one moment the API still reports its engine as loaded. On whatsapp-web.js that window lasted as long as Chromium took to close, and left an open QR modal on a dead code with the started actions still offered ([#1649](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1649)).
-- The dashboard blanks a session's displayed QR code as soon as the session disconnects, so a code minted by a connection that is gone is never left on screen to be scanned ([#1649](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1649)).
-- A pairing-code request whose retry budget runs out on a reloading WhatsApp Web page answers `503` instead of `500`, so a client can tell a retryable transport failure from a broken gateway ([#1654](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1654)).
-- A re-delivery of an already-persisted ingress event is answered with the route's declared ack, with the same status and headers the first delivery received (a body template renders from the retry), instead of a hardcoded `200 duplicate` that bypassed the ack entirely. A provider that validates the ack no longer fails on the retry path dedup exists for ([#1638](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1638)).
-- The `session-alive` preflight's `503` carries a `Retry-After`, so a provider that retries a 503 only when that header is present comes back instead of failing the call; the rejection writes no dedup row, so the retry is treated as a new delivery ([#1639](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1639)).
-- A `429` from a rate-limit window carries a plain `Retry-After` in seconds alongside the existing `Retry-After-<window>`, which no HTTP client reads. The suffixed names stay, since they are what identify which window shed the request ([#1639](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1639)).
-- An ingress route's declared ack `content-type` of `application/json` or `text/plain` reaches the provider instead of being overwritten with `text/plain`, so a provider that requires `application/json` on a 200 or 202 accepts the ack; any other declared type is still sent as `text/plain` ([#1637](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1637)). Thanks @wesamdev for the report.
-- Restoring a data archive into PostgreSQL from a gateway that does not run in UTC no longer shifts every timestamp by the host offset, and no longer shifts it again on each further restore ([#1624](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1624)).
+- whatsapp-web.js sessions send media again on the WhatsApp Web builds rolled out on 2026-09-17: the library spread the media model into the outgoing message after its id, and the model's private `__x_id` clobbered it, so every image, video, audio, document and status media send failed with `Data passed to getter must include an id property` while text kept working. An install-time patch carries upstream's one-line fix until a whatsapp-web.js release ships it ([#1643](https://github.com/AsmSafone/ZapturaWA/issues/1643), [#1636](https://github.com/AsmSafone/ZapturaWA/issues/1636)). Thanks @15874611923 and @Magnarks for the reports.
+- An ingress route can declare `dedupOn: "body"` to key provider retries on the raw body instead of the delivery-id header. A provider that mints a fresh delivery id on every retry attempt, as supabase/auth does inside its hook retry loop, was never deduplicated when an ack was lost, so the contact received the message twice; routes that do not declare it keep the header ([#1641](https://github.com/AsmSafone/ZapturaWA/issues/1641)).
+- Baileys sessions record a message the account sent from its phone while the gateway was down, and dispatch `message.sent` for it, as they already did for one sent while the gateway was online. The offline replay carried the same `append` tag as the library's echo of an API send, which the upsert handler dropped wholesale; it now skips only the ids this session sent itself, and the phone's reactions, edits and revokes from that window are replayed the same way ([#1667](https://github.com/AsmSafone/ZapturaWA/issues/1667)).
+- Baileys sessions no longer drop the inbound messages WhatsApp queued while they were down. The offline replay is tagged `append`, which the upsert handler treated as history and skipped for anything older than the reconnect, so every message sent during an outage was never stored and never dispatched ([#1660](https://github.com/AsmSafone/ZapturaWA/issues/1660)). Thanks @fransarni for the report.
+- A whatsapp-web.js session that comes up without its page-side call hook says so in the log instead of silently never reporting an incoming call. The library installs the hook only when the page's call-collection module exposes an `on` method, so a WhatsApp Web build that keeps the module but drops that method leaves calls undetected while messages keep working. The check stays quiet when it cannot tell, and is skipped entirely when the `patch-wwebjs-ready-sync` install-time patch is missing, since a session can then reach ready before the hook is installed and the warning would be false ([#1655](https://github.com/AsmSafone/ZapturaWA/issues/1655)).
+- Stopping, unlinking or force-killing a session announces `session.status: disconnected` after the engine is released, not while it is still tearing down, so a dashboard tab or a webhook consumer no longer learns the session is down in the one moment the API still reports its engine as loaded. On whatsapp-web.js that window lasted as long as Chromium took to close, and left an open QR modal on a dead code with the started actions still offered ([#1649](https://github.com/AsmSafone/ZapturaWA/issues/1649)).
+- The dashboard blanks a session's displayed QR code as soon as the session disconnects, so a code minted by a connection that is gone is never left on screen to be scanned ([#1649](https://github.com/AsmSafone/ZapturaWA/issues/1649)).
+- A pairing-code request whose retry budget runs out on a reloading WhatsApp Web page answers `503` instead of `500`, so a client can tell a retryable transport failure from a broken gateway ([#1654](https://github.com/AsmSafone/ZapturaWA/issues/1654)).
+- A re-delivery of an already-persisted ingress event is answered with the route's declared ack, with the same status and headers the first delivery received (a body template renders from the retry), instead of a hardcoded `200 duplicate` that bypassed the ack entirely. A provider that validates the ack no longer fails on the retry path dedup exists for ([#1638](https://github.com/AsmSafone/ZapturaWA/issues/1638)).
+- The `session-alive` preflight's `503` carries a `Retry-After`, so a provider that retries a 503 only when that header is present comes back instead of failing the call; the rejection writes no dedup row, so the retry is treated as a new delivery ([#1639](https://github.com/AsmSafone/ZapturaWA/issues/1639)).
+- A `429` from a rate-limit window carries a plain `Retry-After` in seconds alongside the existing `Retry-After-<window>`, which no HTTP client reads. The suffixed names stay, since they are what identify which window shed the request ([#1639](https://github.com/AsmSafone/ZapturaWA/issues/1639)).
+- An ingress route's declared ack `content-type` of `application/json` or `text/plain` reaches the provider instead of being overwritten with `text/plain`, so a provider that requires `application/json` on a 200 or 202 accepts the ack; any other declared type is still sent as `text/plain` ([#1637](https://github.com/AsmSafone/ZapturaWA/issues/1637)). Thanks @wesamdev for the report.
+- Restoring a data archive into PostgreSQL from a gateway that does not run in UTC no longer shifts every timestamp by the host offset, and no longer shifts it again on each further restore ([#1624](https://github.com/AsmSafone/ZapturaWA/issues/1624)).
 - Retention sweeps on PostgreSQL delete the rows their window names instead of taking up to the host's UTC offset of younger rows with them, and the `today` message counts cover the host's local day.
 - Session leases on PostgreSQL compare as instants across nodes in different time zones and across a daylight-saving change.
-- Live WebSocket sockets are re-validated against the API-key table once a minute, so a key deleted, revoked, expired or narrowed on another node or by a direct database write drops its sockets there too, and a socket that connected while its key was being revoked no longer keeps that authorization for the life of the connection ([#1625](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1625)).
+- Live WebSocket sockets are re-validated against the API-key table once a minute, so a key deleted, revoked, expired or narrowed on another node or by a direct database write drops its sockets there too, and a socket that connected while its key was being revoked no longer keeps that authorization for the life of the connection ([#1625](https://github.com/AsmSafone/ZapturaWA/issues/1625)).
 - A WebSocket subscribe whose socket is evicted while it is in flight no longer registers its rooms after the disconnect.
 - The dashboard no longer opens a QR modal after a start that left the session without an engine.
 - A failed start in the dashboard that left no engine shows the gateway's error in a toast.
@@ -87,8 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The dashboard disables a session's Start and Reconnect buttons while its start request is in flight.
 - whatsapp-web.js sessions no longer report a call rejection that did not stop the call: the call reject route answers `501` and `autoRejectCalls` logs a failed auto-reject.
 - A Baileys session added to or joining a group emits `group.join`, as whatsapp-web.js already did.
-- A send that fails inside the engine logs a warning carrying the session, chat, message id and the engine's error, where only Nest's generic `[ExceptionsHandler]` line recorded it before ([#1679](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1679)). Thanks @DavidgFernandes for the report.
-- A whatsapp-web.js send that fails inside the page reports what the page threw and the WhatsApp Web build that was running, in the failure log, the bulk batch result and the `message:failed` hook, instead of the minified `t: t` ([#1679](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1679)). Thanks @DavidgFernandes for the report.
+- A send that fails inside the engine logs a warning carrying the session, chat, message id and the engine's error, where only Nest's generic `[ExceptionsHandler]` line recorded it before ([#1679](https://github.com/AsmSafone/ZapturaWA/issues/1679)). Thanks @DavidgFernandes for the report.
+- A whatsapp-web.js send that fails inside the page reports what the page threw and the WhatsApp Web build that was running, in the failure log, the bulk batch result and the `message:failed` hook, instead of the minified `t: t` ([#1679](https://github.com/AsmSafone/ZapturaWA/issues/1679)). Thanks @DavidgFernandes for the report.
 - whatsapp-web.js sessions reach ready in the Docker image, Compose and Helm when no WA Web version is pinned; the library's local HTML cache tried to write to the read-only app directory.
 - A stopped built-in `zaptura-postgres` container is started before the data connection dials it, instead of the gateway crash-looping at boot.
 - `POST /api/infra/import-data` on PostgreSQL answers `imported: false` with the rejected row's database error instead of `500`.
@@ -135,12 +135,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- The troubleshooting FAQ covers the two linking failures reported most often: the passkey step WhatsApp now requires on some accounts, which neither engine library implements and no client-side change escapes ([#560](https://github.com/AsmSafone/Whatsapp-SaaS/issues/560)), and a Baileys pairing code answered with "Couldn't link device", which `BAILEYS_BROWSER_NAME` resolves ([#1666](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1666)). Thanks @adampalli and @Muhammad-Suban for the reports.
-- The pairing-code route, the phone-pairing example and the dashboard's phone tab warn that on whatsapp-web.js a code requested for a number that already has a linked session can end with WhatsApp unlinking that device; the capability matrix records the measurement ([#1653](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1653)).
-- The docs and the OpenAPI field descriptions scope `maxReconnectAttempts` and `reconnectBaseDelay` to the gateway's own reconnect: on Baileys that is only the reconnect after a logged-out close, since the engine retries every other drop itself, with a fixed 1s to 60s backoff and no attempt cap ([#1651](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1651)).
-- The docs, the README, the OpenAPI field descriptions and the dashboard's auto-reject hint mark call rejection, `autoRejectCalls` and the call outcome events as Baileys only, and `call.received` as not reliable on whatsapp-web.js ([#1118](https://github.com/AsmSafone/Whatsapp-SaaS/discussions/1118)). Thanks @etondeengole for the report.
-- The FAQ, `.env.example` and the whatsapp-web.js unrecognised-dialog warning describe the onboarding-modal language correctly: `--lang=en-US` is appended automatically, WhatsApp Web can still render the modal in the account's language, and a label in `WWEBJS_ONBOARDING_CONTINUE_LABELS` plus a restart of Zaptura covers it ([#1679](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1679)). Thanks @DavidgFernandes for the report.
-- The FAQ and the phone-pairing example say that `BAILEYS_BROWSER_NAME` takes effect after a restart of Zaptura, not of the session, since the name is read at boot ([#1666](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1666)). Thanks @Muhammad-Suban for the report.
+- The troubleshooting FAQ covers the two linking failures reported most often: the passkey step WhatsApp now requires on some accounts, which neither engine library implements and no client-side change escapes ([#560](https://github.com/AsmSafone/ZapturaWA/issues/560)), and a Baileys pairing code answered with "Couldn't link device", which `BAILEYS_BROWSER_NAME` resolves ([#1666](https://github.com/AsmSafone/ZapturaWA/issues/1666)). Thanks @adampalli and @Muhammad-Suban for the reports.
+- The pairing-code route, the phone-pairing example and the dashboard's phone tab warn that on whatsapp-web.js a code requested for a number that already has a linked session can end with WhatsApp unlinking that device; the capability matrix records the measurement ([#1653](https://github.com/AsmSafone/ZapturaWA/issues/1653)).
+- The docs and the OpenAPI field descriptions scope `maxReconnectAttempts` and `reconnectBaseDelay` to the gateway's own reconnect: on Baileys that is only the reconnect after a logged-out close, since the engine retries every other drop itself, with a fixed 1s to 60s backoff and no attempt cap ([#1651](https://github.com/AsmSafone/ZapturaWA/issues/1651)).
+- The docs, the README, the OpenAPI field descriptions and the dashboard's auto-reject hint mark call rejection, `autoRejectCalls` and the call outcome events as Baileys only, and `call.received` as not reliable on whatsapp-web.js ([#1118](https://github.com/AsmSafone/ZapturaWA/discussions/1118)). Thanks @etondeengole for the report.
+- The FAQ, `.env.example` and the whatsapp-web.js unrecognised-dialog warning describe the onboarding-modal language correctly: `--lang=en-US` is appended automatically, WhatsApp Web can still render the modal in the account's language, and a label in `WWEBJS_ONBOARDING_CONTINUE_LABELS` plus a restart of Zaptura covers it ([#1679](https://github.com/AsmSafone/ZapturaWA/issues/1679)). Thanks @DavidgFernandes for the report.
+- The FAQ and the phone-pairing example say that `BAILEYS_BROWSER_NAME` takes effect after a restart of Zaptura, not of the session, since the name is read at boot ([#1666](https://github.com/AsmSafone/ZapturaWA/issues/1666)). Thanks @Muhammad-Suban for the report.
 - docs/06: a re-delivered ingress event gets the route's ack with the retry's `{timestamp}`, and every media route lists the URL-fetch `400` and `413`.
 - docs/06 and the OpenAPI text: webhook `retryCount` counts total attempts, `GET /labels` answers `200 []` on a personal account, and the reconnect cap is the per-session `maxReconnectAttempts`.
 - docs/06: a filter condition on a field the event lacks passes the event for `isNot` and for a boolean `false`.
@@ -182,46 +182,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - `adm-zip` moves to `0.6.1`, which bounds the memory a declared uncompressed size can ask for (GHSA-7q85-xj36-vmfc) and stops extraction following symlinks out of the target directory. The plugin installer reads entries one at a time under its own byte cap rather than extracting the archive, so neither vector was reachable there.
-- Baileys sessions with a SOCKS4 proxy fetch through it instead of connecting direct: inbound media, the WhatsApp Web version lookup, the initial-sync payloads and a product card's image URL, which 0.23.5 routed through HTTP, HTTPS and SOCKS5 proxies only ([#1626](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1626)).
-- A media URL passed to a send route or to `POST /api/sessions/{sessionId}/media/convert/voice` or `.../convert/video`, and the link preview of a text send, are fetched through the named session's egress proxy on both engines, instead of leaving from the gateway's own address ([#1626](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1626)).
+- Baileys sessions with a SOCKS4 proxy fetch through it instead of connecting direct: inbound media, the WhatsApp Web version lookup, the initial-sync payloads and a product card's image URL, which 0.23.5 routed through HTTP, HTTPS and SOCKS5 proxies only ([#1626](https://github.com/AsmSafone/ZapturaWA/issues/1626)).
+- A media URL passed to a send route or to `POST /api/sessions/{sessionId}/media/convert/voice` or `.../convert/video`, and the link preview of a text send, are fetched through the named session's egress proxy on both engines, instead of leaving from the gateway's own address ([#1626](https://github.com/AsmSafone/ZapturaWA/issues/1626)).
 - A proxy password no longer reaches the log. A failed SOCKS connect carries the whole proxy config as the error's only property, and `BAILEYS_LOG_LEVEL=debug` wrote it to stdout verbatim. Logs written at that level by an earlier release may hold the password; rotate it.
-- Media conversion runs only the ffmpeg demuxers of single-file media containers, so an operator key can no longer make a crafted input read other local files on the host ([GHSA-c9fv-6j9g-8p98](https://github.com/AsmSafone/Whatsapp-SaaS/security/advisories/GHSA-c9fv-6j9g-8p98)).
+- Media conversion runs only the ffmpeg demuxers of single-file media containers, so an operator key can no longer make a crafted input read other local files on the host ([GHSA-c9fv-6j9g-8p98](https://github.com/AsmSafone/ZapturaWA/security/advisories/GHSA-c9fv-6j9g-8p98)).
 - The MCP pre-auth per-IP limit counts each message of a JSON-RPC batch, so one request can no longer run more unauthenticated key lookups, or write more audit rows, than `MCP_IP_RATE_LIMIT_MAX` allows.
-- Per-client rate limits key an IPv6 client on its /64, so rotating addresses inside one allocation no longer escapes them ([#1686](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1686)). Thanks @Saksham-official.
-- The MCP, Bull Board and WebSocket pre-auth limiters, the WebSocket rate-limit audit sampler, the per-client upload body budget and the health route's auth-failure audit limiter key an IPv6 client on its /64 as well ([#1695](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1695)).
+- Per-client rate limits key an IPv6 client on its /64, so rotating addresses inside one allocation no longer escapes them ([#1686](https://github.com/AsmSafone/ZapturaWA/issues/1686)). Thanks @Saksham-official.
+- The MCP, Bull Board and WebSocket pre-auth limiters, the WebSocket rate-limit audit sampler, the per-client upload body budget and the health route's auth-failure audit limiter key an IPv6 client on its /64 as well ([#1695](https://github.com/AsmSafone/ZapturaWA/issues/1695)).
 
 ## [0.23.5] - 2026-09-15
 
 ### Security
 
-- The group invite-code read, over REST or the MCP `GroupGetInviteCode` tool, requires the OPERATOR role; the code is a transferable join capability, so a VIEWER key can no longer extract it ([GHSA-45fh-xj7x-vj2x](https://github.com/AsmSafone/Whatsapp-SaaS/security/advisories/GHSA-45fh-xj7x-vj2x)). Thanks Matija Petronijević for the report.
+- The group invite-code read, over REST or the MCP `GroupGetInviteCode` tool, requires the OPERATOR role; the code is a transferable join capability, so a VIEWER key can no longer extract it ([GHSA-45fh-xj7x-vj2x](https://github.com/AsmSafone/ZapturaWA/security/advisories/GHSA-45fh-xj7x-vj2x)). Thanks Matija Petronijević for the report.
 - The amd64 image ships Chrome for Testing 153.0.8010.36 instead of 146.0.7680.31, picking up the browser security fixes released since (the arm64 image uses the Debian chromium package).
-- The `session.qr` WebSocket event reaches only OPERATOR and ADMIN keys, matching `GET /api/sessions/{sessionId}/qr`; a VIEWER key subscribed by name or through a wildcard no longer receives the pairing QR ([GHSA-m427-j4h4-9qwj](https://github.com/AsmSafone/Whatsapp-SaaS/security/advisories/GHSA-m427-j4h4-9qwj)).
+- The `session.qr` WebSocket event reaches only OPERATOR and ADMIN keys, matching `GET /api/sessions/{sessionId}/qr`; a VIEWER key subscribed by name or through a wildcard no longer receives the pairing QR ([GHSA-m427-j4h4-9qwj](https://github.com/AsmSafone/ZapturaWA/security/advisories/GHSA-m427-j4h4-9qwj)).
 - An integration ingress route verified with `shared-secret` no longer stores the instance secret from its declared header; the value is redacted in the persisted event, the queued job, the dead-letter row and the `ingress:error` hook payload.
 - Baileys sessions with an HTTP, HTTPS or SOCKS5 proxy fetch through the proxy instead of connecting direct: inbound media, the WhatsApp Web version lookup, the history-sync and app-state payloads of the initial sync, and a product card's image URL. With a SOCKS4 proxy, which the HTTP client cannot use, inbound media is skipped and arrives as the omitted marker, the version lookup falls back to the bundled version, and the initial-sync payloads and product image are still fetched directly.
 
 ### Added
 
-- Inbound commerce messages arrive typed `order` and `product` instead of a bodyless `unknown`, on both engines, and are accepted by webhook and automation-rule message-type filters ([#1547](https://github.com/AsmSafone/Whatsapp-SaaS/pull/1547)). Thanks @m7fz7.
+- Inbound commerce messages arrive typed `order` and `product` instead of a bodyless `unknown`, on both engines, and are accepted by webhook and automation-rule message-type filters ([#1547](https://github.com/AsmSafone/ZapturaWA/pull/1547)). Thanks @m7fz7.
 - The JavaScript, Python, Go and Java SDKs type the `order` and `product` message types, and the Python `ChatHistoryMessage` carries their blocks with required fields and enums matching the contract.
-- `GET /api/sessions` accepts a `name` query parameter that returns only the session with that exact name, also on the MCP `SessionFindAll` tool and the JavaScript, Python, Go, Java and PHP SDKs ([#1594](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1594)). Thanks @rivenash for the request.
+- `GET /api/sessions` accepts a `name` query parameter that returns only the session with that exact name, also on the MCP `SessionFindAll` tool and the JavaScript, Python, Go, Java and PHP SDKs ([#1594](https://github.com/AsmSafone/ZapturaWA/issues/1594)). Thanks @rivenash for the request.
 
 ### Changed
 
-- The Italian (`it`) dashboard translates the session proxy Save button, the webhook chat-kind filter label and the warning shown when a backup export leaves out media ([#1583](https://github.com/AsmSafone/Whatsapp-SaaS/pull/1583)). Thanks @albanobattistella.
+- The Italian (`it`) dashboard translates the session proxy Save button, the webhook chat-kind filter label and the warning shown when a backup export leaves out media ([#1583](https://github.com/AsmSafone/ZapturaWA/pull/1583)). Thanks @albanobattistella.
 - `webhooks.deliveryFailures` returns a typed `WebhookDeliveryFailure` list in the JavaScript, Python, Go and Java SDKs; Go and Java callers that handled the old untyped value must update.
 - From-source minimum Node.js rises from 22.13 to **22.19**, the floor of the bundled `undici`.
 
 ### Fixed
 
-- Engine auth directories are named after the session id instead of the session name, so two sessions whose names differ only in letter case no longer share one WhatsApp login, or wipe each other's, on a case-insensitive filesystem such as macOS APFS, Windows, or a Docker Desktop bind mount of either ([#1597](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1597)). Existing directories are renamed at the first boot after the upgrade.
-- The Baileys live path drops a message made only of sender-key distributions or message-history notices instead of delivering it as a bodyless `unknown` `message.received`; other messages it cannot type still arrive as `unknown` ([#1568](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1568)). Thanks @berodcdev for the report.
-- A Baileys reconnect loop is observable through `lastError` on the session, a `session.reconnect_loop` webhook every fifth attempt and reconnect metrics; a QR left unscanned is not reported as one ([#1546](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1546)). Thanks @OdaiAhmed99 for the report.
-- A Baileys connection attempt refused at the WebSocket upgrade is closed and retried instead of leaving the session at `initializing` ([#1546](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1546)). Thanks @OdaiAhmed99 for the report.
-- The dashboard session card keeps the phone number, session id and last-active time while a linked session reconnects, instead of the pairing placeholder ([#1546](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1546)). Thanks @OdaiAhmed99 for the report.
+- Engine auth directories are named after the session id instead of the session name, so two sessions whose names differ only in letter case no longer share one WhatsApp login, or wipe each other's, on a case-insensitive filesystem such as macOS APFS, Windows, or a Docker Desktop bind mount of either ([#1597](https://github.com/AsmSafone/ZapturaWA/issues/1597)). Existing directories are renamed at the first boot after the upgrade.
+- The Baileys live path drops a message made only of sender-key distributions or message-history notices instead of delivering it as a bodyless `unknown` `message.received`; other messages it cannot type still arrive as `unknown` ([#1568](https://github.com/AsmSafone/ZapturaWA/issues/1568)). Thanks @berodcdev for the report.
+- A Baileys reconnect loop is observable through `lastError` on the session, a `session.reconnect_loop` webhook every fifth attempt and reconnect metrics; a QR left unscanned is not reported as one ([#1546](https://github.com/AsmSafone/ZapturaWA/issues/1546)). Thanks @OdaiAhmed99 for the report.
+- A Baileys connection attempt refused at the WebSocket upgrade is closed and retried instead of leaving the session at `initializing` ([#1546](https://github.com/AsmSafone/ZapturaWA/issues/1546)). Thanks @OdaiAhmed99 for the report.
+- The dashboard session card keeps the phone number, session id and last-active time while a linked session reconnects, instead of the pairing placeholder ([#1546](https://github.com/AsmSafone/ZapturaWA/issues/1546)). Thanks @OdaiAhmed99 for the report.
 - The Sessions page reports a dead live-event feed. When the feed recovers from a gap, the Sessions page re-reads its list and the Chats page refetches the open thread and contact statuses; a feed that never connected counts as a gap only once it has failed and shown the reconnect banner.
 - A Baileys media download aborted at `MEDIA_DOWNLOAD_MAX_BYTES` reports the bytes received as `sizeBytes`, and a timed-out one its declared size, instead of the cap.
-- The webhook docs state that at the default limits media above about 768 KiB reaches webhooks as the omitted marker, and how to raise both limits ([#1569](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1569)). Thanks @Magnarks for the report.
+- The webhook docs state that at the default limits media above about 768 KiB reaches webhooks as the omitted marker, and how to raise both limits ([#1569](https://github.com/AsmSafone/ZapturaWA/issues/1569)). Thanks @Magnarks for the report.
 - The takeover sweep marks as disconnected any session left `ready`, `initializing`, `authenticating` or `action_required` by a node that never returned, regardless of `AUTO_START_SESSIONS`.
 - The takeover sweep also marks a lapsed `qr_ready` session with no phone as disconnected; one with a phone keeps its status.
 - Reconnect on a dashboard session card that reads `initializing` or `qr_ready` with no engine loaded starts the session, instead of opening a QR modal that never receives a code.
@@ -238,8 +238,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The dashboard Templates page shows a load or permission error when the template list cannot be read, instead of "No templates saved".
 - The dashboard Webhooks Configured card shows a placeholder instead of 0 when the webhook list cannot be read.
 - Dashboard message search ignores a response that arrives after a newer query, so stale results no longer replace the current ones.
-- A session whose automatic reconnect fails to relaunch the engine (a network, DNS or browser launch error) keeps retrying with backoff instead of stopping in `failed` until restarted by hand; an authentication failure or a stale browser profile still ends in `failed` ([#1580](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1580)).
-- The `504` a start returns when the engine does not finish initializing names every possible cause, an unreachable WhatsApp Web, network or session proxy and a browser stalled during startup, instead of ruling the network out ([#1601](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1601)).
+- A session whose automatic reconnect fails to relaunch the engine (a network, DNS or browser launch error) keeps retrying with backoff instead of stopping in `failed` until restarted by hand; an authentication failure or a stale browser profile still ends in `failed` ([#1580](https://github.com/AsmSafone/ZapturaWA/issues/1580)).
+- The `504` a start returns when the engine does not finish initializing names every possible cause, an unreachable WhatsApp Web, network or session proxy and a browser stalled during startup, instead of ruling the network out ([#1601](https://github.com/AsmSafone/ZapturaWA/issues/1601)).
 - A session that runs out of reconnect attempts fires the `session:error` plugin hook when it lands in `failed`.
 - A session that runs out of reconnect attempts keeps the last attempt's failure reason in `lastError` and in the `session:error` hook, after the attempts message.
 - A stop during the retry delay after a transient start failure is no longer undone by the retry; a stop or delete the ownership fence refused leaves the retry alone.
@@ -286,16 +286,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `GET /sessions/{sessionId}/chats` reports `muteExpiration`, the epoch-ms instant a mute ends
-  (`0` = indefinite), alongside `muted` ([#1473](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1473)).
+  (`0` = indefinite), alongside `muted` ([#1473](https://github.com/AsmSafone/ZapturaWA/issues/1473)).
   Thanks @usmancynosure and @purnamcommunity.
 - The dashboard Message Tester loads bulk recipients from a `.txt` or `.csv` file, one entry per line,
   appended to the Recipients box. Thanks @harry0x.
 - `GET /sessions/{sessionId}/messages` accepts `inlineMedia=false`, omitting inline media payloads
   while keeping each row's `{ omitted, sizeBytes }` marker and the media endpoint
-  ([#1516](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1516)).
+  ([#1516](https://github.com/AsmSafone/ZapturaWA/issues/1516)).
 - `GET /sessions/{sessionId}/messages` accepts `after`, a keyset cursor on the previous page's last
   `id`, so a message arriving mid-walk cannot repeat or skip a page; `offset` is unchanged
-  ([#1479](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1479)).
+  ([#1479](https://github.com/AsmSafone/ZapturaWA/issues/1479)).
 - Each engine names the install-time patches its library is missing at startup, not only the
   message-id backport. Diagnostic only; startup continues. See docs/12.
 - The dashboard API Keys page can scope an operator or viewer key to chosen sessions, on creation and
@@ -306,14 +306,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Thanks @JuanGalzerano.
 - `GET` and `PATCH /api/sessions/{sessionId}/proxy` read and update a session's egress proxy;
   credentials are never returned and changes apply on the next start
-  ([#1474](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1474)). Thanks @vitusan.
+  ([#1474](https://github.com/AsmSafone/ZapturaWA/issues/1474)). Thanks @vitusan.
 - Sessions dashboard: set a proxy when creating a session, and view, change or clear it afterwards.
   Thanks @vitusan.
 - The dashboard chat room loads older history as you scroll up, paged by DB rows already fetched and
   holding the reading position when a page is prepended. Thanks @JuanGalzerano.
 - Webhook filters and automation rules can match on chat `kind` (`individual`, `group`, `channel`,
   `status`, `broadcast`, `unknown`), separating channel traffic the `isGroup` boolean could not
-  ([#1500](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1500)).
+  ([#1500](https://github.com/AsmSafone/ZapturaWA/issues/1500)).
 - `GET /sessions/{sessionId}/chats` and `.../labels/{labelId}/chats` report each chat's `archived`,
   `pinned` and `muted` state; the archive/pin/mute actions existed but the list never reported the
   result back.
@@ -348,12 +348,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Baileys logs a failed inbound media download at `warn`, not `debug`, so it is visible by default.
 - The webhook `secret` example in Swagger and the API reference now meets the 16-character floor, so
   pasting it back no longer answers `400`; both webhook routes publish the length rule
-  ([#1491](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1491)). Thanks @onepay-ye.
+  ([#1491](https://github.com/AsmSafone/ZapturaWA/issues/1491)). Thanks @onepay-ye.
 - `STORAGE_TYPE=s3` missing `S3_ACCESS_KEY_ID` or `S3_SECRET_ACCESS_KEY` warns at startup and names
   the unset one, instead of silently writing every file to local disk. Thanks @onepay-ye.
 - Six whatsapp-web.js contact operations (blocked list, number lookup, addressbook save and delete,
   block, unblock) answer the `503` their routes document when the page dies, not a bare `500`
-  ([#1476](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1476)). Thanks @onepay-ye.
+  ([#1476](https://github.com/AsmSafone/ZapturaWA/issues/1476)). Thanks @onepay-ye.
 - Fifteen more whatsapp-web.js operations answer `503` not `500` when the page dies mid-request: the
   group list and membership queue, four label reads and writes, and nine message operations. Twelve
   had no error handling on that path. The message sends keep `500` deliberately, since `503` is
@@ -400,11 +400,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An unusable `sharp` no longer fails the gateway at boot. It backs one Baileys sticker route but was
   imported at the top of a module both engines load, so a native binary that could not load took the
   process down. It now loads lazily and only that route degrades
-  ([#1459](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1459)).
+  ([#1459](https://github.com/AsmSafone/ZapturaWA/issues/1459)).
 - whatsapp-web.js `requestPairingCode` no longer hangs when it lands during a QR-page reload. The
   in-page call ran against a destroyed context and hung until Puppeteer's protocol timeout; it is now
   bounded per attempt and the navigation and timeout shapes are retried, so a code returns instead of
-  "Creating pairing code..." forever ([#1543](https://github.com/AsmSafone/Whatsapp-SaaS/issues/1543)).
+  "Creating pairing code..." forever ([#1543](https://github.com/AsmSafone/ZapturaWA/issues/1543)).
   Thanks @emadhashem0.
 
 ### Dependencies
@@ -1366,7 +1366,7 @@ The session-lifecycle security hardening release: lifecycle and logout operation
 
 ### Changed
 
-- The SQLite driver is now the actively maintained `better-sqlite3` (current SQLite 3.53.x with FTS5 fixes); existing database files open as-is and all migrations apply unchanged. ([#848](https://github.com/AsmSafone/Whatsapp-SaaS/issues/848))
+- The SQLite driver is now the actively maintained `better-sqlite3` (current SQLite 3.53.x with FTS5 fixes); existing database files open as-is and all migrations apply unchanged. ([#848](https://github.com/AsmSafone/ZapturaWA/issues/848))
 
 ### Fixed
 
@@ -1376,7 +1376,7 @@ The session-lifecycle security hardening release: lifecycle and logout operation
 
 ### Fixed
 
-- Enabled plugins stay enabled across a gateway restart; enable state is tracked separately from running state, and enabled plugins are restarted after boot. A plugin that fails to start is logged and left disabled ([#856](https://github.com/AsmSafone/Whatsapp-SaaS/issues/856)).
+- Enabled plugins stay enabled across a gateway restart; enable state is tracked separately from running state, and enabled plugins are restarted after boot. A plugin that fails to start is logged and left disabled ([#856](https://github.com/AsmSafone/ZapturaWA/issues/856)).
 - Messages handled by a plugin (chain stopped via `message:sending`/outgoing gate) are now recorded and delivered to webhooks instead of being dropped from history.
 - A plugin configuration or disable that fails to save now reports the failure instead of showing "Saved".
 - A plugin that ships its own settings editor no longer renders the generated form and second Save button underneath it.

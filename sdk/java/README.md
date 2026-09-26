@@ -1,6 +1,6 @@
 # Zaptura Java SDK
 
-Official Java client for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS)
+Official Java client for the [Zaptura](https://github.com/AsmSafone/ZapturaWA)
 WhatsApp API Gateway.
 
 Hand-written against the exact API surface (paths, DTOs, response shapes) and

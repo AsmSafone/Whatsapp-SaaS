@@ -210,6 +210,16 @@ export class AccountService {
     apiKey.keyPrefix = 'nxw_jwt';
 
     const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    if (isOwner) {
+      try {
+        await this.sessions
+          .createQueryBuilder()
+          .update(Session)
+          .set({ ownerUserId: user.id })
+          .where('ownerUserId IS NULL')
+          .execute();
+      } catch {}
+    }
 
     apiKey.role = isOwner ? ApiKeyRole.ADMIN : ApiKeyRole.USER;
     apiKey.allowedIps = null;
@@ -249,6 +259,18 @@ export class AccountService {
       }
     }
 
+    const nullOwnerCount = await this.sessions
+      .createQueryBuilder('s')
+      .where('s.ownerUserId IS NULL')
+      .getCount();
+
+    if (nullOwnerCount > 0) {
+      const adminUser = users.find(u => u.email.toLowerCase() === defaultAdmin);
+      if (adminUser) {
+        countMap.set(adminUser.id, (countMap.get(adminUser.id) || 0) + nullOwnerCount);
+      }
+    }
+
     return users.map(user => {
       const isOwner = user.email.toLowerCase() === defaultAdmin;
       return {
@@ -270,8 +292,13 @@ export class AccountService {
     if (!user) throw new NotFoundException('User not found');
     user.plan = plan;
     const saved = await this.users.save(user);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
     const isOwner = saved.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isOwner
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: saved.id })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: user.id } });
     return {
       id: saved.id,
       name: saved.name,
@@ -315,7 +342,12 @@ export class AccountService {
     }
 
     const saved = await this.users.save(user);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    const sessionCount = isOwner
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: saved.id })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: user.id } });
     return {
       id: saved.id,
       name: saved.name,

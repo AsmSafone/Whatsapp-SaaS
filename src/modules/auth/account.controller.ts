@@ -32,7 +32,13 @@ export class AccountController {
   @ApiOperation({ summary: 'Log in to a Zaptura account' })
   async login(@Body() dto: LoginDto) {
     const issued = await this.accounts.login(dto.email, dto.password);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: issued.id } });
+    const isOwner = issued.role === 'admin';
+    const sessionCount = isOwner
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: issued.id })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: issued.id } });
     return { ...issued, sessionCount };
   }
 
@@ -58,8 +64,14 @@ export class AccountController {
       };
     }
     const user = await this.accounts.findById(actor.userId);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: actor.userId } });
     const isOwner = user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isOwner
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: actor.userId })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: actor.userId } });
+
     return {
       id: user?.id,
       name: user?.name,
@@ -78,7 +90,13 @@ export class AccountController {
       return { ok: false, message: 'Plan changes apply to user accounts only' };
     }
     const user = await this.accounts.setPlan(actor.userId, dto.plan);
-    const sessionCount = await this.sessions.count({ where: { ownerUserId: user.id } });
+    const isOwner = user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const sessionCount = isOwner
+      ? await this.sessions
+          .createQueryBuilder('s')
+          .where('s.ownerUserId = :userId OR s.ownerUserId IS NULL', { userId: user.id })
+          .getCount()
+      : await this.sessions.count({ where: { ownerUserId: user.id } });
     const issued = this.accounts.issue(user);
     return { ...issued, sessionCount };
   }

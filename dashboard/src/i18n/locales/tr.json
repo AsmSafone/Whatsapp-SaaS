@@ -12,6 +12,8 @@
     "cancel": "İptal",
     "delete": "Sil",
     "create": "Oluştur",
+    "created": "Oluşturuldu",
+    "edit": "Düzenle",
     "save": "Save",
     "close": "Kapat",
     "showApiKey": "API anahtarını göster",
@@ -60,11 +62,14 @@
     "sessions": "Oturumlar",
     "chats": "Sohbetler",
     "webhooks": "Webhook'lar",
+    "automation": "Otomasyon",
     "templates": "Şablonlar",
     "apiKeys": "API Anahtarları",
     "messageTester": "Mesaj Test Aracı",
+    "playground": "Playground",
     "infrastructure": "Altyapı",
     "plugins": "Eklentiler",
+    "users": "Kullanıcılar",
     "logs": "Kayıtlar (Logs)",
     "profile": "Profil"
   },
@@ -268,7 +273,8 @@
     "disconnected": "Bağlantı Kesildi",
     "action_required": "İşlem gerekiyor",
     "failed": "Başarısız",
-    "authenticating": "Kimlik doğrulanıyor..."
+    "authenticating": "Kimlik doğrulanıyor...",
+    "logged_out": "Çıkış Yapıldı"
   },
   "sessions": {
     "title": "Oturumlar",
@@ -514,30 +520,94 @@
       "delete": "Sil"
     },
     "eventDescriptions": {
-      "message.received": "Bir mesaj alındığında",
-      "message.sent": "Bir mesaj gönderildiğinde",
-      "message.ack": "Bir mesajın teslim veya okunma durumu değiştiğinde",
-      "message.failed": "Giden bir mesaj teslim edilemediğinde",
-      "message.revoked": "Bir mesaj herkesten silindiğinde",
-      "message.reaction": "Bir tepki eklendiğinde, değiştirildiğinde veya kaldırıldığında",
-      "message.edited": "Bir mesaj düzenlendiğinde",
-      "session.status": "Bir oturumun durumu değiştiğinde",
-      "session.qr": "QR kodu oluşturulduğunda",
-      "session.authenticated": "Bir oturum eşlendiğinde ve hazır olduğunda",
-      "session.disconnected": "Bir oturumun bağlantısı kesildiğinde",
-      "session.reconnect_loop": "Bir oturum yeniden bağlanmayı sürekli başaramadığında",
-      "session.restriction": "WhatsApp hesabı kısıtladığında veya bir kısıtlamayı kaldırdığında",
-      "presence.update": "Abone olunan bir sohbet çevrimiçi olduğunda, yazdığında veya çevrimdışı olduğunda",
-      "group.join": "Katılımcılar bir gruba katıldığında veya eklendiğinde",
-      "group.leave": "Katılımcılar bir gruptan ayrıldığında veya çıkarıldığında",
-      "group.update": "Bir grubun adı, açıklaması veya ayarları değiştiğinde",
-      "group.join_request": "Birisi bu oturumun yönettiği bir gruba katılmak istediğinde",
-      "call.received": "Gelen bir arama çalmaya başladığında",
-      "call.accepted": "Bir arama yanıtlandığında",
-      "call.rejected": "Bir arama reddedildiğinde",
-      "call.missed": "Bir arama yanıtsız kaldığında",
-      "status.received": "Bir kişi durum paylaştığında",
-      "all": "Tüm olaylar"
+      "all": "Tüm olaylar",
+      "message": {
+        "received": "Bir mesaj alındığında",
+        "sent": "Bir mesaj gönderildiğinde",
+        "ack": "Bir mesajın teslim veya okunma durumu değiştiğinde",
+        "failed": "Giden bir mesaj teslim edilemediğinde",
+        "revoked": "Bir mesaj herkesten silindiğinde",
+        "reaction": "Bir tepki eklendiğinde, değiştirildiğinde veya kaldırıldığında",
+        "edited": "Bir mesaj düzenlendiğinde"
+      },
+      "session": {
+        "status": "Bir oturumun durumu değiştiğinde",
+        "qr": "QR kodu oluşturulduğunda",
+        "authenticated": "Bir oturum eşlendiğinde ve hazır olduğunda",
+        "disconnected": "Bir oturumun bağlantısı kesildiğinde",
+        "reconnect_loop": "Bir oturum yeniden bağlanmayı sürekli başaramadığında",
+        "restriction": "WhatsApp hesabı kısıtladığında veya bir kısıtlamayı kaldırdığında"
+      },
+      "presence": {
+        "update": "Abone olunan bir sohbet çevrimiçi olduğunda, yazdığında veya çevrimdışı olduğunda"
+      },
+      "group": {
+        "join": "Katılımcılar bir gruba katıldığında veya eklendiğinde",
+        "leave": "Katılımcılar bir gruptan ayrıldığında veya çıkarıldığında",
+        "update": "Bir grubun adı, açıklaması veya ayarları değiştiğinde",
+        "join_request": "Birisi bu oturumun yönettiği bir gruba katılmak istediğinde"
+      },
+      "call": {
+        "received": "Gelen bir arama çalmaya başladığında",
+        "accepted": "Bir arama yanıtlandığında",
+        "rejected": "Bir arama reddedildiğinde",
+        "missed": "Bir arama yanıtsız kaldığında"
+      },
+      "status": {
+        "received": "Bir kişi durum paylaştığında"
+      }
+    }
+  },
+  "automation": {
+    "title": "Otomasyon",
+    "subtitle": "Gelen mesajlar için otomatik yanıtlar ve anahtar kelime tetikleyicileri yapılandırın",
+    "newRule": "Yeni Kural",
+    "editRule": "Otomasyon Kuralını Düzenle",
+    "selectSession": "Oturum seçin",
+    "searchPlaceholder": "Kuralları, koşulları veya yanıtları arayın...",
+    "triggers": "Tetikleyiciler",
+    "reply": "Yanıt",
+    "allInbound": "Tüm Gelen Mesajlar",
+    "cooldownLabel": "Sohbet başına {{count}} sn bekleme süresi",
+    "noSessionsTitle": "Kullanılabilir WhatsApp Oturumu Yok",
+    "noSessionsDesc": "Otomasyon kurallarını ayarlamak için aktif bir oturuma ihtiyacınız var. Lütfen önce bir oturum oluşturun veya bağlayın.",
+    "stats": {
+      "total": "Toplam Kural",
+      "active": "Aktif",
+      "paused": "Duraklatıldı"
+    },
+    "empty": {
+      "title": "Henüz Otomasyon Kuralı Yok",
+      "desc": "Anahtar kelimelere veya özel koşullara göre gelen mesajları otomatik olarak yanıtlamak için ilk otomatik yanıt kuralınızı oluşturun.",
+      "noMatch": "Eşleşen kural bulunamadı",
+      "searchDesc": "Tüm kuralları görmek için arama sorgunuzu temizleyin."
+    },
+    "form": {
+      "nameLabel": "Kural Adı",
+      "namePlaceholder": "örn. Hoş Geldiniz Mesajı veya Fiyat Bilgisi",
+      "nameHint": "Panoda bu kuralı tanımlamak için açıklayıcı bir ad.",
+      "conditionsLabel": "Tetikleme Koşulları",
+      "conditionsHint": "Mesajları metin, gönderen veya türe göre eşleştirmek için filtreler ekleyin. Boş bırakılırsa tüm gelen mesajlara yanıt verir.",
+      "replyLabel": "Otomatik Yanıt Metni",
+      "replyPlaceholder": "Otomatik yanıt mesajını buraya yazın...",
+      "replyHint": "Koşullar eşleştiğinde bu mesaj otomatik olarak gönderilecektir.",
+      "cooldownLabel": "Bekleme Süresi (saniye)",
+      "cooldownHint": "Botlar arasında sonsuz döngüleri önlemek için sohbet başına bekleme süresi (varsayılan: 60 sn).",
+      "enabledLabel": "Bu kuralı hemen etkinleştir"
+    },
+    "deleteConfirmTitle": "Otomasyon Kuralını Sil",
+    "deleteConfirmMessage": "\"{{name}}\" kuralını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    "toasts": {
+      "created": "Kural başarıyla oluşturuldu",
+      "updated": "Kural başarıyla güncellendi",
+      "deleted": "Kural başarıyla silindi",
+      "activated": "Kural etkinleştirildi",
+      "paused": "Kural duraklatıldı",
+      "nameRequired": "Kural adı gereklidir",
+      "replyRequired": "Yanıt metni gereklidir",
+      "saveFailed": "Kural kaydedilemedi",
+      "deleteFailed": "Kural silinemedi",
+      "updateFailed": "Kural güncellenemedi"
     }
   },
   "templates": {
@@ -593,6 +663,7 @@
     "title": "API Anahtarları",
     "subtitle": "Kimlik doğrulama ve erişim denetimi için API anahtarlarını yönetin",
     "createBtn": "API Anahtarı Oluştur",
+    "documentation": "Belgeler",
     "modalTitle": "API Anahtarı Oluştur",
     "createdTitle": "API Anahtarı Oluşturuldu",
     "createdHint": "Bu anahtarı şimdi kopyalayın. Bir daha göremeyeceksiniz.",
@@ -924,6 +995,8 @@
     "subtitle": "Eklentileri yükleyin, yapılandırın ve yönetin",
     "refresh": "Yenile",
     "builtIn": "Dahili",
+    "myPlugin": "Eklentim",
+    "customPlugin": "Özel Eklenti",
     "noDescription": "Açıklama bulunmuyor",
     "enable": "Etkinleştir",
     "disable": "Devre Dışı Bırak",
@@ -999,7 +1072,6 @@
       "title": "Örnekler (Instances)",
       "description": "Bu entegrasyon için hesap başına örnekler tanımlayın. Her örneğin kendi imzalama gizli anahtarı ve giriş URL'si vardır.",
       "create": "Örnek oluştur",
-      "save": "Save",
       "empty": "Henüz örnek yok. Giriş URL'si ve gizli anahtar almak için bir tane oluşturun.",
       "loadError": "Örnekler yüklenemedi.",
       "allSessions": "Tüm oturumlar",
@@ -1083,5 +1155,73 @@
       "current": "Bu oturum"
     },
     "loading": "Aranıyor…"
+  },
+  "playground": {
+    "title": "API Playground",
+    "subtitle": "WhatsApp API uç noktalarını etkileşimli olarak test edin"
+  },
+  "users": {
+    "title": "Kullanıcılar",
+    "subtitle": "Kayıtlı kiracı hesaplarını, abonelikleri ve erişimleri yönetin",
+    "totalUsers": "Toplam Kullanıcı",
+    "activeSessions": "Aktif Oturumlar",
+    "starterUsers": "Starter Planı",
+    "proUsers": "Pro Planı",
+    "plusUsers": "Plus Planı",
+    "businessUsers": "Business Planı",
+    "searchPlaceholder": "Kullanıcıları ada veya e-postaya göre arayın...",
+    "filterPlan": "Tüm Planlar",
+    "noUsersFound": "Kullanıcı bulunamadı",
+    "noUsersMatch": "Aramanızla eşleşen kullanıcı yok",
+    "ownerBadge": "Yönetici",
+    "columns": {
+      "user": "Kullanıcı",
+      "role": "Rol",
+      "plan": "Plan",
+      "sessions": "Oturum Kullanımı",
+      "joined": "Katıldı",
+      "actions": "İşlemler"
+    },
+    "sessionsUsage": "{{limit}} oturumdan {{count}} tanesi kullanılıyor",
+    "actions": {
+      "changePlan": "Planı Değiştir",
+      "resetPassword": "Şifreyi Sıfırla",
+      "deleteUser": "Kullanıcıyı Sil"
+    },
+    "changePlanModal": {
+      "title": "Abonelik Planını Değiştir",
+      "subtitle": "{{name}} ({{email}}) için plan katmanını ve oturum limitlerini ayarlayın",
+      "currentPlan": "Mevcut Plan",
+      "selectPlan": "Yeni Plan Seçin",
+      "confirm": "Planı Güncelle",
+      "cancel": "İptal",
+      "starterDesc": "1 WhatsApp Oturumu dahil",
+      "proDesc": "3 WhatsApp Oturumu dahil",
+      "plusDesc": "6 WhatsApp Oturumu dahil",
+      "businessDesc": "10 WhatsApp Oturumu dahil",
+      "updating": "Plan güncelleniyor...",
+      "success": "Plan başarıyla güncellendi"
+    },
+    "resetPasswordModal": {
+      "title": "Şifreyi Sıfırla",
+      "subtitle": "{{name}} ({{email}}) için yeni bir şifre belirleyin",
+      "newPassword": "Yeni Şifre",
+      "placeholder": "En az 8 karakter",
+      "confirm": "Şifreyi Sıfırla",
+      "cancel": "İptal",
+      "resetting": "Şifre sıfırlanıyor...",
+      "success": "Şifre başarıyla sıfırlandı",
+      "lengthError": "Şifre en az 8 karakter olmalıdır"
+    },
+    "deleteModal": {
+      "title": "Kullanıcı Hesabını Sil",
+      "confirmMessage": "<strong>{{name}}</strong> ({{email}}) kullanıcısını silmek istediğinizden emin misiniz?",
+      "warning": "Bu işlem kullanıcı hesabını ve ilişkili tüm WhatsApp oturumlarını kalıcı olarak silecektir. Bu işlem geri alınamaz.",
+      "confirm": "Kullanıcıyı Sil",
+      "cancel": "İptal",
+      "deleting": "Kullanıcı siliniyor...",
+      "success": "Kullanıcı başarıyla silindi",
+      "cannotDeleteOwner": "Birincil sahip/yönetici hesabı silinemez"
+    }
   }
 }

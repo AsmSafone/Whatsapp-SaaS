@@ -1,6 +1,6 @@
 # asmsafone/zaptura
 
-Official PHP SDK for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) WhatsApp API Gateway.
+Official PHP SDK for the [Zaptura](https://github.com/AsmSafone/ZapturaWA) WhatsApp API Gateway.
 
 A synchronous client built on [Guzzle](https://docs.guzzlephp.org/), PSR-4 autoloaded.
 

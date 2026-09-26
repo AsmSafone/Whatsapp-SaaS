@@ -12,6 +12,8 @@
     "cancel": "取消",
     "delete": "刪除",
     "create": "建立",
+    "created": "已建立",
+    "edit": "編輯",
     "save": "Save",
     "close": "關閉",
     "showApiKey": "顯示 API 金鑰",
@@ -60,11 +62,14 @@
     "sessions": "工作階段",
     "chats": "聊天",
     "webhooks": "Webhooks",
+    "automation": "自動化",
     "templates": "Templates",
     "apiKeys": "API 金鑰",
     "messageTester": "訊息測試器",
+    "playground": "演練場",
     "infrastructure": "基礎架構",
     "plugins": "外掛",
+    "users": "使用者",
     "logs": "記錄",
     "profile": "個人資料"
   },
@@ -268,7 +273,8 @@
     "disconnected": "已中斷連線",
     "action_required": "需要操作",
     "failed": "失敗",
-    "authenticating": "正在驗證..."
+    "authenticating": "正在驗證...",
+    "logged_out": "已登出"
   },
   "sessions": {
     "title": "工作階段",
@@ -312,6 +318,11 @@
       "successDescGeneric": "工作階段已刪除",
       "errorTitle": "刪除失敗",
       "errorDefault": "刪除工作階段失敗"
+    },
+    "start": {
+      "teardownPendingTitle": "工作階段啟動中",
+      "teardownPending": "此工作階段的憑證拆除仍在進行中。請稍候再試。",
+      "errorTitle": "啟動失敗"
     },
     "qr": {
       "title": "掃描 QR 碼",
@@ -399,10 +410,10 @@
       "confirm": "解除連結",
       "successTitle": "裝置已解除連結",
       "success": "解除連結已完成：裝置已登出，本機工作階段憑證已清除。重新連線需要新的 QR 掃描或配對碼。",
-      "failedTitle": "解除連結失敗",
-      "failed": "無法解除該工作階段的連結。",
       "incompleteTitle": "解除連結未完成",
-      "incomplete": "工作階段已在本地停止，但登出操作未完成——裝置可能仍處於連結狀態。請啟動工作階段後重新嘗試解除連結。"
+      "incomplete": "工作階段已在本地停止，但登出操作未完成——裝置可能仍處於連結狀態。請啟動工作階段後重新嘗試解除連結。",
+      "failedTitle": "解除連結失敗",
+      "failed": "無法解除該工作階段的連結。"
     },
     "pairing": {
       "tabQr": "QR 碼",
@@ -422,11 +433,6 @@
       "step3": "<strong>3.</strong> 點按<strong>連結裝置</strong>，然後點按<strong>改用電話號碼連結</strong>",
       "step4": "<strong>4.</strong> 在手機上輸入上方顯示的 8 位字元配對碼",
       "waitingConnection": "正在等待你的手機完成連結…"
-    },
-    "start": {
-      "teardownPendingTitle": "工作階段啟動中",
-      "teardownPending": "此工作階段的憑證拆除仍在進行中。請稍候再試。",
-      "errorTitle": "啟動失敗"
     },
     "restriction": {
       "reachout_timelock": "新對話被封鎖",
@@ -514,30 +520,94 @@
       "delete": "刪除"
     },
     "eventDescriptions": {
-      "message.received": "收到訊息時",
-      "message.sent": "傳送訊息時",
-      "message.ack": "訊息的送達或已讀狀態變更時",
-      "message.failed": "發出的訊息傳送失敗時",
-      "message.revoked": "訊息被收回時",
-      "message.reaction": "新增、變更或移除回應時",
-      "message.edited": "訊息被編輯時",
-      "session.status": "工作階段狀態變更時",
-      "session.qr": "產生 QR 碼時",
-      "session.authenticated": "工作階段完成配對並就緒時",
-      "session.disconnected": "工作階段中斷連線時",
-      "session.reconnect_loop": "工作階段反覆重新連線失敗時",
-      "session.restriction": "WhatsApp 限制帳戶或解除限制時",
-      "presence.update": "已訂閱的聊天上線、正在輸入或離線時",
-      "group.join": "有成員加入或被加入群組時",
-      "group.leave": "有成員退出或被移出群組時",
-      "group.update": "群組名稱、描述或設定變更時",
-      "group.join_request": "有人申請加入此工作階段管理的群組時",
-      "call.received": "來電開始響鈴時",
-      "call.accepted": "來電被接聽時",
-      "call.rejected": "來電被拒接時",
-      "call.missed": "來電未接聽時",
-      "status.received": "聯絡人發佈狀態時",
-      "all": "所有事件"
+      "all": "所有事件",
+      "message": {
+        "received": "收到訊息時",
+        "sent": "傳送訊息時",
+        "ack": "訊息的送達或已讀狀態變更時",
+        "failed": "發出的訊息傳送失敗時",
+        "revoked": "訊息被收回時",
+        "reaction": "新增、變更或移除回應時",
+        "edited": "訊息被編輯時"
+      },
+      "session": {
+        "status": "工作階段狀態變更時",
+        "qr": "產生 QR 碼時",
+        "authenticated": "工作階段完成配對並就緒時",
+        "disconnected": "工作階段中斷連線時",
+        "reconnect_loop": "工作階段反覆重新連線失敗時",
+        "restriction": "WhatsApp 限制帳戶或解除限制時"
+      },
+      "presence": {
+        "update": "已訂閱的聊天上線、正在輸入或離線時"
+      },
+      "group": {
+        "join": "有成員加入或被加入群組時",
+        "leave": "有成員退出或被移出群組時",
+        "update": "群組名稱、描述或設定變更時",
+        "join_request": "有人申請加入此工作階段管理的群組時"
+      },
+      "call": {
+        "received": "來電開始響鈴時",
+        "accepted": "來電被接聽時",
+        "rejected": "來電被拒接時",
+        "missed": "來電未接聽時"
+      },
+      "status": {
+        "received": "聯絡人發佈狀態時"
+      }
+    }
+  },
+  "automation": {
+    "title": "自動化",
+    "subtitle": "為入站訊息設定自動回覆和關鍵字觸發條件",
+    "newRule": "新增規則",
+    "editRule": "編輯自動化規則",
+    "selectSession": "選取工作階段",
+    "searchPlaceholder": "搜尋規則、條件或回覆...",
+    "triggers": "觸發條件",
+    "reply": "回覆",
+    "allInbound": "所有傳入訊息",
+    "cooldownLabel": "每次對話冷卻 {{count}} 秒",
+    "noSessionsTitle": "無可用 WhatsApp 工作階段",
+    "noSessionsDesc": "您需要一個有效的工作階段來設定自動化規則。請先建立或連接工作階段。",
+    "stats": {
+      "total": "總規則數",
+      "active": "已啟用",
+      "paused": "已暫停"
+    },
+    "empty": {
+      "title": "尚無自動化規則",
+      "desc": "建立您的首個自動回覆規則，根據關鍵字或自訂條件自動回覆傳入訊息。",
+      "noMatch": "未找到符合的規則",
+      "searchDesc": "清除搜尋以查看所有規則。"
+    },
+    "form": {
+      "nameLabel": "規則名稱",
+      "namePlaceholder": "例如：歡迎訊息或價格查詢",
+      "nameHint": "用於在主控台中識別此規則的名稱。",
+      "conditionsLabel": "觸發條件",
+      "conditionsHint": "新增篩選條件以按內文、發件人或類型比對訊息。若為空，則對所有傳入訊息作出回覆。",
+      "replyLabel": "自動回覆文字",
+      "replyPlaceholder": "在此輸入自動回覆內容...",
+      "replyHint": "當條件吻合時將自動傳送此訊息。",
+      "cooldownLabel": "冷卻間隔（秒）",
+      "cooldownHint": "每個對話的冷卻時間，防止機器人之間無限回覆循環（預設：60 秒）。",
+      "enabledLabel": "立即啟用此規則"
+    },
+    "deleteConfirmTitle": "刪除自動化規則",
+    "deleteConfirmMessage": "確定要刪除規則 \"{{name}}\" 嗎？此操作無法還原。",
+    "toasts": {
+      "created": "規則建立成功",
+      "updated": "規則更新成功",
+      "deleted": "規則刪除成功",
+      "activated": "規則已啟用",
+      "paused": "規則已暫停",
+      "nameRequired": "規則名稱為必填項",
+      "replyRequired": "回覆內容為必填項",
+      "saveFailed": "儲存規則失敗",
+      "deleteFailed": "刪除規則失敗",
+      "updateFailed": "更新規則失敗"
     }
   },
   "templates": {
@@ -593,6 +663,7 @@
     "title": "API 金鑰",
     "subtitle": "管理用於認證及存取控制的 API 金鑰",
     "createBtn": "建立 API 金鑰",
+    "documentation": "文件",
     "modalTitle": "建立 API 金鑰",
     "createdTitle": "API 金鑰已建立",
     "createdHint": "請立即複製此金鑰。之後將無法再次查看。",
@@ -858,6 +929,7 @@
     },
     "storage": {
       "title": "儲存空間設定",
+      "s3Unreachable": "S3（無法連線）",
       "local": "本機檔案系統",
       "localDesc": "在本機儲存媒體檔案",
       "s3": "Amazon S3",
@@ -870,32 +942,12 @@
       "accessKey": "存取金鑰",
       "secretKey": "秘密金鑰",
       "endpoint": "自訂端點（選填）",
-      "endpointHint": "適用於 MinIO 或其他兼容 S3 的服務",
-      "s3Unreachable": "S3（無法連線）"
+      "endpointHint": "適用於 MinIO 或其他兼容 S3 的服務"
     },
     "statusLabels": {
       "connected": "已連線",
       "disconnected": "已中斷連線",
       "disabled": "已停用"
-    },
-    "restart": {
-      "idleTitle": "⚙️ 設定已儲存",
-      "restartingTitle": "🔄 正在重新啟動伺服器...",
-      "waitingTitle": "⏳ 請稍候...",
-      "successTitle": "✅ 伺服器就緒",
-      "errorTitle": "❌ 重新啟動失敗",
-      "idleDesc": "設定已儲存到 <code>.env.generated</code>。<br/>需要重新啟動伺服器才能套用變更。",
-      "later": "稍後重新啟動",
-      "now": "立即重新啟動",
-      "restartingMsg": "伺服器正在重新啟動... {{count}} 秒",
-      "checking": "正在檢查伺服器狀態...",
-      "dontClose": "請不要關閉此視窗",
-      "successMsg": "伺服器已重新上線！頁面將自動重新載入。",
-      "errorMsg": "伺服器在 30 秒後仍未回應。請檢查 Docker 記錄並手動重新啟動。",
-      "reload": "重新載入頁面"
-    },
-    "toasts": {
-      "saveFailed": "儲存失敗"
     },
     "envPinNote": "已由環境變數 {{name}} 鎖定 — 這是正在運行的值；在取消設定該變數之前，儀表板的變更不會生效。",
     "pendingRestartNote": "已儲存，但尚未生效 — 請重新啟動伺服器以套用此變更。",
@@ -917,6 +969,25 @@
       "invalidFile": "該檔案並非有效的 Zaptura 資料備份。",
       "importTooLarge": "備份超出請求大小限制。請在伺服器上調高 BODY_SIZE_LIMIT 後重試。"
     },
+    "restart": {
+      "idleTitle": "⚙️ 設定已儲存",
+      "restartingTitle": "🔄 正在重新啟動伺服器...",
+      "waitingTitle": "⏳ 請稍候...",
+      "successTitle": "✅ 伺服器就緒",
+      "errorTitle": "❌ 重新啟動失敗",
+      "idleDesc": "設定已儲存到 <code>.env.generated</code>。<br/>需要重新啟動伺服器才能套用變更。",
+      "later": "稍後重新啟動",
+      "now": "立即重新啟動",
+      "restartingMsg": "伺服器正在重新啟動... {{count}} 秒",
+      "checking": "正在檢查伺服器狀態...",
+      "dontClose": "請不要關閉此視窗",
+      "successMsg": "伺服器已重新上線！頁面將自動重新載入。",
+      "errorMsg": "伺服器在 30 秒後仍未回應。請檢查 Docker 記錄並手動重新啟動。",
+      "reload": "重新載入頁面"
+    },
+    "toasts": {
+      "saveFailed": "儲存失敗"
+    },
     "statusLoadError": "無法載入目前的基礎設施狀態。請重新整理以重試。"
   },
   "plugins": {
@@ -924,6 +995,8 @@
     "subtitle": "安裝、設定和管理擴充功能",
     "refresh": "重新整理",
     "builtIn": "內置",
+    "myPlugin": "我的外掛程式",
+    "customPlugin": "自訂外掛程式",
     "noDescription": "沒有可用描述",
     "enable": "啟用",
     "disable": "停用",
@@ -999,7 +1072,6 @@
       "title": "執行個體",
       "description": "為此整合按帳戶佈建執行個體。每個執行個體都有專屬的簽署密鑰和連入 URL。",
       "create": "建立執行個體",
-      "save": "Save",
       "empty": "尚無執行個體。建立一個即可取得連入 URL 和密鑰。",
       "loadError": "載入執行個體失敗。",
       "allSessions": "所有工作階段",
@@ -1083,5 +1155,73 @@
       "current": "目前工作階段"
     },
     "loading": "搜尋中…"
+  },
+  "playground": {
+    "title": "API 演練場",
+    "subtitle": "以互動方式測試 WhatsApp API 端點"
+  },
+  "users": {
+    "title": "使用者",
+    "subtitle": "管理已註冊的租戶帳戶、訂閱方案與權限",
+    "totalUsers": "總使用者數",
+    "activeSessions": "活躍工作階段",
+    "starterUsers": "入門版使用者",
+    "proUsers": "專業版使用者",
+    "plusUsers": "增強版使用者",
+    "businessUsers": "企業版使用者",
+    "searchPlaceholder": "按姓名或電子郵件搜尋使用者...",
+    "filterPlan": "所有方案",
+    "noUsersFound": "未找到使用者",
+    "noUsersMatch": "沒有符合搜尋條件的使用者",
+    "ownerBadge": "管理員",
+    "columns": {
+      "user": "使用者",
+      "role": "角色",
+      "plan": "方案",
+      "sessions": "工作階段用量",
+      "joined": "加入時間",
+      "actions": "操作"
+    },
+    "sessionsUsage": "{{count}} / {{limit}} 個工作階段",
+    "actions": {
+      "changePlan": "更改方案",
+      "resetPassword": "重設密碼",
+      "deleteUser": "刪除使用者"
+    },
+    "changePlanModal": {
+      "title": "更改訂閱方案",
+      "subtitle": "調整 {{name}} ({{email}}) 的方案等級與工作階段限額",
+      "currentPlan": "目前方案",
+      "selectPlan": "選取新方案",
+      "confirm": "更新方案",
+      "cancel": "取消",
+      "starterDesc": "包含 1 個 WhatsApp 工作階段",
+      "proDesc": "包含 3 個 WhatsApp 工作階段",
+      "plusDesc": "包含 6 個 WhatsApp 工作階段",
+      "businessDesc": "包含 10 個 WhatsApp 工作階段",
+      "updating": "正在更新方案...",
+      "success": "方案更新成功"
+    },
+    "resetPasswordModal": {
+      "title": "重設密碼",
+      "subtitle": "為 {{name}} ({{email}}) 設定新密碼",
+      "newPassword": "新密碼",
+      "placeholder": "至少 8 個字元",
+      "confirm": "重設密碼",
+      "cancel": "取消",
+      "resetting": "正在重設密碼...",
+      "success": "密碼重設成功",
+      "lengthError": "密碼長度必須至少為 8 個字元"
+    },
+    "deleteModal": {
+      "title": "刪除使用者帳戶",
+      "confirmMessage": "確定要刪除使用者 <strong>{{name}}</strong> ({{email}}) 嗎？",
+      "warning": "這將永久刪除該使用者帳戶及其關聯的所有 WhatsApp 工作階段。此操作無法還原。",
+      "confirm": "刪除使用者",
+      "cancel": "取消",
+      "deleting": "正在刪除使用者...",
+      "success": "使用者刪除成功",
+      "cannotDeleteOwner": "無法刪除主要擁有者/管理員帳戶"
+    }
   }
 }

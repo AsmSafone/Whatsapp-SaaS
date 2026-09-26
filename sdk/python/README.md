@@ -1,6 +1,6 @@
 # asmsafone-zaptura
 
-Official Python SDK for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) WhatsApp API Gateway.
+Official Python SDK for the [Zaptura](https://github.com/AsmSafone/ZapturaWA) WhatsApp API Gateway.
 
 A synchronous client built on [httpx](https://www.python-httpx.org/), with bundled type hints (PEP 561).
 

@@ -12,8 +12,12 @@
     "cancel": "Cancelar",
     "delete": "Excluir",
     "create": "Criar",
+    "created": "Criado",
+    "edit": "Editar",
     "save": "Save",
     "close": "Fechar",
+    "showApiKey": "Mostrar chave API",
+    "hideApiKey": "Ocultar chave API",
     "search": "Pesquisar",
     "status": "Status",
     "name": "Nome",
@@ -42,8 +46,6 @@
     "refresh": "Atualizar",
     "errorGeneric": "Ocorreu um erro",
     "unknownError": "Erro desconhecido",
-    "showApiKey": "Mostrar chave API",
-    "hideApiKey": "Ocultar chave API",
     "retry": "Tentar novamente"
   },
   "theme": {
@@ -60,12 +62,15 @@
     "sessions": "Sessões",
     "chats": "Chats",
     "webhooks": "Webhooks",
+    "automation": "Automação",
+    "templates": "Modelos",
     "apiKeys": "Chaves API",
     "messageTester": "Testador de mensagens",
+    "playground": "Playground",
     "infrastructure": "Infraestrutura",
     "plugins": "Plugins",
+    "users": "Usuários",
     "logs": "Registros",
-    "templates": "Modelos",
     "profile": "Perfil"
   },
   "chats": {
@@ -268,7 +273,8 @@
     "disconnected": "Desconectada",
     "action_required": "Ação necessária",
     "failed": "Falha",
-    "authenticating": "Autenticando..."
+    "authenticating": "Autenticando...",
+    "logged_out": "Desconectado"
   },
   "sessions": {
     "title": "Sessões",
@@ -312,6 +318,11 @@
       "successDescGeneric": "Sessão excluída",
       "errorTitle": "Erro ao excluir",
       "errorDefault": "Não foi possível excluir a sessão"
+    },
+    "start": {
+      "teardownPendingTitle": "Iniciando sessão",
+      "teardownPending": "A remoção de credenciais desta sessão ainda está em andamento. Aguarde um momento e tente novamente.",
+      "errorTitle": "Erro ao iniciar"
     },
     "qr": {
       "title": "Escanear código QR",
@@ -399,10 +410,10 @@
       "confirm": "Desvincular",
       "successTitle": "Dispositivo desvinculado",
       "success": "Desvinculação concluída: o dispositivo foi desconectado e as credenciais locais da sessão foram apagadas. Reconectar exige um novo QR code ou código de pareamento.",
-      "failedTitle": "Falha ao desvincular",
-      "failed": "Não foi possível desvincular a sessão.",
       "incompleteTitle": "Desvinculação incompleta",
-      "incomplete": "A sessão foi encerrada localmente, mas a operação de logout está incompleta — o dispositivo pode ainda estar vinculado. Inicie a sessão e tente a desvinculação novamente."
+      "incomplete": "A sessão foi encerrada localmente, mas a operação de logout está incompleta — o dispositivo pode ainda estar vinculado. Inicie a sessão e tente a desvinculação novamente.",
+      "failedTitle": "Falha ao desvincular",
+      "failed": "Não foi possível desvincular a sessão."
     },
     "pairing": {
       "tabQr": "Código QR",
@@ -422,11 +433,6 @@
       "step3": "<strong>3.</strong> Toque em <strong>Conectar dispositivo</strong> e depois em <strong>Vincular com número de telefone</strong>",
       "step4": "<strong>4.</strong> Digite no seu celular o código de 8 caracteres mostrado acima",
       "waitingConnection": "Aguardando a conexão do seu celular…"
-    },
-    "start": {
-      "teardownPendingTitle": "Iniciando sessão",
-      "teardownPending": "A remoção de credenciais desta sessão ainda está em andamento. Aguarde um momento e tente novamente.",
-      "errorTitle": "Erro ao iniciar"
     },
     "restriction": {
       "reachout_timelock": "Novas conversas bloqueadas",
@@ -514,36 +520,150 @@
       "delete": "Excluir"
     },
     "eventDescriptions": {
-      "message.received": "Quando uma mensagem é recebida",
-      "message.sent": "Quando uma mensagem é enviada",
-      "message.ack": "Quando o status de entrega ou leitura de uma mensagem muda",
-      "message.failed": "Quando a entrega de uma mensagem enviada falha",
-      "message.revoked": "Quando uma mensagem é apagada para todos",
-      "message.reaction": "Quando uma reação é adicionada, alterada ou removida",
-      "message.edited": "Quando uma mensagem é editada",
-      "session.status": "Quando o status de uma sessão muda",
-      "session.qr": "Quando um código QR é gerado",
-      "session.authenticated": "Quando uma sessão é pareada e fica pronta",
-      "session.disconnected": "Quando uma sessão se desconecta",
-      "session.reconnect_loop": "Quando uma sessão continua sem conseguir se reconectar",
-      "session.restriction": "Quando o WhatsApp restringe a conta ou remove uma restrição",
-      "presence.update": "Quando um chat inscrito fica online, digita ou fica offline",
-      "group.join": "Quando participantes entram em um grupo ou são adicionados",
-      "group.leave": "Quando participantes saem de um grupo ou são removidos",
-      "group.update": "Quando o nome, a descrição ou as configurações de um grupo mudam",
-      "group.join_request": "Quando alguém pede para entrar em um grupo administrado por esta sessão",
-      "call.received": "Quando uma chamada recebida começa a tocar",
-      "call.accepted": "Quando uma chamada é atendida",
-      "call.rejected": "Quando uma chamada é recusada",
-      "call.missed": "Quando uma chamada não é atendida",
-      "status.received": "Quando um contato publica um status",
-      "all": "Todos os eventos"
+      "all": "Todos os eventos",
+      "message": {
+        "received": "Quando uma mensagem é recebida",
+        "sent": "Quando uma mensagem é enviada",
+        "ack": "Quando o status de entrega ou leitura de uma mensagem muda",
+        "failed": "Quando a entrega de uma mensagem enviada falha",
+        "revoked": "Quando uma mensagem é apagada para todos",
+        "reaction": "Quando uma reação é adicionada, alterada ou removida",
+        "edited": "Quando uma mensagem é editada"
+      },
+      "session": {
+        "status": "Quando o status de uma sessão muda",
+        "qr": "Quando um código QR é gerado",
+        "authenticated": "Quando uma sessão é pareada e fica pronta",
+        "disconnected": "Quando uma sessão se desconecta",
+        "reconnect_loop": "Quando uma sessão continua sem conseguir se reconectar",
+        "restriction": "Quando o WhatsApp restringe a conta ou remove uma restrição"
+      },
+      "presence": {
+        "update": "Quando um chat inscrito fica online, digita ou fica offline"
+      },
+      "group": {
+        "join": "Quando participantes entram em um grupo ou são adicionados",
+        "leave": "Quando participantes saem de um grupo ou são removidos",
+        "update": "Quando o nome, a descrição ou as configurações de um grupo mudam",
+        "join_request": "Quando alguém pede para entrar em um grupo administrado por esta sessão"
+      },
+      "call": {
+        "received": "Quando uma chamada recebida começa a tocar",
+        "accepted": "Quando uma chamada é atendida",
+        "rejected": "Quando uma chamada é recusada",
+        "missed": "Quando uma chamada não é atendida"
+      },
+      "status": {
+        "received": "Quando um contato publica um status"
+      }
     }
+  },
+  "automation": {
+    "title": "Automação",
+    "subtitle": "Configure respostas automáticas e gatilhos de palavras-chave para mensagens recebidas",
+    "newRule": "Nova regra",
+    "editRule": "Editar regra de automação",
+    "selectSession": "Selecionar sessão",
+    "searchPlaceholder": "Pesquisar regras, condições ou respostas...",
+    "triggers": "Gatilhos",
+    "reply": "Resposta",
+    "allInbound": "Todas as mensagens recebidas",
+    "cooldownLabel": "{{count}}s de espera por conversa",
+    "noSessionsTitle": "Nenhuma sessão do WhatsApp disponível",
+    "noSessionsDesc": "Você precisa de uma sessão ativa para configurar regras de automação. Crie ou conecte uma sessão primeiro.",
+    "stats": {
+      "total": "Total de regras",
+      "active": "Ativas",
+      "paused": "Pausadas"
+    },
+    "empty": {
+      "title": "Nenhuma regra de automação ainda",
+      "desc": "Crie sua primeira regra de resposta automática para responder mensagens recebidas com base em palavras-chave ou condições personalizadas.",
+      "noMatch": "Nenhuma regra correspondente encontrada",
+      "searchDesc": "Limpe a pesquisa para visualizar todas as regras."
+    },
+    "form": {
+      "nameLabel": "Nome da regra",
+      "namePlaceholder": "ex.: Mensagem de boas-vindas ou Informações de preços",
+      "nameHint": "Um nome descritivo para identificar esta regra no painel.",
+      "conditionsLabel": "Condições de disparo",
+      "conditionsHint": "Adicione filtros para corresponder mensagens por texto, remetente ou tipo. Se vazio, responde a todas as mensagens recebidas.",
+      "replyLabel": "Texto de resposta automática",
+      "replyPlaceholder": "Digite aqui o texto da resposta automática...",
+      "replyHint": "Esta mensagem será enviada automaticamente quando as condições forem atendidas.",
+      "cooldownLabel": "Tempo de espera / Cooldown (segundos)",
+      "cooldownHint": "Período de espera por conversa para evitar loops infinitos entre robôs (padrão: 60s).",
+      "enabledLabel": "Ativar esta regra imediatamente"
+    },
+    "deleteConfirmTitle": "Excluir regra de automação",
+    "deleteConfirmMessage": "Tem certeza de que deseja excluir a regra \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "toasts": {
+      "created": "Regra criada com sucesso",
+      "updated": "Regra atualizada com sucesso",
+      "deleted": "Regra excluída com sucesso",
+      "activated": "Regra ativada",
+      "paused": "Regra pausada",
+      "nameRequired": "O nome da regra é obrigatório",
+      "replyRequired": "O texto de resposta é obrigatório",
+      "saveFailed": "Falha ao salvar regra",
+      "deleteFailed": "Falha ao excluir regra",
+      "updateFailed": "Falha ao atualizar regra"
+    }
+  },
+  "templates": {
+    "title": "Modelos",
+    "subtitle": "Crie modelos de mensagem reutilizáveis para cada sessão do WhatsApp",
+    "createTitle": "Criar modelo",
+    "editTitle": "Editar modelo",
+    "newTemplate": "Novo modelo",
+    "createTemplate": "Criar modelo",
+    "saveChanges": "Salvar alterações",
+    "viewOnly": "Somente leitura",
+    "noSessions": "Sem sessões",
+    "sessionHint": "Salvo em {{name}}",
+    "namePlaceholder": "ex.: confirmacao-pedido",
+    "header": "Cabeçalho",
+    "headerPlaceholder": "Linha de introdução opcional",
+    "body": "Corpo",
+    "bodyPlaceholder": "Olá {{customer}}, seu pedido {{orderId}} está pronto.",
+    "footer": "Rodapé",
+    "footerPlaceholder": "Linha de encerramento opcional",
+    "previewTitle": "Pré-visualização",
+    "previewValuePlaceholder": "Valor de exemplo",
+    "previewEmpty": "Comece a digitar um modelo para pré-visualizá-lo aqui.",
+    "noPlaceholders": "Use marcadores {{name}} para testar substituições.",
+    "savedTitle": "Modelos salvos",
+    "count": "{{count}} no total",
+    "deleteTitle": "Excluir modelo",
+    "deleteConfirm": "Excluir o modelo \"{{name}}\"? Esta ação não pode ser desfeita.",
+    "actions": {
+      "copyName": "Copiar nome do modelo"
+    },
+    "empty": {
+      "title": "Nenhum modelo salvo",
+      "description": "Crie um modelo reutilizável para agilizar respostas e notificações habituais.",
+      "noSessionsTitle": "Nenhuma sessão disponível",
+      "noSessionsDesc": "Crie uma sessão do WhatsApp antes de adicionar modelos.",
+      "loadErrorTitle": "Não foi possível carregar os modelos",
+      "forbiddenTitle": "Sem acesso aos modelos",
+      "forbiddenDesc": "Os modelos exigem uma chave de API com a função de operador ou administrador."
+    },
+    "toasts": {
+      "created": "Modelo criado com sucesso",
+      "createFailed": "Erro ao criar o modelo: {{message}}",
+      "updated": "Modelo atualizado com sucesso",
+      "updateFailed": "Erro ao atualizar o modelo: {{message}}",
+      "deleted": "Modelo excluído com sucesso",
+      "deleteFailed": "Erro ao excluir o modelo: {{message}}",
+      "copied": "Nome do modelo copiado"
+    },
+    "sessionSelect": "Sessão"
   },
   "apiKeys": {
     "title": "Chaves API",
     "subtitle": "Gerencie as chaves API para autenticação e controle de acesso",
     "createBtn": "Criar chave API",
+    "documentation": "Documentação",
     "modalTitle": "Criar chave API",
     "createdTitle": "Chave API criada",
     "createdHint": "Copie esta chave agora. Você não poderá vê-la novamente.",
@@ -745,55 +865,6 @@
       "cancelling": "Cancelando..."
     }
   },
-  "templates": {
-    "title": "Modelos",
-    "subtitle": "Crie modelos de mensagem reutilizáveis para cada sessão do WhatsApp",
-    "createTitle": "Criar modelo",
-    "editTitle": "Editar modelo",
-    "newTemplate": "Novo modelo",
-    "createTemplate": "Criar modelo",
-    "saveChanges": "Salvar alterações",
-    "viewOnly": "Somente leitura",
-    "noSessions": "Sem sessões",
-    "sessionHint": "Salvo em {{name}}",
-    "namePlaceholder": "ex.: confirmacao-pedido",
-    "header": "Cabeçalho",
-    "headerPlaceholder": "Linha de introdução opcional",
-    "body": "Corpo",
-    "bodyPlaceholder": "Olá {{customer}}, seu pedido {{orderId}} está pronto.",
-    "footer": "Rodapé",
-    "footerPlaceholder": "Linha de encerramento opcional",
-    "previewTitle": "Pré-visualização",
-    "previewValuePlaceholder": "Valor de exemplo",
-    "previewEmpty": "Comece a digitar um modelo para pré-visualizá-lo aqui.",
-    "noPlaceholders": "Use marcadores {{name}} para testar substituições.",
-    "savedTitle": "Modelos salvos",
-    "count": "{{count}} no total",
-    "deleteTitle": "Excluir modelo",
-    "deleteConfirm": "Excluir o modelo \"{{name}}\"? Esta ação não pode ser desfeita.",
-    "actions": {
-      "copyName": "Copiar nome do modelo"
-    },
-    "empty": {
-      "title": "Nenhum modelo salvo",
-      "description": "Crie um modelo reutilizável para agilizar respostas e notificações habituais.",
-      "noSessionsTitle": "Nenhuma sessão disponível",
-      "noSessionsDesc": "Crie uma sessão do WhatsApp antes de adicionar modelos.",
-      "loadErrorTitle": "Não foi possível carregar os modelos",
-      "forbiddenTitle": "Sem acesso aos modelos",
-      "forbiddenDesc": "Os modelos exigem uma chave de API com a função de operador ou administrador."
-    },
-    "toasts": {
-      "created": "Modelo criado com sucesso",
-      "createFailed": "Erro ao criar o modelo: {{message}}",
-      "updated": "Modelo atualizado com sucesso",
-      "updateFailed": "Erro ao atualizar o modelo: {{message}}",
-      "deleted": "Modelo excluído com sucesso",
-      "deleteFailed": "Erro ao excluir o modelo: {{message}}",
-      "copied": "Nome do modelo copiado"
-    },
-    "sessionSelect": "Sessão"
-  },
   "infrastructure": {
     "title": "Infraestrutura",
     "subtitle": "Configure o servidor, banco de dados, cache, armazenamento e motor",
@@ -858,6 +929,7 @@
     },
     "storage": {
       "title": "Configuração de armazenamento",
+      "s3Unreachable": "S3 (inacessível)",
       "local": "Sistema de arquivos local",
       "localDesc": "Armazenar arquivos de mídia localmente",
       "s3": "Amazon S3",
@@ -870,32 +942,12 @@
       "accessKey": "Chave de acesso",
       "secretKey": "Chave secreta",
       "endpoint": "Endpoint personalizado (opcional)",
-      "endpointHint": "Para MinIO ou outros serviços compatíveis com S3",
-      "s3Unreachable": "S3 (inacessível)"
+      "endpointHint": "Para MinIO ou outros serviços compatíveis com S3"
     },
     "statusLabels": {
       "connected": "Conectado",
       "disconnected": "Desconectado",
       "disabled": "Desabilitado"
-    },
-    "restart": {
-      "idleTitle": "⚙️ Configuração salva",
-      "restartingTitle": "🔄 Reiniciando servidor...",
-      "waitingTitle": "⏳ Por favor aguarde...",
-      "successTitle": "✅ Servidor pronto",
-      "errorTitle": "❌ Erro ao reiniciar",
-      "idleDesc": "A configuração foi salva em <code>.env.generated</code>.<br/>É necessário reiniciar o servidor para aplicar as alterações.",
-      "later": "Reiniciar depois",
-      "now": "Reiniciar agora",
-      "restartingMsg": "Reiniciando servidor... {{count}}s",
-      "checking": "Verificando status do servidor...",
-      "dontClose": "Por favor, não feche esta janela",
-      "successMsg": "O servidor voltou a ficar online! A página será recarregada automaticamente.",
-      "errorMsg": "O servidor não respondeu após 30 segundos. Verifique os logs do Docker e reinicie manualmente.",
-      "reload": "Recarregar página"
-    },
-    "toasts": {
-      "saveFailed": "Erro ao salvar"
     },
     "envPinNote": "Fixado pela variável de ambiente {{name}}: este é o valor em execução; as alterações do painel não serão aplicadas até que essa variável seja removida.",
     "pendingRestartNote": "Salvo, mas ainda não aplicado: reinicie o servidor para que esta alteração tenha efeito.",
@@ -917,6 +969,25 @@
       "invalidFile": "Esse arquivo não é um backup de dados válido do Zaptura.",
       "importTooLarge": "O backup excede o limite da requisição. Aumente BODY_SIZE_LIMIT no servidor e tente novamente."
     },
+    "restart": {
+      "idleTitle": "⚙️ Configuração salva",
+      "restartingTitle": "🔄 Reiniciando servidor...",
+      "waitingTitle": "⏳ Por favor aguarde...",
+      "successTitle": "✅ Servidor pronto",
+      "errorTitle": "❌ Erro ao reiniciar",
+      "idleDesc": "A configuração foi salva em <code>.env.generated</code>.<br/>É necessário reiniciar o servidor para aplicar as alterações.",
+      "later": "Reiniciar depois",
+      "now": "Reiniciar agora",
+      "restartingMsg": "Reiniciando servidor... {{count}}s",
+      "checking": "Verificando status do servidor...",
+      "dontClose": "Por favor, não feche esta janela",
+      "successMsg": "O servidor voltou a ficar online! A página será recarregada automaticamente.",
+      "errorMsg": "O servidor não respondeu após 30 segundos. Verifique os logs do Docker e reinicie manualmente.",
+      "reload": "Recarregar página"
+    },
+    "toasts": {
+      "saveFailed": "Erro ao salvar"
+    },
     "statusLoadError": "Não foi possível carregar o status atual da infraestrutura. Atualize para tentar novamente."
   },
   "plugins": {
@@ -924,6 +995,8 @@
     "subtitle": "Instale, configure e gerencie extensões",
     "refresh": "Atualizar",
     "builtIn": "Integrado",
+    "myPlugin": "Meu plugin",
+    "customPlugin": "Plugin personalizado",
     "noDescription": "Sem descrição disponível",
     "enable": "Habilitar",
     "disable": "Desabilitar",
@@ -999,7 +1072,6 @@
       "title": "Instâncias",
       "description": "Provisione instâncias por conta para esta integração. Cada instância tem seu próprio segredo de assinatura e URL de entrada.",
       "create": "Criar instância",
-      "save": "Save",
       "empty": "Ainda não há instâncias. Crie uma para obter uma URL de entrada e um segredo.",
       "loadError": "Falha ao carregar as instâncias.",
       "allSessions": "Todas as sessões",
@@ -1083,5 +1155,73 @@
       "current": "Esta sessão"
     },
     "loading": "Pesquisando…"
+  },
+  "playground": {
+    "title": "Playground da API",
+    "subtitle": "Teste endpoints da API do WhatsApp interativamente"
+  },
+  "users": {
+    "title": "Usuários",
+    "subtitle": "Gerencie contas de locatários registrados, assinaturas e acessos",
+    "totalUsers": "Total de usuários",
+    "activeSessions": "Sessões ativas",
+    "starterUsers": "Plano Starter",
+    "proUsers": "Plano Pro",
+    "plusUsers": "Plano Plus",
+    "businessUsers": "Plano Business",
+    "searchPlaceholder": "Pesquisar usuários por nome ou e-mail...",
+    "filterPlan": "Todos os planos",
+    "noUsersFound": "Nenhum usuário encontrado",
+    "noUsersMatch": "Nenhum usuário corresponde à sua busca",
+    "ownerBadge": "Admin",
+    "columns": {
+      "user": "Usuário",
+      "role": "Função",
+      "plan": "Plano",
+      "sessions": "Uso de sessões",
+      "joined": "Registrado em",
+      "actions": "Ações"
+    },
+    "sessionsUsage": "{{count}} de {{limit}} sessões",
+    "actions": {
+      "changePlan": "Alterar plano",
+      "resetPassword": "Redefinir senha",
+      "deleteUser": "Excluir usuário"
+    },
+    "changePlanModal": {
+      "title": "Alterar plano de assinatura",
+      "subtitle": "Ajuste o nível do plano e limites de sessão para {{name}} ({{email}})",
+      "currentPlan": "Plano atual",
+      "selectPlan": "Selecionar novo plano",
+      "confirm": "Atualizar plano",
+      "cancel": "Cancelar",
+      "starterDesc": "1 sessão do WhatsApp inclusa",
+      "proDesc": "3 sessões do WhatsApp inclusas",
+      "plusDesc": "6 sessões do WhatsApp inclusas",
+      "businessDesc": "10 sessões do WhatsApp inclusas",
+      "updating": "Atualizando plano...",
+      "success": "Plano atualizado com sucesso"
+    },
+    "resetPasswordModal": {
+      "title": "Redefinir senha",
+      "subtitle": "Defina uma nova senha para {{name}} ({{email}})",
+      "newPassword": "Nova senha",
+      "placeholder": "No mínimo 8 caracteres",
+      "confirm": "Redefinir senha",
+      "cancel": "Cancelar",
+      "resetting": "Redefinindo senha...",
+      "success": "Senha redefinida com sucesso",
+      "lengthError": "A senha deve ter pelo menos 8 caracteres"
+    },
+    "deleteModal": {
+      "title": "Excluir conta de usuário",
+      "confirmMessage": "Tem certeza de que deseja excluir o usuário <strong>{{name}}</strong> ({{email}})?",
+      "warning": "Isso excluirá permanentemente a conta do usuário e todas as sessões associadas do WhatsApp. Esta ação não pode ser desfeita.",
+      "confirm": "Excluir usuário",
+      "cancel": "Cancelar",
+      "deleting": "Excluindo usuário...",
+      "success": "Usuário excluído com sucesso",
+      "cannotDeleteOwner": "Não é possível excluir a conta do proprietário/administrador principal"
+    }
   }
 }

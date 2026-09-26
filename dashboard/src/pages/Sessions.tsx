@@ -185,6 +185,7 @@ export function Sessions() {
       // setState would otherwise drop a row). Then invalidate the prefix so stats/groups/chats refresh.
       setSessions(current => [...current, newSession]);
       void invalidateSessionQueries(queryClient, queryKeys.sessions);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
     },
     onFailed: msg => setError(msg),
   });
@@ -312,6 +313,7 @@ export function Sessions() {
       // Functional removal (no stale `sessions` capture), then invalidate the prefix.
       setSessions(current => current.filter(s => s.id !== id));
       await invalidateSessionQueries(queryClient, queryKeys.sessions);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.accountMe });
       toast.success(
         t('sessions.delete.successTitle'),
         session

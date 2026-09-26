@@ -5,7 +5,6 @@ import {
   dropUnexpressibleOperations,
   exemptPublicOperations,
   PUBLIC_PATHS,
-  METRICS_BEARER_SCHEME,
 } from './swagger.config';
 import type { OpenAPIObject } from '@nestjs/swagger';
 
@@ -17,18 +16,6 @@ describe('createSwaggerConfig', () => {
     const config = createSwaggerConfig();
 
     expect(config.security).toContainEqual({ 'X-API-Key': [] });
-  });
-
-  it('defines the METRICS_TOKEN bearer scheme without applying it globally', () => {
-    const config = createSwaggerConfig();
-
-    expect(config.components?.securitySchemes?.[METRICS_BEARER_SCHEME]).toMatchObject({
-      type: 'http',
-      scheme: 'bearer',
-    });
-    // Only the scrape endpoint uses it (per-operation @ApiSecurity) — a global bearer
-    // requirement would falsely claim every route accepts it.
-    expect(config.security).not.toContainEqual({ [METRICS_BEARER_SCHEME]: [] });
   });
 
   // Swagger UI aims "Try it" at servers[0]. A relative URL resolves against whatever origin served
@@ -103,7 +90,6 @@ describe('PUBLIC_PATHS drift guard', () => {
     'src/modules/health/health.controller.ts',
     'src/modules/infra/infra-status.controller.ts',
     'src/modules/integration/ingress.controller.ts',
-    'src/modules/metrics/metrics.controller.ts',
   ];
 
   function listTsFiles(dir: string, out: string[] = []): string[] {

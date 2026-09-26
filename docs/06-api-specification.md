@@ -5376,7 +5376,7 @@ release number until the next release bumps it.
   "current": "0.23.5",
   "latest": "0.23.6",
   "updateAvailable": true,
-  "releaseUrl": "https://github.com/AsmSafone/Whatsapp-SaaS/releases/tag/v0.23.6"
+  "releaseUrl": "https://github.com/AsmSafone/ZapturaWA/releases/tag/v0.23.6"
 }
 ```
 

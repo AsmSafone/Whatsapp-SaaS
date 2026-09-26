@@ -968,9 +968,9 @@ export function Landing() {
                           aria-label={playingVoiceId === msg.id ? 'Pause voice message' : 'Play voice message'}
                         >
                           {playingVoiceId === msg.id ? (
-                            <Pause size={14} />
+                            <Pause size={15} fill="#ffffff" stroke="#ffffff" />
                           ) : (
-                            <Play size={14} className="zp-play-icon" />
+                            <Play size={15} fill="#ffffff" stroke="#ffffff" className="zp-play-icon" />
                           )}
                         </button>
                         <div className="zp-wa-voice-waveform">
@@ -1358,7 +1358,7 @@ export function Landing() {
                   <li className="zp-feature-highlight">
                     <Check size={16} className="zp-text-emerald" />
                     <strong>
-                      {plan.sessions} Linked WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
+                      {plan.sessions} WhatsApp {plan.sessions > 1 ? 'Accounts' : 'Account'}
                     </strong>
                   </li>
                   {FEATURE_MATRIX.flatMap(g => g.rows)

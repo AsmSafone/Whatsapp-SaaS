@@ -179,12 +179,18 @@
 }
 
 .zp-shell .zp-mobile-links {
-  display: flex;
+  display: none;
   flex-direction: column;
   padding: 1rem 1.5rem 1.5rem;
   background: #090e1a;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   gap: 1rem;
+}
+
+@media (min-width: 769px) {
+  .zp-shell .zp-mobile-links {
+    display: none !important;
+  }
 }
 
 .zp-shell .zp-mobile-links a {
@@ -1312,6 +1318,15 @@
     transform 0.2s,
     background 0.2s;
   box-shadow: 0 2px 6px rgba(0, 168, 132, 0.35);
+  position: relative;
+  z-index: 2;
+}
+
+.zp-shell .zp-wa-voice-play-btn svg {
+  display: block;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .zp-shell .zp-wa-voice-play-btn:hover {
@@ -2566,10 +2581,60 @@
   margin-bottom: 0.75rem;
 }
 
-.zp-shell .zp-mock-note {
-  font-size: 0.78rem;
-  color: #64748b;
-  margin-top: 1rem;
+.zp-shell .zp-security-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.zp-shell .zp-trust-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.zp-shell .zp-trust-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(52, 211, 153, 0.35);
+  transform: translateY(-1px);
+}
+
+.zp-shell .zp-trust-card svg {
+  flex-shrink: 0;
+}
+
+.zp-shell .zp-trust-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.zp-shell .zp-trust-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.zp-shell .zp-trust-sub {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.zp-shell .zp-text-purple {
+  color: #c084fc;
 }
 
 .zp-shell .zp-footer-bar {
@@ -2658,6 +2723,11 @@
 /* ---- Mobile landscape / small tablet (≤ 768px) ---- */
 @media (max-width: 768px) {
   /* Nav */
+  .zp-shell .zp-nav-wrap.zp-nav-scrolled {
+    background: #090e1a;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
   .zp-shell .zp-nav {
     padding: 0.75rem 1rem;
   }
@@ -2672,6 +2742,9 @@
   }
   .zp-shell .zp-menu-btn {
     display: block;
+  }
+  .zp-shell .zp-mobile-links {
+    display: flex;
   }
 
   /* Top banner */

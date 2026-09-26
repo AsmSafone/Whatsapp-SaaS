@@ -268,7 +268,7 @@ fix, and nothing on the client side changes the outcome: switching engine, using
 of a QR, or presenting a different client identity (`BAILEYS_BROWSER_NAME` or otherwise) all end at the
 same gate. Re-registering the number as a different account type has also been tried by the community
 and did not hold; the block returned on its own within days. Tracked in
-[#560](https://github.com/AsmSafone/Whatsapp-SaaS/issues/560) and upstream in
+[#560](https://github.com/AsmSafone/ZapturaWA/issues/560) and upstream in
 [WhiskeySockets/Baileys#2672](https://github.com/WhiskeySockets/Baileys/issues/2672); the only durable
 change will come from the engine libraries implementing the step.
 
@@ -1503,8 +1503,8 @@ When creating GitHub issue, include:
 
 ### Community Resources
 
-- **GitHub Issues**: [github.com/AsmSafone/Whatsapp-SaaS/issues](https://github.com/AsmSafone/Whatsapp-SaaS/issues)
-- **Discussions**: [github.com/AsmSafone/Whatsapp-SaaS/discussions](https://github.com/AsmSafone/Whatsapp-SaaS/discussions)
+- **GitHub Issues**: [github.com/AsmSafone/ZapturaWA/issues](https://github.com/AsmSafone/ZapturaWA/issues)
+- **Discussions**: [github.com/AsmSafone/ZapturaWA/discussions](https://github.com/AsmSafone/ZapturaWA/discussions)
 - **Discord**: [discord.gg/zaptura](https://discord.gg/zaptura) (if available)
 - **Stack Overflow**: Tag with `zaptura`
 ---

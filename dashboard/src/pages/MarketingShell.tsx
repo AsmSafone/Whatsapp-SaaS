@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, ArrowRight, ShieldCheck, Terminal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { ZapturaLogo } from '../components/ZapturaLogo';
@@ -12,7 +12,34 @@ interface MarketingShellProps {
 export function MarketingShell({ children }: MarketingShellProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
   const close = () => setOpen(false);
+
+  // Close mobile menu on page navigation or hash anchor change
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname, location.hash]);
+
+  // Automatically close mobile menu when switching or resizing to desktop view
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile menu on Escape key press
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -140,7 +167,87 @@ export function MarketingShell({ children }: MarketingShellProps) {
               <Terminal size={16} className="zp-text-cyan" />
               <span>SSRF-Protected Sandboxing</span>
             </div>
-            <p className="zp-mock-note">Instant activation with 3-day full access. No card required.</p>
+            <div className="zp-security-badges-grid" aria-label="Security and Compliance Certifications">
+              <div className="zp-trust-card" title="AICPA SOC 2 Type II Certified">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <div className="zp-trust-meta">
+                  <span className="zp-trust-title">SOC 2</span>
+                  <span className="zp-trust-sub zp-text-emerald">Type II</span>
+                </div>
+              </div>
+
+              <div className="zp-trust-card" title="ISO/IEC 27001 Information Security Certified">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#0ea5e9"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <div className="zp-trust-meta">
+                  <span className="zp-trust-title">ISO 27001</span>
+                  <span className="zp-trust-sub zp-text-cyan">Certified</span>
+                </div>
+              </div>
+
+              <div className="zp-trust-card" title="EU General Data Protection Regulation Compliant">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#a855f7"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <div className="zp-trust-meta">
+                  <span className="zp-trust-title">GDPR</span>
+                  <span className="zp-trust-sub zp-text-purple">Compliant</span>
+                </div>
+              </div>
+
+              <div className="zp-trust-card" title="Cloudflare Enterprise Protected & TLS 1.3">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#f59e0b"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                  <path d="m11 13 2 2 4-4" />
+                </svg>
+                <div className="zp-trust-meta">
+                  <span className="zp-trust-title">Cloudflare</span>
+                  <span className="zp-trust-sub zp-text-amber">Verified</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

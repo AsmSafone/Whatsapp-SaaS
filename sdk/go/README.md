@@ -1,11 +1,11 @@
 # Zaptura Go SDK
 
-Idiomatic Go client for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS) WhatsApp
+Idiomatic Go client for the [Zaptura](https://github.com/AsmSafone/ZapturaWA) WhatsApp
 API Gateway. Stdlib-only (no dependencies), context-first, with typed errors and
 an injectable transport pipeline.
 
 ```bash
-go get github.com/AsmSafone/Whatsapp-SaaS/sdk/go
+go get github.com/AsmSafone/ZapturaWA/sdk/go
 ```
 
 Requires Go 1.22+.
@@ -19,7 +19,7 @@ import (
 	"context"
 	"log"
 
-	zaptura "github.com/AsmSafone/Whatsapp-SaaS/sdk/go"
+	zaptura "github.com/AsmSafone/ZapturaWA/sdk/go"
 )
 
 func main() {
@@ -187,7 +187,7 @@ The tag must carry the module's directory prefix, because the module lives in a
 subdirectory rather than at the repository root:
 
 ```bash
-# Correct — `sdk/go/` prefix, matching `module github.com/AsmSafone/Whatsapp-SaaS/sdk/go`
+# Correct — `sdk/go/` prefix, matching `module github.com/AsmSafone/ZapturaWA/sdk/go`
 git tag sdk/go/v0.5.0 && git push origin sdk/go/v0.5.0
 ```
 

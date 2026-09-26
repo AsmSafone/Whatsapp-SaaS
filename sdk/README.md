@@ -1,6 +1,6 @@
 # Zaptura SDKs
 
-Official client libraries for the [Zaptura](https://github.com/AsmSafone/Whatsapp-SaaS)
+Official client libraries for the [Zaptura](https://github.com/AsmSafone/ZapturaWA)
 WhatsApp API Gateway.
 
 All five SDKs are **hand-written** against the exact API surface (paths, DTOs,
@@ -16,7 +16,7 @@ hand-written resource methods.
 | Python                  | [`asmsafone-zaptura`](python/)               | sync (httpx), PEP 561 typed                                 |
 | PHP                     | [`asmsafone/zaptura`](php/)                  | sync (Guzzle, PHP 8.1+)                                     |
 | Java                    | [`com.asmsafone:zaptura`](java/)             | sync (java.net.http + Gson, Java 17)                        |
-| Go                      | [`github.com/AsmSafone/Whatsapp-SaaS/sdk/go`](go/) | stdlib-only, context-first, injectable transport (Go 1.22+) |
+| Go                      | [`github.com/AsmSafone/ZapturaWA/sdk/go`](go/) | stdlib-only, context-first, injectable transport (Go 1.22+) |
 
 ## Coverage
 
@@ -184,7 +184,7 @@ custom `HttpTransport` that records the request — no network. See
 ## Go
 
 ```bash
-go get github.com/AsmSafone/Whatsapp-SaaS/sdk/go
+go get github.com/AsmSafone/ZapturaWA/sdk/go
 ```
 
 ```go
@@ -193,7 +193,7 @@ import (
     "fmt"
     "log"
 
-    zaptura "github.com/AsmSafone/Whatsapp-SaaS/sdk/go"
+    zaptura "github.com/AsmSafone/ZapturaWA/sdk/go"
 )
 
 client, err := zaptura.New("http://localhost:2785", "zap_k1_…")

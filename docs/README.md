@@ -16,12 +16,12 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/package-json/v/AsmSafone/Whatsapp-SaaS?label=version&color=blue" alt="Version"/>
+  <img src="https://img.shields.io/github/package-json/v/AsmSafone/ZapturaWA?label=version&color=blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
   <img src="https://img.shields.io/badge/node-22_LTS-brightgreen.svg" alt="Node"/>
-  <img src="https://img.shields.io/github/package-json/dependency-version/AsmSafone/Whatsapp-SaaS/@nestjs/core?label=NestJS&color=red" alt="NestJS"/>
+  <img src="https://img.shields.io/github/package-json/dependency-version/AsmSafone/ZapturaWA/@nestjs/core?label=NestJS&color=red" alt="NestJS"/>
   <img src="https://img.shields.io/badge/docker-ready-blue.svg" alt="Docker"/>
-  <img src="https://img.shields.io/github/package-json/dependency-version/AsmSafone/Whatsapp-SaaS/dev/typescript?label=TypeScript&color=3178C6" alt="TypeScript"/>
+  <img src="https://img.shields.io/github/package-json/dependency-version/AsmSafone/ZapturaWA/dev/typescript?label=TypeScript&color=3178C6" alt="TypeScript"/>
 </p>
 
 ---
@@ -74,7 +74,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+git clone https://github.com/AsmSafone/ZapturaWA.git
 cd Zaptura
 
 # Install the locked dependencies & configure
@@ -98,7 +98,7 @@ Access:
 
 ```bash
 # Clone repository
-git clone https://github.com/AsmSafone/Whatsapp-SaaS.git
+git clone https://github.com/AsmSafone/ZapturaWA.git
 cd Zaptura
 
 # Start services
