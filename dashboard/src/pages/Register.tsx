@@ -127,7 +127,7 @@ export function Register({ onLogin }: RegisterProps) {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 autoComplete="email"
-                placeholder="dev@zaptura.io"
+                placeholder="dev@zapturawa.com"
                 required
               />
             </div>

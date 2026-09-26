@@ -807,11 +807,7 @@ export class PluginsService {
   }
 
   /** Uninstall an installed user plugin: disable, unload, and delete its files. Built-ins are protected. */
-  uninstall(
-    id: string,
-    tenantUserId?: string | null,
-    isAdmin = false,
-  ): Promise<{ success: boolean; message: string }> {
+  uninstall(id: string, tenantUserId?: string | null, isAdmin = false): Promise<{ success: boolean; message: string }> {
     return this.serialize(id, () => this.uninstallInner(id, tenantUserId, isAdmin));
   }
 
@@ -856,7 +852,9 @@ export class PluginsService {
       try {
         await this.uninstall(id, userId, true);
       } catch (error) {
-        logger.warn(`Failed to uninstall plugin "${id}" for deleted user "${userId}": ${error}`);
+        logger.warn(
+          `Failed to uninstall plugin "${id}" for deleted user "${userId}": ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
     this.pluginLoader.removeUserData(userId);

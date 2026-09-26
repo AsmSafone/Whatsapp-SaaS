@@ -9926,8 +9926,8 @@
     "version": "0.23.6",
     "contact": {
       "name": "Zaptura",
-      "url": "https://zaptura.io",
-      "email": "support@zaptura.io"
+      "url": "https://zapturawa.com",
+      "email": "support@zapturawa.com"
     }
   },
   "tags": [
@@ -10437,7 +10437,7 @@
           },
           "email": {
             "type": "string",
-            "example": "dev@zaptura.io"
+            "example": "dev@zapturawa.com"
           },
           "password": {
             "type": "string",
@@ -10455,7 +10455,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "example": "dev@zaptura.io"
+            "example": "dev@zapturawa.com"
           },
           "password": {
             "type": "string",
@@ -10510,7 +10510,7 @@
           },
           "email": {
             "type": "string",
-            "example": "dev@zaptura.io"
+            "example": "dev@zapturawa.com"
           }
         }
       },

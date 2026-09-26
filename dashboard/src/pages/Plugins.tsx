@@ -1009,15 +1009,6 @@ export default function Plugins() {
             <Puzzle size={64} />
             <h3>{t('plugins.empty.title')}</h3>
             <p>{t('plugins.empty.description')}</p>
-            <button
-              type="button"
-              className="btn-primary"
-              style={{ marginTop: '1rem' }}
-              onClick={() => setShowInstallModal(true)}
-            >
-              <Upload size={16} />
-              {t('plugins.install', 'Install plugin')}
-            </button>
           </div>
         )
       )}

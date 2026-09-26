@@ -54,10 +54,7 @@ describe('Message send endpoints (e2e)', () => {
   };
 
   const post = (verb: string, body: object, session: string = sessionId) =>
-    request(app.getHttpServer())
-      .post(`/api/sessions/${session}/messages/${verb}`)
-      .set('X-API-Key', userKey)
-      .send(body);
+    request(app.getHttpServer()).post(`/api/sessions/${session}/messages/${verb}`).set('X-API-Key', userKey).send(body);
 
   const get = (path: string, session: string = sessionId) =>
     request(app.getHttpServer()).get(`/api/sessions/${session}/messages/${path}`).set('X-API-Key', userKey);

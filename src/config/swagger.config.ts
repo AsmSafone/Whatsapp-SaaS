@@ -116,7 +116,7 @@ export function createSwaggerConfig(): Omit<OpenAPIObject, 'paths'> {
       // Apply the scheme globally so Swagger UI sends the key with every request
       // (mirrors the global ApiKeyGuard). Without this, "Authorize" is cosmetic.
       .addSecurityRequirements(API_KEY_SECURITY_SCHEME)
-      .setContact('Zaptura', 'https://zaptura.io', 'support@zaptura.io')
+      .setContact('Zaptura', 'https://zapturawa.com', 'support@zapturawa.com')
       .addTag('account', 'Tenant account registration, authentication, and plan queries')
       .addTag('admin-users', '[Admin Only] User account administration, plan management, and password resets')
       .addTag('sessions', 'WhatsApp session lifecycle and multi-device connection management (Tenant / Per-User)')

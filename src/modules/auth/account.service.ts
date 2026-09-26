@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -29,11 +28,13 @@ export function resolveDefaultAdminEmail(): string {
     if (bootstrap?.email) {
       return bootstrap.email.trim().toLowerCase();
     }
-  } catch {}
+  } catch {
+    /* ignore missing or malformed bootstrap file */
+  }
   return (
     process.env.ADMIN_EMAIL?.trim().toLowerCase() ||
     process.env.DEFAULT_ADMIN_EMAIL?.trim().toLowerCase() ||
-    'admin@zaptura.io'
+    'admin@zapturawa.com'
   );
 }
 
@@ -224,7 +225,9 @@ export class AccountService {
           .set({ ownerUserId: user.id })
           .where('ownerUserId IS NULL')
           .execute();
-      } catch {}
+      } catch {
+        /* ignore concurrent session updates */
+      }
     }
 
     apiKey.role = isOwner ? ApiKeyRole.ADMIN : ApiKeyRole.USER;
@@ -265,10 +268,7 @@ export class AccountService {
       }
     }
 
-    const nullOwnerCount = await this.sessions
-      .createQueryBuilder('s')
-      .where('s.ownerUserId IS NULL')
-      .getCount();
+    const nullOwnerCount = await this.sessions.createQueryBuilder('s').where('s.ownerUserId IS NULL').getCount();
 
     if (nullOwnerCount > 0) {
       const adminUser = users.find(u => u.email.toLowerCase() === defaultAdmin);
@@ -398,7 +398,9 @@ export class AccountService {
     if (this.moduleRef) {
       try {
         sessionService = this.moduleRef.get(SessionService, { strict: false });
-      } catch {}
+      } catch {
+        /* SessionService may not be registered in tests */
+      }
     }
 
     const ownedSessions = await this.sessions.find({
@@ -411,7 +413,9 @@ export class AccountService {
       for (const s of ownedSessions) {
         try {
           await sessionService.delete(s.id);
-        } catch {}
+        } catch {
+          /* continue deleting other sessions */
+        }
       }
     }
     await this.sessions.delete({ ownerUserId: user.id });
@@ -425,7 +429,9 @@ export class AccountService {
         if (convRepo) {
           await convRepo.delete({ sessionId: In(sessionIds) });
         }
-      } catch {}
+      } catch {
+        /* optional integration repository */
+      }
     }
 
     if (this.moduleRef) {
@@ -437,7 +443,9 @@ export class AccountService {
         if (pluginInstRepo) {
           await pluginInstRepo.delete({ ownerUserId: user.id });
         }
-      } catch {}
+      } catch {
+        /* optional plugin repository */
+      }
     }
 
     if (this.moduleRef) {
@@ -446,7 +454,9 @@ export class AccountService {
         if (pluginsService) {
           await pluginsService.uninstallAllForUser(user.id);
         }
-      } catch {}
+      } catch {
+        /* optional plugins service */
+      }
     }
 
     if (this.apiKeys) {

@@ -46,10 +46,10 @@ describe('AccountService', () => {
   });
 
   describe('resolveDefaultAdminEmail', () => {
-    it('defaults to admin@zaptura.io', () => {
+    it('defaults to admin@zapturawa.com', () => {
       delete process.env.ADMIN_EMAIL;
       delete process.env.DEFAULT_ADMIN_EMAIL;
-      expect(resolveDefaultAdminEmail()).toBe('admin@zaptura.io');
+      expect(resolveDefaultAdminEmail()).toBe('admin@zapturawa.com');
     });
 
     it('honors ADMIN_EMAIL environment variable', () => {
@@ -101,7 +101,7 @@ describe('AccountService', () => {
       const res = await service.ensureDefaultAdminUser();
 
       expect(res.isNew).toBe(true);
-      expect(res.user.email).toBe('admin@zaptura.io');
+      expect(res.user.email).toBe('admin@zapturawa.com');
       expect(res.user.name).toBe('Admin');
       expect(res.user.plan).toBe('business');
       expect(typeof res.rawPassword).toBe('string');
@@ -111,7 +111,7 @@ describe('AccountService', () => {
     it('returns existing admin user without generating new password when already present', async () => {
       const existingUser: Partial<User> = {
         id: 'existing-admin-uuid',
-        email: 'admin@zaptura.io',
+        email: 'admin@zapturawa.com',
         name: 'Admin',
         plan: 'business',
       };
@@ -190,12 +190,12 @@ describe('AccountService', () => {
   describe('actorFromToken', () => {
     it('returns ApiKeyRole.ADMIN and allowedSessions: null for the default admin user', async () => {
       const adminToken = signUserToken(
-        { sub: 'admin-id', email: 'admin@zaptura.io', name: 'Admin', plan: 'business' },
+        { sub: 'admin-id', email: 'admin@zapturawa.com', name: 'Admin', plan: 'business' },
         service.jwtSecret(),
       );
       usersRepo.findOne!.mockResolvedValue({
         id: 'admin-id',
-        email: 'admin@zaptura.io',
+        email: 'admin@zapturawa.com',
         name: 'Admin',
         plan: 'business',
         createdAt: new Date(),

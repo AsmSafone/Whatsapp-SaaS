@@ -314,33 +314,31 @@ export function Automation() {
         </div>
       </div>
 
-      {/* Toolbar: Session Picker + Search */}
+      {/* Toolbar: Search (Left) + Session Picker (Right) */}
       <div className="automation-toolbar">
-        <div className="automation-toolbar-left">
-          <div className="automation-session-picker">
-            <Smartphone size={16} color="var(--primary-text)" />
-            <select
-              aria-label={t('automation.selectSession', 'Select session')}
-              value={selectedSessionId}
-              onChange={e => setSelectedSessionId(e.target.value)}
-            >
-              {sessions.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name || s.id} ({s.status})
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="automation-search-box">
+          <Search size={16} />
+          <input
+            type="text"
+            placeholder={t('automation.searchPlaceholder', 'Search rules, conditions, or replies...')}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-          <div className="automation-search-box">
-            <Search size={16} />
-            <input
-              type="text"
-              placeholder={t('automation.searchPlaceholder', 'Search rules, conditions, or replies...')}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </div>
+        <div className="automation-session-picker">
+          <Smartphone size={16} color="var(--primary-text)" />
+          <select
+            aria-label={t('automation.selectSession', 'Select session')}
+            value={selectedSessionId}
+            onChange={e => setSelectedSessionId(e.target.value)}
+          >
+            {sessions.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.name || s.id} ({s.status})
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -371,12 +369,6 @@ export function Automation() {
                 )
               : t('automation.empty.searchDesc', 'Try clearing your search query to see all rules.')}
           </p>
-          {rules.length === 0 && (
-            <button className="btn-primary" onClick={openCreateModal} disabled={!canWrite}>
-              <Plus size={16} />
-              {t('automation.newRule', 'New Rule')}
-            </button>
-          )}
         </div>
       ) : (
         <div className="automation-list">

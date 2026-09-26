@@ -37,7 +37,7 @@ export const languageOptions: Array<{ value: SupportedLanguage; label: string; c
   { value: 'fr', label: 'Français', compactLabel: 'FR' },
   { value: 'it', label: 'Italiano', compactLabel: 'IT' },
   { value: 'ko', label: '한국어', compactLabel: 'KO' },
-  { value: 'pt-BR', label: 'Português (Brasil)', compactLabel: 'PT' },
+  { value: 'pt-BR', label: 'Português', compactLabel: 'PT' },
 ];
 
 export function resolveSupportedLanguage(lang?: string): SupportedLanguage {

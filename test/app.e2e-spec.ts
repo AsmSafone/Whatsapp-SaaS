@@ -104,7 +104,7 @@ describe('App smoke (e2e)', () => {
 describe('App RED metrics (e2e)', () => {
   let app: INestApplication<App>;
   let adminKey: string;
-  let viewerKey: string;
+  let userKey: string;
 
   const lines = (): string[] => renderHttpRequestMetrics();
   const counter = (method: string, route: string, status: string): number => {

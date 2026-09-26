@@ -817,7 +817,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An inbound media burst no longer loses media past the eighth item on either engine: the Baileys download queue is unbounded, and on whatsapp-web.js the wait for a slot is bounded by `MEDIA_DOWNLOAD_TIMEOUT_MS`.
 - A webhook's `filters` and `lastTriggeredAt` are published as nullable, matching what the route stores and accepts; an invariant now fails when a documented-nullable property does not publish it.
 - The two channel administration routes reject a user id that does not name an individual with `400`, qualifying bare phone numbers like the group participant writes.
-- The chart's optional ServiceMonitor selects on a new `zaptura.io/scrape-target` label, scraping one target per pod instead of two — check anything keyed on the `service` label.
+- The chart's optional ServiceMonitor selects on a new `zapturawa.com/scrape-target` label, scraping one target per pod instead of two — check anything keyed on the `service` label.
 - The Helm chart gains a startup probe allowing 295s of boot where liveness allowed 50s, and `env`/`secretEnv`-only upgrades now restart pods via ConfigMap/Secret checksums (with `existingSecret`, still `kubectl rollout restart`).
 - Participant ids with a recognised domain but a nonsense user-part (`NOT A USER@c.us`) are rejected with `400` across the group writes, the `mentions` validator and the membership-request routes. Fixes #1220.
 - Messages predating the full-text index are indexed on the next boot and can be edited and deleted again; the `messages_fts` emptiness guard is now a rowid-level completeness check.

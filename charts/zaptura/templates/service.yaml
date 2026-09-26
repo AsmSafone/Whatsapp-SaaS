@@ -8,7 +8,7 @@ metadata:
     # headless Service must not carry it, or the ServiceMonitor matches both again. The headless
     # Service exists for StatefulSet DNS and sets publishNotReadyAddresses, so scraping it also
     # produces `up=0` for a pod that is still starting.
-    zaptura.io/scrape-target: "primary"
+    zapturawa.com/scrape-target: "primary"
 spec:
   type: {{ .Values.service.type }}
   selector:

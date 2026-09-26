@@ -17,7 +17,7 @@ spec:
     # `service` label.
     matchLabels:
       {{- include "zaptura.selectorLabels" . | nindent 6 }}
-      zaptura.io/scrape-target: "primary"
+      zapturawa.com/scrape-target: "primary"
   endpoints:
     - port: http
       path: /api/metrics

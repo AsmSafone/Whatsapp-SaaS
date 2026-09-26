@@ -53,11 +53,11 @@ describe('bootstrap account file', () => {
     it('returns parsed account data from valid json', () => {
       writeFileSync(
         join(dir, '.admin-account'),
-        JSON.stringify({ email: 'admin@zaptura.io', password: 'secret-password' }),
+        JSON.stringify({ email: 'admin@zapturawa.com', password: 'secret-password' }),
       );
 
       expect(readBootstrapAccount(logger)).toEqual({
-        email: 'admin@zaptura.io',
+        email: 'admin@zapturawa.com',
         password: 'secret-password',
       });
     });
@@ -75,17 +75,17 @@ describe('bootstrap account file', () => {
 
   describe('writeBootstrapAccount', () => {
     it('writes formatted json to the resolved path', () => {
-      writeBootstrapAccount('admin@zaptura.io', 'written-secret');
+      writeBootstrapAccount('admin@zapturawa.com', 'written-secret');
 
       const content = readFileSync(join(dir, '.admin-account'), 'utf-8');
       const parsed: unknown = JSON.parse(content);
-      expect(parsed).toEqual({ email: 'admin@zaptura.io', password: 'written-secret' });
+      expect(parsed).toEqual({ email: 'admin@zapturawa.com', password: 'written-secret' });
     });
   });
 
   describe('removeBootstrapAccount', () => {
     it('removes the file and logs reason', () => {
-      writeBootstrapAccount('admin@zaptura.io', 'pass');
+      writeBootstrapAccount('admin@zapturawa.com', 'pass');
       expect(existsSync(join(dir, '.admin-account'))).toBe(true);
 
       removeBootstrapAccount('test removal', logger);

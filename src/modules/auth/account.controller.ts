@@ -64,7 +64,9 @@ export class AccountController {
       };
     }
     const user = await this.accounts.findById(actor.userId);
-    const isAdmin = actor.role === ApiKeyRole.ADMIN || user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const isAdmin =
+      actor.role === ApiKeyRole.ADMIN ||
+      user?.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
     const sessionCount = isAdmin
       ? await this.sessions
           .createQueryBuilder('s')
@@ -90,7 +92,9 @@ export class AccountController {
       return { ok: false, message: 'Plan changes apply to user accounts only' };
     }
     const user = await this.accounts.setPlan(actor.userId, dto.plan);
-    const isAdmin = actor?.role === ApiKeyRole.ADMIN || user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const isAdmin =
+      actor?.role === ApiKeyRole.ADMIN ||
+      user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
     const sessionCount = isAdmin
       ? await this.sessions
           .createQueryBuilder('s')
@@ -120,7 +124,9 @@ export class AccountController {
       throw new UnauthorizedException('Profile updates apply to user accounts only');
     }
     const user = await this.accounts.updateProfile(actor.userId, dto);
-    const isAdmin = actor?.role === ApiKeyRole.ADMIN || user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
+    const isAdmin =
+      actor?.role === ApiKeyRole.ADMIN ||
+      user.email.toLowerCase() === resolveDefaultAdminEmail().toLowerCase();
     const sessionCount = isAdmin
       ? await this.sessions
           .createQueryBuilder('s')

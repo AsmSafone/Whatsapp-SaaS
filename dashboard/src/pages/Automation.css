@@ -81,7 +81,7 @@
   margin-top: 0.25rem;
 }
 
-/* Control toolbar: session select, search, new rule button */
+/* Control toolbar: search on left, session select on far right */
 .automation-toolbar {
   display: flex;
   align-items: center;
@@ -91,37 +91,6 @@
   flex-wrap: wrap;
 }
 
-.automation-toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  flex: 1;
-  min-width: 0;
-}
-
-.automation-session-picker {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 0.875rem;
-  min-width: 220px;
-}
-
-.automation-session-picker select {
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  outline: none;
-  width: 100%;
-  cursor: pointer;
-}
-
 .automation-search-box {
   display: flex;
   align-items: center;
@@ -129,9 +98,17 @@
   background: var(--bg-white);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 0.5rem 0.875rem;
+  padding: 0 0.875rem;
+  height: 40px;
+  min-height: 40px;
+  box-sizing: border-box;
   flex: 1;
-  max-width: 380px;
+  max-width: 420px;
+  color: var(--text-muted);
+}
+
+.automation-search-box svg {
+  flex-shrink: 0;
   color: var(--text-muted);
 }
 
@@ -142,6 +119,50 @@
   font-size: 0.875rem;
   color: var(--text-primary);
   width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.automation-session-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 0.875rem;
+  height: 40px;
+  min-height: 40px;
+  box-sizing: border-box;
+  min-width: 220px;
+  max-width: 320px;
+  margin-left: auto;
+}
+
+.automation-session-picker svg {
+  flex-shrink: 0;
+}
+
+.automation-session-picker select {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.automation-session-picker select option {
+  background: var(--bg-white);
+  color: var(--text-primary);
 }
 
 /* Rules List */
@@ -474,17 +495,14 @@
   .automation-toolbar {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .automation-toolbar-left {
-    flex-direction: column;
-    align-items: stretch;
+    gap: 0.75rem;
   }
 
   .automation-session-picker,
   .automation-search-box {
     max-width: none;
     width: 100%;
+    margin-left: 0;
   }
 
   .automation-form-row {

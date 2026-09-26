@@ -8,7 +8,7 @@ export class RegisterDto {
   @MaxLength(120)
   name!: string;
 
-  @ApiProperty({ example: 'dev@zaptura.io' })
+  @ApiProperty({ example: 'dev@zapturawa.com' })
   @IsEmail()
   @MaxLength(190)
   email!: string;
@@ -26,7 +26,7 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  @ApiProperty({ example: 'dev@zaptura.io' })
+  @ApiProperty({ example: 'dev@zapturawa.com' })
   @IsEmail()
   email!: string;
 
@@ -64,7 +64,7 @@ export class UpdateProfileDto {
   @MaxLength(120)
   name?: string;
 
-  @ApiPropertyOptional({ example: 'dev@zaptura.io' })
+  @ApiPropertyOptional({ example: 'dev@zapturawa.com' })
   @IsOptional()
   @IsEmail()
   @MaxLength(190)

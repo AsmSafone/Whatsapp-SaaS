@@ -249,6 +249,32 @@ export function Landing() {
   const chatBodyRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
 
+  // Global cursor hover tracking across the entire landing page
+  useEffect(() => {
+    let animId: number;
+    const handleMouseMove = (e: MouseEvent) => {
+      cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(() => {
+        document.documentElement.style.setProperty('--cursor-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--cursor-y', `${e.clientY}px`);
+        document.documentElement.style.setProperty('--cursor-opacity', '1');
+      });
+    };
+    const handleMouseLeave = () => {
+      document.documentElement.style.setProperty('--cursor-opacity', '0');
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.documentElement.style.removeProperty('--cursor-opacity');
+      document.documentElement.style.removeProperty('--cursor-x');
+      document.documentElement.style.removeProperty('--cursor-y');
+    };
+  }, []);
+
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const el = heroRef.current;
     if (!el) return;
@@ -416,7 +442,7 @@ export function Landing() {
       } else if (btn.action === 'address') {
         replyText = '📍 Address Update: Please reply with your updated delivery address or apartment number.';
       } else if (btn.action === 'copy_otp') {
-        replyText = '✅ One-Time Code verified! Developer authentication session activated for user dev@zaptura.io.';
+        replyText = '✅ One-Time Code verified! Developer authentication session activated for user dev@zapturawa.com.';
       } else if (btn.action === 'pricing') {
         replyText =
           '💳 *Zaptura Tier Overview:*\n• Starter: $6/mo (10k msgs)\n• Growth: $15/mo (40k msgs)\n• Scale: $45/mo (unlimited)\n\nZero setup fees, cancel anytime.';
@@ -654,6 +680,9 @@ export function Landing() {
 
   return (
     <MarketingShell>
+      {/* Global interactive cursor glow covering entire landing page */}
+      <div className="zp-global-interactive-glow" aria-hidden="true" />
+
       {/* ================= HERO SECTION ================= */}
       <section className="zp-hero" ref={heroRef} onMouseMove={handleHeroMouseMove} onMouseLeave={handleHeroMouseLeave}>
         <div className="zp-hero-bg" aria-hidden="true">

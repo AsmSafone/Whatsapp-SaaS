@@ -117,7 +117,7 @@ export function Login({ onLogin }: LoginProps) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="dev@zaptura.io"
+                placeholder="dev@zapturawa.com"
                 className={error ? 'error' : ''}
                 autoComplete="email"
                 aria-label={t('login.email')}
