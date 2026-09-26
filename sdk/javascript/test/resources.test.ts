@@ -510,3 +510,54 @@ describe('SearchResource — exact path and query forwarding', () => {
     expect(t.lastCall!.url).toBe('http://x/api/search?q=term&chatId=628%40c.us&direction=incoming');
   });
 });
+
+describe('AutomationResource — exact paths and bodies', () => {
+  it('list / get / create / update / delete', async () => {
+    const sample = {
+      id: 'rule_1',
+      sessionId: 's',
+      name: 'Auto Reply',
+      enabled: true,
+      conditions: null,
+      replyText: 'Hello',
+      cooldownSeconds: 60,
+      createdAt: '2026-09-26T00:00:00.000Z',
+      updatedAt: '2026-09-26T00:00:00.000Z',
+    };
+    const t = new MockTransport()
+      .on('GET', /\/automation-rules$/, { body: [sample] })
+      .on('GET', /\/automation-rules\/rule_1$/, { body: sample })
+      .on('POST', /\/automation-rules$/, { status: 201, body: sample })
+      .on('PUT', /\/automation-rules\/rule_1$/, { body: { ...sample, replyText: 'Updated' } })
+      .on('DELETE', /\/automation-rules\/rule_1$/, { status: 204 });
+
+    const c = client(t);
+
+    const list = await c.automation.list('s');
+    expect(t.lastCall!.method).toBe('GET');
+    expect(t.lastCall!.url).toBe('http://x/api/sessions/s/automation-rules');
+    expect(list).toEqual([sample]);
+
+    const one = await c.automation.get('s', 'rule_1');
+    expect(t.lastCall!.method).toBe('GET');
+    expect(t.lastCall!.url).toBe('http://x/api/sessions/s/automation-rules/rule_1');
+    expect(one).toEqual(sample);
+
+    const created = await c.automation.create('s', { name: 'Auto Reply', replyText: 'Hello' });
+    expect(t.lastCall!.method).toBe('POST');
+    expect(t.lastCall!.url).toBe('http://x/api/sessions/s/automation-rules');
+    expect(t.lastCall!.body).toEqual({ name: 'Auto Reply', replyText: 'Hello' });
+    expect(created).toEqual(sample);
+
+    const updated = await c.automation.update('s', 'rule_1', { replyText: 'Updated' });
+    expect(t.lastCall!.method).toBe('PUT');
+    expect(t.lastCall!.url).toBe('http://x/api/sessions/s/automation-rules/rule_1');
+    expect(t.lastCall!.body).toEqual({ replyText: 'Updated' });
+    expect(updated.replyText).toBe('Updated');
+
+    await c.automation.delete('s', 'rule_1');
+    expect(t.lastCall!.method).toBe('DELETE');
+    expect(t.lastCall!.url).toBe('http://x/api/sessions/s/automation-rules/rule_1');
+  });
+});
+

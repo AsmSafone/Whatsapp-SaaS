@@ -1399,3 +1399,36 @@ export interface ConvertedMedia {
 export interface MediaConversionAvailability {
   available: boolean;
 }
+
+/**
+ * Autoreply automation rule matching inbound messages.
+ * Backed by `src/modules/automation/dto/automation-rule.dto.ts`.
+ */
+export interface AutomationRule {
+  id: string;
+  sessionId: string;
+  name: string;
+  enabled: boolean;
+  conditions: WebhookFilters | null;
+  replyText: string;
+  cooldownSeconds: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAutomationRuleRequest {
+  name: string;
+  replyText: string;
+  conditions?: WebhookFilters | null;
+  cooldownSeconds?: number;
+  enabled?: boolean;
+}
+
+export interface UpdateAutomationRuleRequest {
+  name?: string;
+  replyText?: string;
+  conditions?: WebhookFilters | null;
+  cooldownSeconds?: number;
+  enabled?: boolean;
+}
+

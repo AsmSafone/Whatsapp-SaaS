@@ -541,4 +541,52 @@ class ResourcesTest extends TestCase
         $this->assertStringContainsString('call.whatsapp.com', $res['link']);
     }
 
+    public function testAutomationResource(): void
+    {
+        $backend = new MockBackend();
+        $sample = [
+            'id' => 'rule_1',
+            'sessionId' => 's',
+            'name' => 'Auto Reply',
+            'enabled' => true,
+            'conditions' => null,
+            'replyText' => 'Hello',
+            'cooldownSeconds' => 60,
+            'createdAt' => '2026-09-26T00:00:00.000Z',
+            'updatedAt' => '2026-09-26T00:00:00.000Z',
+        ];
+        $backend->on(200, [$sample]);
+        $backend->on(200, $sample);
+        $backend->on(201, $sample);
+        $backend->on(200, array_merge($sample, ['replyText' => 'Updated']));
+        $backend->on(204);
+        $client = $backend->makeClient();
+
+        $rules = $client->automation->list('s');
+        $this->assertSame('GET', $backend->lastCall()['method']);
+        $this->assertStringEndsWith('/sessions/s/automation-rules', $backend->lastCall()['url']);
+        $this->assertSame([$sample], $rules);
+
+        $rule = $client->automation->get('s', 'rule_1');
+        $this->assertSame('GET', $backend->lastCall()['method']);
+        $this->assertStringEndsWith('/sessions/s/automation-rules/rule_1', $backend->lastCall()['url']);
+        $this->assertSame($sample, $rule);
+
+        $created = $client->automation->create('s', ['name' => 'Auto Reply', 'replyText' => 'Hello']);
+        $this->assertSame('POST', $backend->lastCall()['method']);
+        $this->assertStringEndsWith('/sessions/s/automation-rules', $backend->lastCall()['url']);
+        $this->assertSame(['name' => 'Auto Reply', 'replyText' => 'Hello'], $backend->lastCall()['body']);
+        $this->assertSame($sample, $created);
+
+        $updated = $client->automation->update('s', 'rule_1', ['replyText' => 'Updated']);
+        $this->assertSame('PUT', $backend->lastCall()['method']);
+        $this->assertStringEndsWith('/sessions/s/automation-rules/rule_1', $backend->lastCall()['url']);
+        $this->assertSame(['replyText' => 'Updated'], $backend->lastCall()['body']);
+        $this->assertSame('Updated', $updated['replyText']);
+
+        $client->automation->delete('s', 'rule_1');
+        $this->assertSame('DELETE', $backend->lastCall()['method']);
+        $this->assertStringEndsWith('/sessions/s/automation-rules/rule_1', $backend->lastCall()['url']);
+    }
 }
+

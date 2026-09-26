@@ -38,13 +38,14 @@ All five SDKs expose the same fluent resource surface:
 | `templates` | list, get, create, update, delete                                                                                                                                                                                                                                                          |
 | `profile`   | setProfileName, setProfileStatus, setProfilePicture, deleteProfilePicture                                                                                                                                                                                                     |
 | `calls`     | rejectCall, createLink                                                                                                                                                                                                                                                        |
-| `media`     | conversionStatus, convertVoice, convertVideo                                                                                                                                                                                                                                  |
-| `health`    | check, live, ready                                                                                                                                                                                                                                                                         |
+| `media`      | conversionStatus, convertVoice, convertVideo                                                                                                                                                                                                                                  |
+| `automation` | list, get, create, update, delete                                                                                                                                                                                                                                             |
+| `health`     | check, live, ready                                                                                                                                                                                                                                                            |
 
 > ⚠️ Endpoints requiring an `OPERATOR`-level API key are noted in the inline
-> docs. Deliberately **not** exposed, matching `docs/18-sdk-design.md` exactly:
-> `auth`/api-keys, `account`, `audit`, `settings`, `stats`, `automation`, `infra`,
-> `plugins`, the `integration` management routes, `metrics`, `mcp`, `ingress`
+> docs. Deliberately **not** exposed:
+> `auth`/api-keys, `account`, `audit`, `settings`, `stats`, `infra`,
+> `plugins`, the `integration` management routes, `mcp`, `ingress`
 > and `docker`. These two lists have to agree — they did not, in both
 > directions, and a list that disagrees with its own design doc reads as an
 > accidental omission rather than a decision.

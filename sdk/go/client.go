@@ -70,6 +70,7 @@ type Client struct {
 	Profile   *ProfileService
 	Calls     *CallsService
 	Media     *MediaService
+	Automation *AutomationService
 }
 
 var localhostHosts = map[string]bool{"localhost": true, "127.0.0.1": true, "::1": true}
@@ -152,6 +153,7 @@ func New(baseURL, apiKey string, opts ...Option) (*Client, error) {
 	c.Profile = &ProfileService{client: c}
 	c.Calls = &CallsService{client: c}
 	c.Media = &MediaService{client: c}
+	c.Automation = &AutomationService{client: c}
 	return c, nil
 }
 

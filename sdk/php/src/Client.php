@@ -7,6 +7,7 @@ namespace Zaptura;
 use GuzzleHttp\ClientInterface;
 use Zaptura\Exceptions\ZapturaException;
 use Zaptura\Http\HttpExecutor;
+use Zaptura\Resources\AutomationResource;
 use Zaptura\Resources\CatalogResource;
 use Zaptura\Resources\CallsResource;
 use Zaptura\Resources\MediaResource;
@@ -69,6 +70,7 @@ class Client
     public ProfileResource $profile;
     public CallsResource $calls;
     public MediaResource $media;
+    public AutomationResource $automation;
 
     /**
      * @param array{
@@ -116,6 +118,7 @@ class Client
         $this->profile = new ProfileResource($this->http);
         $this->calls = new CallsResource($this->http);
         $this->media = new MediaResource($this->http);
+        $this->automation = new AutomationResource($this->http);
     }
 
     /**

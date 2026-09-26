@@ -17,6 +17,7 @@ import com.asmsafone.zaptura.http.HttpRequestData;
 import com.asmsafone.zaptura.http.HttpResponseData;
 import com.asmsafone.zaptura.http.HttpTransport;
 import com.asmsafone.zaptura.model.AuthValidateResponse;
+import com.asmsafone.zaptura.resources.AutomationResource;
 import com.asmsafone.zaptura.resources.CallsResource;
 import com.asmsafone.zaptura.resources.MediaResource;
 import com.asmsafone.zaptura.resources.CatalogResource;
@@ -84,6 +85,7 @@ public final class ZapturaClient {
     public final ProfileResource profile = new ProfileResource(this);
     public final CallsResource calls = new CallsResource(this);
     public final MediaResource media = new MediaResource(this);
+    public final AutomationResource automation = new AutomationResource(this);
 
     public ZapturaClient(ClientConfig config) {
         // ClientConfig's constructor validates baseUrl/apiKey/timeout, so config is already sound here.

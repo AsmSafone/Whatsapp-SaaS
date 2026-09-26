@@ -975,3 +975,52 @@ class TestChannelAdminOwnership:
         client.channels.transfer_ownership("s", "c@newsletter", {"newOwnerId": "b@c.us"})
         assert backend.calls[-1].url.endswith("/channels/c@newsletter/owner/transfer")
         assert backend.calls[-1].body == {"newOwnerId": "b@c.us"}
+
+
+class TestAutomationResource:
+    def test_list_get_create_update_delete(self):
+        sample = {
+            "id": "rule_1",
+            "sessionId": "s",
+            "name": "Auto Reply",
+            "enabled": True,
+            "conditions": None,
+            "replyText": "Hello",
+            "cooldownSeconds": 60,
+            "createdAt": "2026-09-26T00:00:00.000Z",
+            "updatedAt": "2026-09-26T00:00:00.000Z",
+        }
+        backend = MockBackend()
+        backend.on("GET", "/automation-rules", body=[sample])
+        backend.on("GET", "/automation-rules/rule_1", body=sample)
+        backend.on("POST", "/automation-rules", status=201, body=sample)
+        backend.on("PUT", "/automation-rules/rule_1", body={**sample, "replyText": "Updated"})
+        backend.on("DELETE", "/automation-rules/rule_1", status=204)
+        client = make_client(backend)
+
+        rules = client.automation.list("s")
+        assert backend.calls[-1].method == "GET"
+        assert backend.calls[-1].url.endswith("/sessions/s/automation-rules")
+        assert rules == [sample]
+
+        rule = client.automation.get("s", "rule_1")
+        assert backend.calls[-1].method == "GET"
+        assert backend.calls[-1].url.endswith("/sessions/s/automation-rules/rule_1")
+        assert rule == sample
+
+        created = client.automation.create("s", {"name": "Auto Reply", "replyText": "Hello"})
+        assert backend.calls[-1].method == "POST"
+        assert backend.calls[-1].url.endswith("/sessions/s/automation-rules")
+        assert backend.calls[-1].body == {"name": "Auto Reply", "replyText": "Hello"}
+        assert created == sample
+
+        updated = client.automation.update("s", "rule_1", {"replyText": "Updated"})
+        assert backend.calls[-1].method == "PUT"
+        assert backend.calls[-1].url.endswith("/sessions/s/automation-rules/rule_1")
+        assert backend.calls[-1].body == {"replyText": "Updated"}
+        assert updated["replyText"] == "Updated"
+
+        client.automation.delete("s", "rule_1")
+        assert backend.calls[-1].method == "DELETE"
+        assert backend.calls[-1].url.endswith("/sessions/s/automation-rules/rule_1")
+

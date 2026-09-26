@@ -32,6 +32,7 @@ import httpx
 
 from ._http import HttpExecutor, HttpMethod
 from .resources import (
+    AutomationResource,
     CallsResource,
     MediaResource,
     CatalogResource,
@@ -163,6 +164,10 @@ class ZapturaClient:
     @property
     def media(self) -> MediaResource:
         return MediaResource(self._http)
+
+    @property
+    def automation(self) -> AutomationResource:
+        return AutomationResource(self._http)
 
     # ── Auth ─────────────────────────────────────────────────────────
 

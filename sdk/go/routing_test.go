@@ -169,6 +169,12 @@ func TestRouting(t *testing.T) {
 
 		{"Calls.RejectCall", func(c *Client) { c.Calls.RejectCall(ctx, "s1", "call1") }, "POST", "/api/sessions/s1/calls/call1/reject"},
 		{"Calls.CreateLink", func(c *Client) { c.Calls.CreateLink(ctx, "s1", CreateCallLinkRequest{}) }, "POST", "/api/sessions/s1/calls/link"},
+
+		{"Automation.List", func(c *Client) { c.Automation.List(ctx, "s1") }, "GET", "/api/sessions/s1/automation-rules"},
+		{"Automation.Get", func(c *Client) { c.Automation.Get(ctx, "s1", "r1") }, "GET", "/api/sessions/s1/automation-rules/r1"},
+		{"Automation.Create", func(c *Client) { c.Automation.Create(ctx, "s1", CreateAutomationRuleRequest{}) }, "POST", "/api/sessions/s1/automation-rules"},
+		{"Automation.Update", func(c *Client) { c.Automation.Update(ctx, "s1", "r1", UpdateAutomationRuleRequest{}) }, "PUT", "/api/sessions/s1/automation-rules/r1"},
+		{"Automation.Delete", func(c *Client) { c.Automation.Delete(ctx, "s1", "r1") }, "DELETE", "/api/sessions/s1/automation-rules/r1"},
 	}
 
 	for _, tc := range cases {

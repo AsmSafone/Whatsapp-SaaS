@@ -1434,3 +1434,41 @@ class MediaConversionAvailability(TypedDict, total=False):
     """Whether server-side conversion can be used on this deployment."""
 
     available: bool
+
+
+class AutomationRule(TypedDict):
+    """Autoreply automation rule matching inbound messages.
+
+    Backed by ``src/modules/automation/dto/automation-rule.dto.ts``.
+    """
+
+    id: str
+    sessionId: str
+    name: str
+    enabled: bool
+    conditions: WebhookFilters | None
+    replyText: str
+    cooldownSeconds: int
+    createdAt: str
+    updatedAt: str
+
+
+class CreateAutomationRuleRequest(TypedDict):
+    """Payload for creating an automation rule."""
+
+    name: str
+    replyText: str
+    conditions: NotRequired[WebhookFilters | None]
+    cooldownSeconds: NotRequired[int]
+    enabled: NotRequired[bool]
+
+
+class UpdateAutomationRuleRequest(TypedDict, total=False):
+    """Payload for updating an automation rule."""
+
+    name: str
+    replyText: str
+    conditions: WebhookFilters | None
+    cooldownSeconds: int
+    enabled: bool
+

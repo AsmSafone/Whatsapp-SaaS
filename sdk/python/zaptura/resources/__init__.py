@@ -6,6 +6,7 @@ API path group. They are constructed by :class:`zaptura.client.ZapturaClient`.
 
 from __future__ import annotations
 
+from .automation import AutomationResource
 from .calls import CallsResource
 from .catalog import CatalogResource
 from .channels import ChannelsResource
@@ -24,6 +25,7 @@ from .templates import TemplatesResource
 from .webhooks import WebhooksResource
 
 __all__ = [
+    "AutomationResource",
     "CallsResource",
     "CatalogResource",
     "ChannelsResource",

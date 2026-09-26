@@ -24,6 +24,7 @@
  */
 
 import { request, requestBytes, encodeSegment, warnIfInsecureHttpUrl, type BinaryResponse, type ClientConfig, type FetchLike, type RequestOptions } from './http.js';
+import { AutomationResource } from './resources/automation.js';
 import { CallsResource } from './resources/calls.js';
 import { MediaResource } from './resources/media.js';
 import { CatalogResource } from './resources/catalog.js';
@@ -91,6 +92,7 @@ export class ZapturaClient {
   readonly profile = new ProfileResource(this);
   readonly calls = new CallsResource(this);
   readonly media = new MediaResource(this);
+  readonly automation = new AutomationResource(this);
 
   // ── Auth ─────────────────────────────────────────────────────────
 
